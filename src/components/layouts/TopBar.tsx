@@ -15,8 +15,8 @@ export function TopBar() {
   const navigate = useNavigate();
   const unreadCount = mockNotifications.filter(n => !n.read).length;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 

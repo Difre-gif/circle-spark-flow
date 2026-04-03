@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Auth pages
 import Login from "@/pages/auth/Login";
@@ -42,11 +43,20 @@ import TenantPaymentHistory from "@/pages/tenant/TenantPaymentHistory";
 import TenantProfile from "@/pages/tenant/TenantProfile";
 
 import NotFound from "./pages/NotFound";
+import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 function AppRoutes() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <Routes>
@@ -64,7 +74,11 @@ function AppRoutes() {
       } />
 
       {/* Landlord portal */}
-      <Route path="/landlord" element={isAuthenticated ? <LandlordLayout /> : <Navigate to="/login" replace />}>
+      <Route path="/landlord" element={
+        <ProtectedRoute allowedRoles={['OWNER', 'MANAGER', 'ACCOUNTANT']}>
+          <LandlordLayout />
+        </ProtectedRoute>
+      }>
         <Route index element={<LandlordDashboard />} />
         <Route path="properties" element={<Properties />} />
         <Route path="properties/:id" element={<PropertyDetail />} />
@@ -84,7 +98,11 @@ function AppRoutes() {
       </Route>
 
       {/* Tenant portal */}
-      <Route path="/tenant" element={isAuthenticated ? <TenantLayout /> : <Navigate to="/login" replace />}>
+      <Route path="/tenant" element={
+        <ProtectedRoute allowedRoles={['TENANT']}>
+          <TenantLayout />
+        </ProtectedRoute>
+      }>
         <Route index element={<TenantDashboard />} />
         <Route path="invoices" element={<TenantInvoices />} />
         <Route path="invoices/:id" element={<TenantInvoiceDetail />} />
