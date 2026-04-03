@@ -6,26 +6,32 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+
+  // If already authenticated, redirect
+  if (isAuthenticated && user) {
+    const target = user.role === 'tenant' ? '/tenant' : '/landlord';
+    navigate(target, { replace: true });
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const success = await login(email, password);
+    setError(null);
+    const result = await login(email, password);
     setLoading(false);
-    if (success) {
-      if (email.includes('tenant') || email === 'alice@gmail.com') {
-        navigate('/tenant');
-      } else {
-        navigate('/landlord');
-      }
+    if (result.error) {
+      setError(result.error);
     }
+    // Redirect is handled by AuthContext + onAuthStateChange
   };
 
   return (
@@ -42,6 +48,11 @@ export default function Login() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
@@ -61,12 +72,6 @@ export default function Login() {
             <p className="text-sm text-muted-foreground">
               Don't have an account? <Link to="/register" className="text-primary hover:underline">Sign up</Link>
             </p>
-            <div className="text-xs text-muted-foreground text-center mt-2 p-3 rounded-md bg-muted">
-              <p className="font-medium mb-1">Demo Credentials</p>
-              <p>Landlord: any email → <strong>jp@bizrent.rw</strong></p>
-              <p>Tenant: <strong>alice@gmail.com</strong></p>
-              <p className="mt-1 italic">Any password works</p>
-            </div>
           </CardFooter>
         </form>
       </Card>
