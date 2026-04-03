@@ -30,7 +30,7 @@ export function TenantLayout() {
         <BizRentLogo variant="full" size="sm" className="text-primary" />
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground hidden sm:block">{user?.name}</span>
-          <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/login'); }}>
+          <Button variant="ghost" size="icon" onClick={async () => { await logout(); navigate('/login'); }}>
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
