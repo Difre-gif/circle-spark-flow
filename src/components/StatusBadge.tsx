@@ -1,10 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-type StatusType = 'PAID' | 'DUE' | 'PARTIAL' | 'OVERDUE' | 'PENDING' | 'APPROVED' | 'REJECTED' |
-  'ACTIVE' | 'INACTIVE' | 'VACANT' | 'OCCUPIED' | 'MAINTENANCE' | 'TERMINATED' | 'UPCOMING' |
-  'CURRENT' | 'LATE' | 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'INVITED' |
-  'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | 'OWNER' | 'MANAGER' | 'ACCOUNTANT';
+type StatusType = string;
 
 const statusStyles: Record<string, string> = {
   PAID: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
