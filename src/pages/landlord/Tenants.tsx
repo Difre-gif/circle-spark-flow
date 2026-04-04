@@ -1,24 +1,27 @@
 import { useState } from 'react';
-import { UserPlus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
-import { mockTenants, formatDate } from '@/data/mockData';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { useTenants, formatDate } from '@/hooks/useSupabaseData';
 
 export default function Tenants() {
+  const { data: tenants, isLoading } = useTenants();
   const [search, setSearch] = useState('');
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const filtered = mockTenants.filter(t => t.name.toLowerCase().includes(search.toLowerCase()) || t.email.toLowerCase().includes(search.toLowerCase()));
+
+  const filtered = (tenants ?? []).filter(t => {
+    const user = t.user as any;
+    return user?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+           user?.email?.toLowerCase().includes(search.toLowerCase());
+  });
+
+  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">Tenants</h1><p className="text-muted-foreground">{mockTenants.length} tenants</p></div>
-        <Button onClick={() => setDialogOpen(true)}><UserPlus className="mr-2 h-4 w-4" /> Invite Tenant</Button>
+      <div>
+        <h1 className="text-2xl font-bold">Tenants</h1>
+        <p className="text-muted-foreground">{tenants?.length ?? 0} tenants</p>
       </div>
       <Input placeholder="Search tenants..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
       <Card>
@@ -26,37 +29,26 @@ export default function Tenants() {
           <Table>
             <TableHeader>
               <TableRow className="bg-primary/5">
-                <TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Phone</TableHead><TableHead>Unit</TableHead><TableHead>Property</TableHead><TableHead>Payment</TableHead><TableHead>Joined</TableHead>
+                <TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Phone</TableHead><TableHead>Joined</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map(t => (
-                <TableRow key={t.id}>
-                  <TableCell className="font-medium">{t.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{t.email}</TableCell>
-                  <TableCell>{t.phone}</TableCell>
-                  <TableCell>{t.unitNumber || '—'}</TableCell>
-                  <TableCell>{t.propertyName || '—'}</TableCell>
-                  <TableCell><StatusBadge status={t.paymentStatus} /></TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{formatDate(t.joinedAt)}</TableCell>
-                </TableRow>
-              ))}
+              {filtered.map(t => {
+                const user = t.user as any;
+                return (
+                  <TableRow key={t.user_id}>
+                    <TableCell className="font-medium">{user?.full_name ?? '—'}</TableCell>
+                    <TableCell className="text-muted-foreground">{user?.email ?? '—'}</TableCell>
+                    <TableCell>{user?.phone ?? '—'}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{formatDate(t.created_at)}</TableCell>
+                  </TableRow>
+                );
+              })}
+              {filtered.length === 0 && <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No tenants found</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Invite Tenant</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2"><Label>Full Name</Label><Input placeholder="Jane Doe" /></div>
-            <div className="space-y-2"><Label>Email</Label><Input type="email" placeholder="tenant@example.com" /></div>
-            <div className="space-y-2"><Label>Phone</Label><Input placeholder="+250 788 000 000" /></div>
-          </div>
-          <DialogFooter><Button onClick={() => setDialogOpen(false)}>Send Invite</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

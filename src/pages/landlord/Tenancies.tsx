@@ -1,22 +1,19 @@
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
-import { mockTenancies, formatRWF, formatDate } from '@/data/mockData';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useTenancies, formatRWF, formatDate } from '@/hooks/useSupabaseData';
 
 export default function Tenancies() {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { data: tenancies, isLoading } = useTenancies();
+
+  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">Tenancies</h1><p className="text-muted-foreground">{mockTenancies.length} lease agreements</p></div>
-        <Button onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" /> New Tenancy</Button>
+      <div>
+        <h1 className="text-2xl font-bold">Tenancies</h1>
+        <p className="text-muted-foreground">{tenancies?.length ?? 0} lease agreements</p>
       </div>
       <Card>
         <CardContent className="p-0">
@@ -27,37 +24,22 @@ export default function Tenancies() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockTenancies.map(t => (
+              {(tenancies ?? []).map(t => (
                 <TableRow key={t.id}>
-                  <TableCell className="font-medium">{t.tenantName}</TableCell>
-                  <TableCell>{t.unitNumber}</TableCell>
-                  <TableCell>{t.propertyName}</TableCell>
-                  <TableCell className="text-sm">{formatDate(t.startDate)}</TableCell>
-                  <TableCell>{formatRWF(t.agreedRent)}</TableCell>
-                  <TableCell>{formatRWF(t.deposit)}</TableCell>
+                  <TableCell className="font-medium">{(t.tenant as any)?.full_name ?? '—'}</TableCell>
+                  <TableCell>{(t.unit as any)?.unit_number ?? '—'}</TableCell>
+                  <TableCell>{(t.unit as any)?.property?.name ?? '—'}</TableCell>
+                  <TableCell className="text-sm">{formatDate(t.start_date)}</TableCell>
+                  <TableCell>{formatRWF(t.agreed_rent)}</TableCell>
+                  <TableCell>{formatRWF(t.deposit_amount)}</TableCell>
                   <TableCell><StatusBadge status={t.status} /></TableCell>
                 </TableRow>
               ))}
+              {(!tenancies || tenancies.length === 0) && <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No tenancies found</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>New Tenancy Agreement</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2"><Label>Tenant</Label><Input placeholder="Select tenant" /></div>
-            <div className="space-y-2"><Label>Unit</Label><Input placeholder="Select unit" /></div>
-            <div className="space-y-2"><Label>Start Date</Label><Input type="date" /></div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Monthly Rent (RWF)</Label><Input type="number" placeholder="300000" /></div>
-              <div className="space-y-2"><Label>Deposit (RWF)</Label><Input type="number" placeholder="300000" /></div>
-            </div>
-          </div>
-          <DialogFooter><Button onClick={() => setDialogOpen(false)}>Create Tenancy</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
