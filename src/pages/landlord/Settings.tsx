@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -5,9 +7,22 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { StatusBadge } from '@/components/StatusBadge';
-import { mockOrganisation } from '@/data/mockData';
+import { useOrganisation, useUpdateOrganisation, useSubscription } from '@/hooks/useSupabaseData';
 
 export default function Settings() {
+  const { data: org, isLoading: orgLoading } = useOrganisation();
+  const { data: subscription } = useSubscription();
+  const updateOrg = useUpdateOrganisation();
+  const [form, setForm] = useState<{ name: string; email: string; phone: string } | null>(null);
+
+  if (orgLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+
+  const currentForm = form ?? { name: org?.name ?? '', email: org?.email ?? '', phone: org?.phone ?? '' };
+
+  const handleSave = () => {
+    updateOrg.mutate(currentForm);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -19,14 +34,12 @@ export default function Settings() {
         <CardHeader><CardTitle>Organisation Profile</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2"><Label>Organisation Name</Label><Input defaultValue={mockOrganisation.name} /></div>
-            <div className="space-y-2"><Label>Email</Label><Input defaultValue={mockOrganisation.email} /></div>
-            <div className="space-y-2"><Label>Phone</Label><Input defaultValue={mockOrganisation.phone} /></div>
-            <div className="space-y-2"><Label>Address</Label><Input defaultValue={mockOrganisation.address} /></div>
-            <div className="space-y-2"><Label>City</Label><Input defaultValue={mockOrganisation.city} /></div>
-            <div className="space-y-2"><Label>Country</Label><Input defaultValue={mockOrganisation.country} /></div>
+            <div className="space-y-2"><Label>Organisation Name</Label><Input value={currentForm.name} onChange={e => setForm({ ...currentForm, name: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Email</Label><Input value={currentForm.email} onChange={e => setForm({ ...currentForm, email: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Phone</Label><Input value={currentForm.phone} onChange={e => setForm({ ...currentForm, phone: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Country</Label><Input value={org?.country_code ?? 'RW'} disabled /></div>
           </div>
-          <Button>Save Changes</Button>
+          <Button onClick={handleSave} disabled={updateOrg.isPending}>{updateOrg.isPending ? 'Saving...' : 'Save Changes'}</Button>
         </CardContent>
       </Card>
 
@@ -34,19 +47,26 @@ export default function Settings() {
         <CardHeader><CardTitle>Subscription</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Current Plan</span>
-            <StatusBadge status="ACTIVE" className="text-sm" />
+            <span className="text-muted-foreground">Status</span>
+            <StatusBadge status={org?.subscription_status ?? 'TRIAL'} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Tier</span>
-            <span className="font-bold text-lg">{mockOrganisation.subscriptionTier}</span>
+            <span className="font-bold text-lg">{subscription?.tier ?? org?.subscription_status ?? '—'}</span>
           </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Properties Allowed</span>
-            <span>Unlimited</span>
-          </div>
+          {subscription?.tier_details && <>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Max Properties</span>
+              <span>{(subscription.tier_details as any)?.max_properties ?? '—'}</span>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Max Units</span>
+              <span>{(subscription.tier_details as any)?.max_units ?? '—'}</span>
+            </div>
+          </>}
           <Button variant="outline" className="mt-4">Upgrade Plan</Button>
         </CardContent>
       </Card>
@@ -62,11 +82,6 @@ export default function Settings() {
           <div className="flex items-center justify-between">
             <div><p className="font-medium">Overdue Invoices</p><p className="text-sm text-muted-foreground">Alert when invoices become overdue</p></div>
             <Switch defaultChecked />
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div><p className="font-medium">SMS Notifications</p><p className="text-sm text-muted-foreground">Receive important alerts via SMS</p></div>
-            <Switch />
           </div>
         </CardContent>
       </Card>

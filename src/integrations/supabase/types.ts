@@ -1363,6 +1363,7 @@ export type Database = {
         Args: { p_org_id: string; p_role: string; p_user_id: string }
         Returns: undefined
       }
+      set_request_context: { Args: never; Returns: undefined }
     }
     Enums: {
       billing_cycle_enum: "MONTHLY" | "ANNUAL"

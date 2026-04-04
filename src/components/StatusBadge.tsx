@@ -1,10 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-type StatusType = 'PAID' | 'DUE' | 'PARTIAL' | 'OVERDUE' | 'PENDING' | 'APPROVED' | 'REJECTED' |
-  'ACTIVE' | 'INACTIVE' | 'VACANT' | 'OCCUPIED' | 'MAINTENANCE' | 'TERMINATED' | 'UPCOMING' |
-  'CURRENT' | 'LATE' | 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'INVITED' |
-  'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | 'OWNER' | 'MANAGER' | 'ACCOUNTANT';
+type StatusType = string;
 
 const statusStyles: Record<string, string> = {
   PAID: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
@@ -34,6 +31,13 @@ const statusStyles: Record<string, string> = {
   OWNER: 'bg-bizrent-navy text-primary-foreground',
   MANAGER: 'bg-bizrent-blue text-primary-foreground',
   ACCOUNTANT: 'bg-bizrent-forest text-primary-foreground',
+  AUTO_APPROVED: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
+  CANCELLED: 'bg-muted text-muted-foreground',
+  EXPIRED: 'bg-muted text-muted-foreground',
+  TRIAL: 'bg-bizrent-blue text-primary-foreground',
+  LAPSED: 'bg-bizrent-amber text-primary-foreground',
+  TENANT: 'bg-bizrent-blue text-primary-foreground',
+  SUPER_ADMIN: 'bg-bizrent-navy text-primary-foreground',
 };
 
 interface StatusBadgeProps {

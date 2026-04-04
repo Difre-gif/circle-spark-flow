@@ -4,15 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
-import { mockPayments, formatRWF, formatDate } from '@/data/mockData';
-import { CheckCircle, XCircle, Eye, CreditCard } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, CreditCard, Loader2 } from 'lucide-react';
 import { StatCard } from '@/components/StatCard';
+import { usePayments, formatRWF, formatDate } from '@/hooks/useSupabaseData';
 
 export default function PendingPayments() {
   const navigate = useNavigate();
-  const pendingPayments = mockPayments.filter(p => p.status === 'PENDING');
-  const approvedCount = mockPayments.filter(p => p.status === 'APPROVED').length;
-  const rejectedCount = mockPayments.filter(p => p.status === 'REJECTED').length;
+  const { data: allPayments, isLoading } = usePayments();
+  const pendingPayments = (allPayments ?? []).filter(p => p.status === 'PENDING');
+  const approvedCount = (allPayments ?? []).filter(p => p.status === 'APPROVED' || p.status === 'AUTO_APPROVED').length;
+  const rejectedCount = (allPayments ?? []).filter(p => p.status === 'REJECTED').length;
+
+  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-6">
@@ -34,19 +37,18 @@ export default function PendingPayments() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-bizrent-amber/10">
-                  <TableHead>Tenant</TableHead><TableHead>Unit</TableHead><TableHead>Invoice</TableHead><TableHead>Amount</TableHead><TableHead>Transaction ID</TableHead><TableHead>Provider</TableHead><TableHead>Submitted</TableHead><TableHead>Actions</TableHead>
+                  <TableHead>Tenant</TableHead><TableHead>Invoice</TableHead><TableHead>Amount</TableHead><TableHead>Transaction ID</TableHead><TableHead>Method</TableHead><TableHead>Submitted</TableHead><TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {pendingPayments.map(p => (
                   <TableRow key={p.id}>
-                    <TableCell className="font-medium">{p.tenantName}</TableCell>
-                    <TableCell>{p.unitNumber}</TableCell>
-                    <TableCell className="text-primary">{p.invoiceNumber}</TableCell>
+                    <TableCell className="font-medium">{(p.tenant as any)?.full_name ?? '—'}</TableCell>
+                    <TableCell className="text-primary">{(p.invoice as any)?.invoice_number ?? '—'}</TableCell>
                     <TableCell className="font-semibold">{formatRWF(p.amount)}</TableCell>
-                    <TableCell className="font-mono text-sm">{p.transactionId}</TableCell>
-                    <TableCell>{p.provider.replace('_', ' ')}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(p.submittedAt)}</TableCell>
+                    <TableCell className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
+                    <TableCell>{p.payment_method?.replace('_', ' ')}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{formatDate(p.submitted_at)}</TableCell>
                     <TableCell>
                       <Button size="sm" variant="outline" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
                         <Eye className="mr-1 h-3 w-3" /> Review
@@ -68,7 +70,6 @@ export default function PendingPayments() {
         </Card>
       )}
 
-      {/* All Payments Table */}
       <Card>
         <CardHeader><CardTitle className="text-lg">All Payments</CardTitle></CardHeader>
         <CardContent className="p-0">
@@ -79,15 +80,18 @@ export default function PendingPayments() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockPayments.map(p => (
+              {(allPayments ?? []).map(p => (
                 <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
-                  <TableCell className="font-medium">{p.tenantName}</TableCell>
+                  <TableCell className="font-medium">{(p.tenant as any)?.full_name ?? '—'}</TableCell>
                   <TableCell>{formatRWF(p.amount)}</TableCell>
-                  <TableCell className="font-mono text-sm">{p.transactionId}</TableCell>
+                  <TableCell className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
                   <TableCell><StatusBadge status={p.status} /></TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDate(p.submittedAt)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{formatDate(p.submitted_at)}</TableCell>
                 </TableRow>
               ))}
+              {(!allPayments || allPayments.length === 0) && (
+                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No payments yet</TableCell></TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
