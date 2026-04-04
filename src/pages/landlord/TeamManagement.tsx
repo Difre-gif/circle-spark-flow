@@ -1,23 +1,19 @@
-import { useState } from 'react';
-import { UserPlus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
-import { mockTeamMembers, formatDate } from '@/data/mockData';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTeamMembers, formatDate } from '@/hooks/useSupabaseData';
 
 export default function TeamManagement() {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { data: members, isLoading } = useTeamMembers();
+
+  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">Team Management</h1><p className="text-muted-foreground">Manage your organisation's team members and roles</p></div>
-        <Button onClick={() => setDialogOpen(true)}><UserPlus className="mr-2 h-4 w-4" /> Invite Member</Button>
+      <div>
+        <h1 className="text-2xl font-bold">Team Management</h1>
+        <p className="text-muted-foreground">Manage your organisation's team members and roles</p>
       </div>
 
       <Card>
@@ -25,19 +21,19 @@ export default function TeamManagement() {
           <Table>
             <TableHeader>
               <TableRow className="bg-primary/5">
-                <TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Role</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead>
+                <TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Role</TableHead><TableHead>Joined</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockTeamMembers.map(m => (
+              {(members ?? []).map(m => (
                 <TableRow key={m.id}>
-                  <TableCell className="font-medium">{m.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{m.email}</TableCell>
+                  <TableCell className="font-medium">{(m.user as any)?.full_name ?? '—'}</TableCell>
+                  <TableCell className="text-muted-foreground">{(m.user as any)?.email ?? '—'}</TableCell>
                   <TableCell><StatusBadge status={m.role} /></TableCell>
-                  <TableCell><StatusBadge status={m.status} /></TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDate(m.joinedAt)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{formatDate(m.created_at)}</TableCell>
                 </TableRow>
               ))}
+              {(!members || members.length === 0) && <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No team members</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>
@@ -53,22 +49,6 @@ export default function TeamManagement() {
           </div>
         </CardContent>
       </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Invite Team Member</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2"><Label>Name</Label><Input placeholder="Full name" /></div>
-            <div className="space-y-2"><Label>Email</Label><Input type="email" placeholder="team@example.com" /></div>
-            <div className="space-y-2"><Label>Role</Label>
-              <Select><SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
-                <SelectContent><SelectItem value="MANAGER">Manager</SelectItem><SelectItem value="ACCOUNTANT">Accountant</SelectItem></SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter><Button onClick={() => setDialogOpen(false)}>Send Invitation</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

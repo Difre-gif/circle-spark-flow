@@ -1,23 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Separator } from '@/components/ui/separator';
-import { mockPayments, formatRWF, formatDate } from '@/data/mockData';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { usePayment, useApprovePayment, useRejectPayment, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const payment = mockPayments.find(p => p.id === id);
+  const { data: payment, isLoading } = usePayment(id);
+  const approvePayment = useApprovePayment();
+  const rejectPayment = useRejectPayment();
   const [rejectOpen, setRejectOpen] = useState(false);
   const [reason, setReason] = useState('');
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (payment?.proof) {
+      const proof = payment.proof as any;
+      if (proof?.file_path && proof?.bucket) {
+        supabase.storage
+          .from(proof.bucket)
+          .createSignedUrl(proof.file_path, 300)
+          .then(({ data }) => {
+            if (data?.signedUrl) setProofUrl(data.signedUrl);
+          });
+      }
+    }
+  }, [payment]);
+
+  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!payment) return <div className="text-center py-12 text-muted-foreground">Payment not found</div>;
+
+  const handleApprove = async () => {
+    await approvePayment.mutateAsync(payment.id);
+    navigate('/landlord/payments');
+  };
+
+  const handleReject = async () => {
+    if (!reason.trim()) return;
+    await rejectPayment.mutateAsync({ paymentId: payment.id, reason });
+    setRejectOpen(false);
+    navigate('/landlord/payments');
+  };
 
   return (
     <div className="space-y-6">
@@ -25,7 +56,7 @@ export default function PaymentDetail() {
         <Button variant="ghost" size="icon" onClick={() => navigate('/landlord/payments')}><ArrowLeft className="h-5 w-5" /></Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Payment Review</h1>
-          <p className="text-muted-foreground">{payment.transactionId}</p>
+          <p className="text-muted-foreground">{payment.transaction_id ?? '—'}</p>
         </div>
         <StatusBadge status={payment.status} />
       </div>
@@ -34,34 +65,30 @@ export default function PaymentDetail() {
         <Card>
           <CardHeader><CardTitle>Payment Details</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between"><span className="text-muted-foreground">Tenant</span><span className="font-medium">{payment.tenantName}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Tenant</span><span className="font-medium">{(payment.tenant as any)?.full_name ?? '—'}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Unit</span><span>{payment.unitNumber}</span></div>
-            <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Property</span><span>{payment.propertyName}</span></div>
-            <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Invoice</span><span className="text-primary font-medium">{payment.invoiceNumber}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Invoice</span><span className="text-primary font-medium">{(payment.invoice as any)?.invoice_number ?? '—'}</span></div>
             <Separator />
             <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="text-xl font-bold">{formatRWF(payment.amount)}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Provider</span><span>{payment.provider.replace('_', ' ')}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Method</span><span>{payment.payment_method?.replace('_', ' ')}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Transaction ID</span><span className="font-mono">{payment.transactionId}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Transaction ID</span><span className="font-mono">{payment.transaction_id ?? '—'}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Submitted</span><span>{formatDate(payment.submittedAt)}</span></div>
-            {payment.reviewedAt && <>
+            <div className="flex justify-between"><span className="text-muted-foreground">Submitted</span><span>{formatDate(payment.submitted_at)}</span></div>
+            {payment.reviewed_at && <>
               <Separator />
-              <div className="flex justify-between"><span className="text-muted-foreground">Reviewed</span><span>{formatDate(payment.reviewedAt)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Reviewed</span><span>{formatDate(payment.reviewed_at)}</span></div>
             </>}
-            {payment.reviewedBy && <>
+            {payment.reviewer && <>
               <Separator />
-              <div className="flex justify-between"><span className="text-muted-foreground">Reviewed By</span><span>{payment.reviewedBy}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Reviewed By</span><span>{(payment.reviewer as any)?.full_name ?? '—'}</span></div>
             </>}
-            {payment.rejectionReason && <>
+            {payment.rejection_reason && <>
               <Separator />
               <div>
                 <p className="text-muted-foreground text-sm mb-1">Rejection Reason</p>
-                <p className="text-sm bg-destructive/10 text-destructive rounded-md p-3">{payment.rejectionReason}</p>
+                <p className="text-sm bg-destructive/10 text-destructive rounded-md p-3">{payment.rejection_reason}</p>
               </div>
             </>}
           </CardContent>
@@ -70,23 +97,27 @@ export default function PaymentDetail() {
         <Card>
           <CardHeader><CardTitle>Payment Proof</CardTitle></CardHeader>
           <CardContent>
-            <div className="aspect-[3/4] rounded-lg bg-muted flex items-center justify-center border-2 border-dashed border-border">
-              <div className="text-center text-muted-foreground">
-                <p className="text-sm">MoMo Screenshot</p>
-                <p className="text-xs mt-1">Transaction confirmation image</p>
+            {proofUrl ? (
+              <img src={proofUrl} alt="Payment proof" className="rounded-lg border max-h-96 w-full object-contain" />
+            ) : (
+              <div className="aspect-[3/4] rounded-lg bg-muted flex items-center justify-center border-2 border-dashed border-border">
+                <div className="text-center text-muted-foreground">
+                  <p className="text-sm">No screenshot uploaded</p>
+                  <p className="text-xs mt-1">Proof image will appear here</p>
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       {payment.status === 'PENDING' && (
         <div className="flex gap-3 justify-end">
-          <Button variant="outline" className="text-bizrent-red border-bizrent-red hover:bg-bizrent-red/10" onClick={() => setRejectOpen(true)}>
+          <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive/10" onClick={() => setRejectOpen(true)}>
             <XCircle className="mr-2 h-4 w-4" /> Reject Payment
           </Button>
-          <Button className="bg-bizrent-emerald hover:bg-bizrent-emerald/90">
-            <CheckCircle className="mr-2 h-4 w-4" /> Approve Payment
+          <Button className="bg-bizrent-emerald hover:bg-bizrent-emerald/90" onClick={handleApprove} disabled={approvePayment.isPending}>
+            <CheckCircle className="mr-2 h-4 w-4" /> {approvePayment.isPending ? 'Approving...' : 'Approve Payment'}
           </Button>
         </div>
       )}
@@ -100,7 +131,9 @@ export default function PaymentDetail() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRejectOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => setRejectOpen(false)}>Reject</Button>
+            <Button variant="destructive" onClick={handleReject} disabled={rejectPayment.isPending || !reason.trim()}>
+              {rejectPayment.isPending ? 'Rejecting...' : 'Reject'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
