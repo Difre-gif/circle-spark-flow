@@ -31,6 +31,13 @@ const statusStyles: Record<string, string> = {
   OWNER: 'bg-bizrent-navy text-primary-foreground',
   MANAGER: 'bg-bizrent-blue text-primary-foreground',
   ACCOUNTANT: 'bg-bizrent-forest text-primary-foreground',
+  AUTO_APPROVED: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
+  CANCELLED: 'bg-muted text-muted-foreground',
+  EXPIRED: 'bg-muted text-muted-foreground',
+  TRIAL: 'bg-bizrent-blue text-primary-foreground',
+  LAPSED: 'bg-bizrent-amber text-primary-foreground',
+  TENANT: 'bg-bizrent-blue text-primary-foreground',
+  SUPER_ADMIN: 'bg-bizrent-navy text-primary-foreground',
 };
 
 interface StatusBadgeProps {
