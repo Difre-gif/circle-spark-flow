@@ -68,6 +68,92 @@ export type Database = {
           },
         ]
       }
+      email_verification_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token_hash: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          token_hash: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token_hash?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_verification_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      failed_notification_jobs: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          error_message: string | null
+          id: number
+          job_type: string
+          org_id: string | null
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          error_message?: string | null
+          id?: number
+          job_type: string
+          org_id?: string | null
+          payload: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          error_message?: string | null
+          id?: number
+          job_type?: string
+          org_id?: string | null
+          payload?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "failed_notification_jobs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "failed_notification_jobs_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       file_attachments: {
         Row: {
           bucket: string
@@ -131,9 +217,12 @@ export type Database = {
           generated_by: string
           id: string
           invoice_number: string
+          last_3day_reminder_sent_at: string | null
+          last_7day_reminder_sent_at: string | null
           notes: string | null
           org_id: string
           status: Database["public"]["Enums"]["invoice_status_enum"]
+          tax_reference: string | null
           tenancy_id: string
           tenant_user_id: string
           unit_id: string
@@ -149,10 +238,13 @@ export type Database = {
           due_date: string
           generated_by?: string
           id?: string
-          invoice_number: string
+          invoice_number?: string
+          last_3day_reminder_sent_at?: string | null
+          last_7day_reminder_sent_at?: string | null
           notes?: string | null
           org_id: string
           status?: Database["public"]["Enums"]["invoice_status_enum"]
+          tax_reference?: string | null
           tenancy_id: string
           tenant_user_id: string
           unit_id: string
@@ -169,9 +261,12 @@ export type Database = {
           generated_by?: string
           id?: string
           invoice_number?: string
+          last_3day_reminder_sent_at?: string | null
+          last_7day_reminder_sent_at?: string | null
           notes?: string | null
           org_id?: string
           status?: Database["public"]["Enums"]["invoice_status_enum"]
+          tax_reference?: string | null
           tenancy_id?: string
           tenant_user_id?: string
           unit_id?: string
@@ -273,6 +368,7 @@ export type Database = {
           email: string
           id: string
           is_active: boolean
+          momo_merchant_number: string | null
           name: string
           phone: string | null
           slug: string
@@ -288,6 +384,7 @@ export type Database = {
           email: string
           id?: string
           is_active?: boolean
+          momo_merchant_number?: string | null
           name: string
           phone?: string | null
           slug: string
@@ -303,6 +400,7 @@ export type Database = {
           email?: string
           id?: string
           is_active?: boolean
+          momo_merchant_number?: string | null
           name?: string
           phone?: string | null
           slug?: string
@@ -313,12 +411,51 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          ip_address: unknown
+          token_hash: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          ip_address?: unknown
+          token_hash: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          token_hash?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_reset_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
           created_at: string
           id: string
           invoice_id: string
+          is_automated: boolean
           org_id: string
           payment_method: Database["public"]["Enums"]["payment_method_enum"]
           proof_file_id: string | null
@@ -336,6 +473,7 @@ export type Database = {
           created_at?: string
           id?: string
           invoice_id: string
+          is_automated?: boolean
           org_id: string
           payment_method: Database["public"]["Enums"]["payment_method_enum"]
           proof_file_id?: string | null
@@ -353,6 +491,7 @@ export type Database = {
           created_at?: string
           id?: string
           invoice_id?: string
+          is_automated?: boolean
           org_id?: string
           payment_method?: Database["public"]["Enums"]["payment_method_enum"]
           proof_file_id?: string | null
@@ -372,6 +511,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "invoices"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "overdue_aging_report"
+            referencedColumns: ["invoice_id"]
           },
           {
             foreignKeyName: "payments_org_id_fkey"
@@ -459,6 +605,76 @@ export type Database = {
           },
         ]
       }
+      property_manager_assignments: {
+        Row: {
+          assigned_by: string
+          created_at: string
+          id: string
+          org_id: string
+          property_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_by: string
+          created_at?: string
+          id?: string
+          org_id: string
+          property_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string
+          created_at?: string
+          id?: string
+          org_id?: string
+          property_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_manager_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_manager_assignments_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_manager_assignments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "overdue_aging_report"
+            referencedColumns: ["property_id"]
+          },
+          {
+            foreignKeyName: "property_manager_assignments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_manager_assignments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "unit_occupancy_summary"
+            referencedColumns: ["property_id"]
+          },
+          {
+            foreignKeyName: "property_manager_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       receipts: {
         Row: {
           created_at: string
@@ -483,7 +699,7 @@ export type Database = {
           invoice_id: string
           org_id: string
           payment_id: string
-          receipt_number: string
+          receipt_number?: string
           tenant_user_id: string
         }
         Update: {
@@ -506,6 +722,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "invoices"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipts_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "overdue_aging_report"
+            referencedColumns: ["invoice_id"]
           },
           {
             foreignKeyName: "receipts_org_id_fkey"
@@ -574,6 +797,7 @@ export type Database = {
       subscription_tiers: {
         Row: {
           annual_price_rwf: number
+          created_at: string
           has_api_access: boolean
           has_kinyarwanda: boolean
           has_whatsapp: boolean
@@ -583,9 +807,11 @@ export type Database = {
           max_units: number
           monthly_price_rwf: number
           tier: Database["public"]["Enums"]["subscription_tier_enum"]
+          updated_at: string
         }
         Insert: {
           annual_price_rwf: number
+          created_at?: string
           has_api_access?: boolean
           has_kinyarwanda?: boolean
           has_whatsapp?: boolean
@@ -595,9 +821,11 @@ export type Database = {
           max_units: number
           monthly_price_rwf: number
           tier: Database["public"]["Enums"]["subscription_tier_enum"]
+          updated_at?: string
         }
         Update: {
           annual_price_rwf?: number
+          created_at?: string
           has_api_access?: boolean
           has_kinyarwanda?: boolean
           has_whatsapp?: boolean
@@ -607,6 +835,7 @@ export type Database = {
           max_units?: number
           monthly_price_rwf?: number
           tier?: Database["public"]["Enums"]["subscription_tier_enum"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -634,8 +863,8 @@ export type Database = {
           current_period_start?: string | null
           id?: string
           org_id: string
-          status: Database["public"]["Enums"]["subscription_status_enum"]
-          tier: Database["public"]["Enums"]["subscription_tier_enum"]
+          status?: Database["public"]["Enums"]["subscription_status_enum"]
+          tier?: Database["public"]["Enums"]["subscription_tier_enum"]
           trial_ends_at?: string | null
           updated_at?: string
         }
@@ -808,8 +1037,22 @@ export type Database = {
             foreignKeyName: "units_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "overdue_aging_report"
+            referencedColumns: ["property_id"]
+          },
+          {
+            foreignKeyName: "units_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "units_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "unit_occupancy_summary"
+            referencedColumns: ["property_id"]
           },
         ]
       }
@@ -919,12 +1162,207 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_dead_letters: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          event_type: string
+          id: string
+          last_error: string | null
+          org_id: string
+          payload: Json
+          subscription_id: string
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          event_type: string
+          id?: string
+          last_error?: string | null
+          org_id: string
+          payload: Json
+          subscription_id: string
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          event_type?: string
+          id?: string
+          last_error?: string | null
+          org_id?: string
+          payload?: Json
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_dead_letters_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "webhook_dead_letters_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_subscriptions: {
+        Row: {
+          created_at: string
+          events: string[]
+          failure_count: number
+          id: string
+          is_active: boolean
+          last_triggered_at: string | null
+          org_id: string
+          secret: string
+          status: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          events: string[]
+          failure_count?: number
+          id?: string
+          is_active?: boolean
+          last_triggered_at?: string | null
+          org_id: string
+          secret: string
+          status?: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          events?: string[]
+          failure_count?: number
+          id?: string
+          is_active?: boolean
+          last_triggered_at?: string | null
+          org_id?: string
+          secret?: string
+          status?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_subscriptions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      invoice_collection_summary: {
+        Row: {
+          collection_rate_pct: number | null
+          org_id: string | null
+          overdue_count: number | null
+          paid_count: number | null
+          partial_count: number | null
+          period: string | null
+          total_amount_due: number | null
+          total_amount_paid: number | null
+          total_invoices: number | null
+          total_outstanding: number | null
+          unpaid_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      overdue_aging_report: {
+        Row: {
+          aging_bucket: string | null
+          amount_due: number | null
+          amount_overdue: number | null
+          days_overdue: number | null
+          due_date: string | null
+          invoice_id: string | null
+          invoice_number: string | null
+          org_id: string | null
+          property_id: string | null
+          property_name: string | null
+          tenant_name: string | null
+          tenant_user_id: string | null
+          unit_id: string | null
+          unit_number: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_tenant_user_id_fkey"
+            columns: ["tenant_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unit_occupancy_summary: {
+        Row: {
+          maintenance_units: number | null
+          monthly_revenue_lost_vacancy: number | null
+          monthly_revenue_occupied: number | null
+          occupancy_rate_pct: number | null
+          occupied_units: number | null
+          org_id: string | null
+          property_id: string | null
+          property_name: string | null
+          property_type:
+            | Database["public"]["Enums"]["property_type_enum"]
+            | null
+          total_units: number | null
+          vacant_units: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "properties_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      generate_invoice_number: { Args: never; Returns: string }
+      generate_receipt_number: { Args: never; Returns: string }
+      get_current_org_id: { Args: never; Returns: string }
+      get_current_user_id: { Args: never; Returns: string }
+      set_org_context: {
+        Args: { p_org_id: string; p_role: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       billing_cycle_enum: "MONTHLY" | "ANNUAL"
@@ -937,8 +1375,8 @@ export type Database = {
         | "INVOICE_OVERDUE"
         | "RECEIPT_AVAILABLE"
         | "SUBSCRIPTION_EXPIRING"
-      payment_method_enum: "MOMO" | "BANK_TRANSFER"
-      payment_status_enum: "PENDING" | "APPROVED" | "REJECTED"
+      payment_method_enum: "MOMO" | "BANK_TRANSFER" | "MPESA"
+      payment_status_enum: "PENDING" | "APPROVED" | "REJECTED" | "AUTO_APPROVED"
       property_type_enum:
         | "APARTMENT"
         | "COMMERCIAL"
@@ -1101,8 +1539,8 @@ export const Constants = {
         "RECEIPT_AVAILABLE",
         "SUBSCRIPTION_EXPIRING",
       ],
-      payment_method_enum: ["MOMO", "BANK_TRANSFER"],
-      payment_status_enum: ["PENDING", "APPROVED", "REJECTED"],
+      payment_method_enum: ["MOMO", "BANK_TRANSFER", "MPESA"],
+      payment_status_enum: ["PENDING", "APPROVED", "REJECTED", "AUTO_APPROVED"],
       property_type_enum: [
         "APARTMENT",
         "COMMERCIAL",
