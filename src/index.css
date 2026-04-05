@@ -36,6 +36,16 @@
     --input: 214 32% 91%;
     --ring: 222 72% 33%;
 
+    /* Sidebar Variables - Customized to match BizRent Navy theme */
+    --sidebar-background: 222 72% 33%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 222 72% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 72% 25%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 72% 25%;
+    --sidebar-ring: 222 72% 48%;
+
     /* Increased radius for the pill-shape / bubbly aesthetic */
     --radius: 1rem;
 

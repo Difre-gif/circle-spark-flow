@@ -3,6 +3,7 @@ import { LandlordSidebar } from './LandlordSidebar';
 import { TopBar } from './TopBar';
 import { useSubscription } from '@/hooks/useSupabaseData';
 import { AlertTriangle } from 'lucide-react';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 function SubscriptionBanner() {
   const { data: subscription } = useSubscription();
@@ -31,17 +32,19 @@ function SubscriptionBanner() {
 
 export function LandlordLayout() {
   return (
-    <div className="min-h-screen flex bg-background font-sans overflow-hidden">
-      <LandlordSidebar />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <SubscriptionBanner />
-        <TopBar />
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-          <div className="max-w-[1600px] mx-auto">
-            <Outlet />
-          </div>
-        </main>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background font-sans overflow-hidden">
+        <LandlordSidebar />
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          <SubscriptionBanner />
+          <TopBar />
+          <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+            <div className="max-w-[1600px] mx-auto">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
