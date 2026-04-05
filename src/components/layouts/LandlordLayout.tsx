@@ -33,17 +33,15 @@ function SubscriptionBanner() {
 export function LandlordLayout() {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background font-sans overflow-hidden">
-        <LandlordSidebar />
-        <div className="flex-1 flex flex-col h-screen overflow-hidden">
-          <SubscriptionBanner />
-          <TopBar />
-          <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-            <div className="max-w-[1600px] mx-auto">
-              <Outlet />
-            </div>
-          </main>
-        </div>
+      <LandlordSidebar />
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background font-sans w-full">
+        <SubscriptionBanner />
+        <TopBar />
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+          <div className="max-w-[1600px] mx-auto">
+            <Outlet />
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );
