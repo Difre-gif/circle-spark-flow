@@ -9,6 +9,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export function TopBar() {
   const { user, logout } = useAuth();
@@ -24,16 +25,16 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-20 flex h-20 items-center justify-between px-4 md:px-8 bg-white/80 backdrop-blur-md border-b border-border/40">
-      {/* Left: Mobile Logo & Menu */}
-      <div className="md:hidden flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="md:hidden text-bizrent-navy">
-          <Menu className="h-5 w-5" />
-        </Button>
-        <BizRentLogo variant="icon" size="sm" className="text-bizrent-navy" />
+      {/* Left: Sidebar Toggle & Mobile Logo */}
+      <div className="flex items-center gap-3">
+        <SidebarTrigger className="h-10 w-10 rounded-xl bg-white border border-border/60 shadow-sm text-bizrent-navy hover:bg-slate-50 transition-all active:scale-95" />
+        <div className="md:hidden flex items-center gap-3">
+          <BizRentLogo variant="icon" size="sm" className="text-bizrent-navy" />
+        </div>
       </div>
 
-      {/* Center: Title / Breadcrumbs space (hidden on mobile) */}
-      <div className="hidden md:flex flex-1 items-center">
+      {/* Center: Breadcrumbs space (hidden on mobile) */}
+      <div className="hidden md:flex flex-1 items-center px-4">
         {/* Future breadcrumbs can go here */}
       </div>
 
