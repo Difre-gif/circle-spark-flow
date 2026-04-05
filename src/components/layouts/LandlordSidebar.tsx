@@ -56,22 +56,22 @@ function NavItem({ item }: any) {
         to={item.url}
         end={item.url === '/landlord'}
         className={({ isActive }) => cn(
-          "group relative flex items-center gap-3 pl-[64px] pr-4 py-2.5 text-[13px] transition-all rounded-r-full mr-2",
+          "group relative flex items-center gap-3 pl-[54px] pr-4 py-2 text-[12px] transition-all rounded-r-xl mr-4",
           isActive 
-            ? "text-bizrent-blue font-bold bg-bizrent-blue/5" 
-            : "text-muted-foreground font-medium hover:text-bizrent-navy hover:bg-muted/30"
+            ? "text-bizrent-blue font-semibold bg-bizrent-blue/[0.04]" 
+            : "text-muted-foreground font-medium hover:text-bizrent-navy hover:bg-muted/20"
         )}
       >
         {({ isActive }) => (
           <>
             {isActive && (
-              <div className="absolute left-[31px] top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-bizrent-blue z-10 shadow-[0_0_8px_rgba(30,64,175,0.4)]" />
+              <div className="absolute left-[31.5px] top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-bizrent-blue z-10 shadow-[0_0_10px_rgba(30,64,175,0.5)]" />
             )}
             
-            <span className="flex-1 truncate">{item.title}</span>
+            <span className="flex-1 truncate tracking-tight">{item.title}</span>
             
             {item.highlight && (
-              <span className="bg-[#ffcc00]/20 text-bizrent-navy text-[9px] px-1.5 py-0.5 rounded-md flex items-center font-bold uppercase tracking-wider shrink-0">
+              <span className="bg-[#ffcc00] text-bizrent-navy text-[8px] px-1.5 py-0.5 rounded-md flex items-center font-extrabold uppercase tracking-tighter shrink-0 shadow-sm border border-[#ffcc00]/50">
                 MoMo
               </span>
             )}
