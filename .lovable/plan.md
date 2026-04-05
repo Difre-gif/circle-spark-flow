@@ -1,135 +1,110 @@
 
 
-# BizRent Frontend Prototype — Full Implementation Plan
+# BizRent — System-Aligned Frontend Rebuild Plan
 
-## Overview
-Build a complete, polished frontend prototype for BizRent — East Africa's MoMo-First Property Management Platform. This covers ~30 screens across the Landlord Portal and Tenant Portal, using mock data, BizRent brand identity, and the uploaded dashboard reference as a visual guide.
+## Current State Assessment
 
-## Brand System (applied globally)
+The codebase is ~80% wired to Supabase already. The key issues to fix:
 
-| Token | Value |
-|-------|-------|
-| Navy (primary) | #1E3A8A |
-| Blue (interactive) | #1D4ED8 |
-| Emerald (approved) | #10B981 |
-| Forest (secondary) | #065F46 |
-| Amber (pending) | #F59E0B |
-| Red (rejected) | #DC2626 |
-| Slate (dark text) | #0F172A |
-| Light (background) | #F8FAFC |
-| Font | Inter (Google Fonts) — 700 headings, 400 body |
-| Border radius | 6px buttons, 8px cards |
+1. **TopBar still imports mockData** — `mockNotifications` used for bell badge count
+2. **Register page doesn't pass metadata** to `signUp()` — trigger creates broken `public.users` rows
+3. **Register inserts into `organisations` directly** — but RLS blocks INSERT for `organisations` (only SELECT/UPDATE allowed)
+4. **No subscription gating** — Add buttons work regardless of tier limits
+5. **No error handling utility** — errors show raw Supabase messages
+6. **Missing: audit_log inserts** on approve/reject, no notification polling with unread count
+7. **`balance` column is GENERATED** — current code tries to SET it directly in approve flow (will fail)
+8. **Types in `src/types/index.ts`** are stale mock types, not used by actual data hooks (hooks use Supabase auto-types). Harmless but messy.
+9. **Pending Payments** fetches ALL payments then filters client-side — should filter server-side with `.eq('status', 'PENDING')`
+10. **No file upload validation** (MIME magic bytes, 5MB limit)
 
-## Architecture
+## What's Already Working
 
-- **Routing**: React Router with two route groups — `/landlord/*` and `/tenant/*`, plus auth pages at root
-- **State**: Mock data via React context providers (no backend)
-- **Layout**: Shared sidebar layout for landlord, simple mobile-first layout for tenant
-- **Components**: Built on existing shadcn/ui, customised to BizRent brand
+- AuthContext with Supabase Auth, session persistence, role fetching
+- ProtectedRoute with role-based access
+- All CRUD hooks in `useSupabaseData.ts` (properties, units, tenancies, invoices, payments, receipts, notifications, audit logs, team, subscription)
+- All 30 pages exist and render with Supabase data
+- Brand tokens configured in Tailwind + CSS variables
 
-## Screen Inventory (30 screens)
+## Implementation Plan (10 tasks)
 
-### Auth Screens (4)
-1. **Login** — Email/password form, BizRent logo, tagline
-2. **Register** — Landlord signup: name, email, phone, password, organisation name
-3. **Forgot Password** — Email input, confirmation message
-4. **Reset Password** — New password form
+### 1. Fix Register page — pass metadata, fix org creation RLS
 
-### Landlord Portal (20 screens)
-5. **Dashboard** — KPI cards (Total Properties, Units, Collection Rate, Outstanding), weekly revenue bar chart, cost/status donut chart, recent transactions list, maintenance requests list (adapted from uploaded reference image)
-6. **Properties List** — Table with property name, type, units count, occupancy %, status; Add Property button
-7. **Property Detail** — Property info card + units table showing unit number, type, rent, status, tenant
-8. **Add/Edit Property** — Form: name, type (APARTMENT/HOUSE/COMMERCIAL), address, city, district
-9. **Units List** — Filterable table of all units across properties
-10. **Add/Edit Unit** — Form: unit number, type, monthly rent, status
-11. **Tenants List** — Table: name, email, phone, unit, property, payment status
-12. **Add/Invite Tenant** — Form: name, email, phone; sends invite
-13. **Tenancies List** — Active/terminated tenancies with lease details
-14. **Add/Edit Tenancy** — Form: unit, tenant, start date, agreed rent, deposit
-15. **Invoices List** — Filterable table: invoice #, tenant, unit, period, amount, status (DUE/PAID/PARTIAL/OVERDUE)
-16. **Invoice Detail** — Full invoice with payment history, balance, generate receipt action
-17. **Pending Payments Queue** — The core screen: list of PENDING payment submissions with transaction ID, amount, tenant, screenshot preview, Approve/Reject buttons
-18. **Payment Detail** — Full payment record with proof screenshot viewer, approve/reject with reason modal
-19. **Reports** — Collections summary, aging report, occupancy report with charts and export buttons
-20. **Receipts List** — Generated receipts table with download links
-21. **Team Management** — Invite managers/accountants, manage roles (OWNER/MANAGER/ACCOUNTANT)
-22. **Audit Logs** — Searchable log table: actor, action, target, timestamp
-23. **Settings** — Organisation profile, notification preferences, subscription tier display
-24. **Notifications** — Bell dropdown + full notifications page with read/unread states
+The `organisations` table has no INSERT RLS policy for authenticated users. The `handle_new_auth_user` trigger creates the `public.users` row automatically, so the manual INSERT is redundant.
 
-### Tenant Portal (6 screens)
-25. **Tenant Dashboard** — Current invoice status, quick submit payment CTA, recent payment history
-26. **Tenant Invoices** — List of invoices with status badges
-27. **Tenant Invoice Detail + Submit Payment** — Invoice details + MoMo transaction ID input + screenshot upload form
-28. **Tenant Receipts** — Downloadable receipt list
-29. **Tenant Payment History** — All submitted payments with status
-30. **Tenant Profile** — Personal info, notification preferences
+**Changes:**
+- `src/pages/auth/Register.tsx`: Pass `data: { full_name, phone }` in `signUp()` options. Remove the manual `users` INSERT (trigger handles it). For `organisations` INSERT, need a **SQL migration** to add an INSERT policy allowing new OWNER users to create their org, OR use an Edge Function / database function to handle registration atomically.
+- Add Zod validation (email, password min 8 chars, passwords match)
 
-## Implementation Phases (executed sequentially)
+**Migration needed:** Add `organisations_insert` RLS policy for authenticated users where `user_id = auth.uid()` — or better, create a `register_organisation` database function (SECURITY DEFINER) that atomically creates org + role + subscription.
 
-### Phase 1: Foundation
-- Configure Tailwind with BizRent brand tokens (colors, fonts)
-- Add Inter font via Google Fonts in index.html
-- Create BizRent logo component (SVG icon mark — geometric "B-Key" building icon)
-- Create mock data files: organisations, properties, units, tenants, tenancies, invoices, payments, receipts, audit logs
-- Build shared layout components: LandlordSidebar (navy sidebar with white text, navigation icons), TenantLayout (mobile-first single column), TopBar (search, notifications bell, user avatar)
+### 2. Fix TopBar — replace mock notifications with live polling
 
-### Phase 2: Auth Screens
-- Login, Register, Forgot Password, Reset Password pages
-- Auth context with mock login (landlord vs tenant role routing)
+**Changes:**
+- `src/components/layouts/TopBar.tsx`: Remove `mockNotifications` import. Use `useNotifications()` hook (already exists with 30s polling). Compute `unreadCount` from live data. Add notification dropdown with last 10 items and deep-link navigation.
 
-### Phase 3: Landlord Dashboard + Core Navigation
-- Dashboard with KPI stat cards, bar chart (Recharts), donut chart, recent transactions, maintenance requests
-- Sidebar navigation: Dashboard, Properties, Tenants, Invoices, Payments, Reports, Receipts, Team, Audit Log, Settings
+### 3. Fix payment approval — don't SET `balance` column
 
-### Phase 4: Property & Unit Management
-- Properties list with table, filters, add/edit modals
-- Property detail page with units sub-table
-- Unit add/edit forms
+**Changes:**
+- `src/hooks/useSupabaseData.ts` (`useApprovePayment`): Remove `balance` from the invoice UPDATE — it's a GENERATED column. Only update `amount_paid` and `status`. Add audit_log INSERT after approval/rejection.
 
-### Phase 5: Tenant & Tenancy Management
-- Tenants list, invite tenant form
-- Tenancies list, add/edit tenancy form
+### 4. Fix Pending Payments — server-side filter + card layout + auto-refresh
 
-### Phase 6: Invoices & Payments (Core Workflow)
-- Invoices list with status filters
-- Invoice detail with payment history
-- Pending Payments Queue — the hero screen for landlords
-- Payment detail with approve/reject modals (reject requires reason)
-- Status badges: PENDING (#F59E0B), APPROVED (#10B981), REJECTED (#DC2626), OVERDUE (#EA580C)
+**Changes:**
+- `src/pages/landlord/PendingPayments.tsx`: Use `usePayments({ status: 'PENDING' })` instead of fetching all and filtering. Change from table to card layout per spec. Add `refetchInterval: 60000`. Add proper empty state copy.
+- `src/hooks/useSupabaseData.ts`: Ensure `usePayments` with `status` filter queries server-side with ascending order by `submitted_at`.
 
-### Phase 7: Reports, Receipts, Audit
-- Reports page with collections table, aging buckets (color-coded), occupancy chart
-- Receipts list
-- Audit logs table with filters
+### 5. Add file upload validation + proper flow for tenant payment submission
 
-### Phase 8: Settings, Team, Notifications
-- Team management with role assignment
-- Settings page with org profile
-- Notifications dropdown and page
+**Changes:**
+- `src/pages/tenant/TenantInvoiceDetail.tsx`: Add MIME magic byte validation, 5MB size check, progress indicator. Check for existing PENDING payment before showing form. Handle 409 duplicate transaction ID inline (not toast).
+- Create `src/lib/uploadPaymentProof.ts` utility with the validation logic from Section 12.
 
-### Phase 9: Tenant Portal
-- Tenant dashboard, invoice list, payment submission form, receipts, payment history, profile
+### 6. Add subscription tier gating
 
-### Phase 10: Polish
-- Empty states with BizRent copy ("All clear. No payments waiting for your review.")
-- Loading skeletons
-- Responsive design verification
-- Status chip consistency across all screens
+**Changes:**
+- Create `src/hooks/useSubscriptionLimits.ts`: Fetch subscription tier limits, current counts, expose `canAddProperty`, `canAddUnit`, `canAddManager` booleans.
+- Update `src/pages/landlord/Properties.tsx`, `Units.tsx`, `TeamManagement.tsx`: Disable Add buttons when limits reached, show upgrade tooltip.
+- Create `src/components/UpgradePrompt.tsx` reusable component.
 
-## Key UI Patterns (from brand doc)
-- **Cards**: white bg, 1px solid #E2E8F0 border, 8px radius, subtle shadow
-- **Data tables**: Navy (#1E3A8A) header with white text, alternating rows white/#F8FAFC
-- **Primary buttons**: #1D4ED8 bg, white text, Inter 600, hover #1E3A8A
-- **Status chips**: Colored bg with white bold labels (12px Inter 600)
-- **Currency**: Always "RWF 120,000" format
-- **Dates**: "1 April 2026" format
+### 7. Add error handling utility
+
+**Changes:**
+- Create `src/lib/handleSupabaseError.ts` with the error mapping from Section 8.
+- Update mutation `onError` callbacks in `useSupabaseData.ts` to use it.
+
+### 8. Add subscription warning banner to landlord layout
+
+**Changes:**
+- `src/components/layouts/LandlordLayout.tsx`: Add amber banner above TopBar when subscription is TRIAL (show days remaining) or LAPSED.
+- Use `useSubscription()` hook.
+
+### 9. Fix data types and cleanup
+
+**Changes:**
+- Delete `src/data/mockData.ts` — no longer imported anywhere after TopBar fix.
+- Clean up `src/types/index.ts` — keep only types actually used by components (UserRole for AuthContext). The Supabase auto-generated types handle everything else.
+
+### 10. Polish remaining screens to spec
+
+- **Dashboard**: Add revenue bar chart using collection summary data, occupancy donut from occupancy summary view. Add overdue invoices list.
+- **Notifications page**: Deep-link click handling using `reference_type` + `reference_id`.
+- **Audit Logs**: Add action type filter, diff viewer modal.
+- **Reports**: Wire aging/collections/occupancy tabs to their respective view hooks (already exist).
+- **Receipts**: Generate signed URL for download.
+
+## SQL Migration Required
+
+A single migration to:
+
+1. Create `register_organisation()` SECURITY DEFINER function that atomically creates org + user_organisation_role + subscription
+2. Add `audit_logs_insert` RLS policy for authenticated users (currently no INSERT policy)
 
 ## Technical Details
-- All screens use React Router for navigation
-- Mock data stored in `src/data/` as TypeScript constants
-- Recharts for dashboard charts (already available via shadcn chart component)
-- React Hook Form + Zod for all forms
-- Responsive: desktop-first for landlord portal, mobile-first for tenant portal
-- ~25 new component files, ~30 page files, ~8 data/type files
+
+- No schema changes to existing tables
+- No new tables
+- 1 new database function (`register_organisation`)
+- 2 new RLS policies (organisations INSERT, audit_logs INSERT)
+- ~5 new utility files, ~15 file edits
+- Delete 1 file (mockData.ts)
 
