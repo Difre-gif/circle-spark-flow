@@ -24,25 +24,29 @@ const navSections = [
     label: 'Management',
     icon: Building2,
     items: [
-      { title: 'Properties', url: '/landlord/properties', icon: Building2 },
-      { title: 'Units', url: '/landlord/units', icon: Home },
-      { title: 'Tenants', url: '/landlord/tenants', icon: Users }
+      { title: 'Properties', url: '/landlord/properties' },
+      { title: 'Units', url: '/landlord/units' },
+      { title: 'Tenants', url: '/landlord/tenants' },
+      { title: 'Tenancies', url: '/landlord/tenancies' }
     ]
   },
   {
     label: 'Collections',
     icon: CreditCard,
     items: [
-      { title: 'Invoices', url: '/landlord/invoices', icon: FileText },
-      { title: 'Payments', url: '/landlord/payments', icon: CreditCard, highlight: true }
+      { title: 'Invoices', url: '/landlord/invoices' },
+      { title: 'Payments', url: '/landlord/payments', highlight: true },
+      { title: 'Receipts', url: '/landlord/receipts' },
+      { title: 'Reports', url: '/landlord/reports' }
     ]
   },
   {
     label: 'System',
     icon: Settings,
     items: [
-      { title: 'Users', url: '/landlord/team', icon: Shield },
-      { title: 'Settings', url: '/landlord/settings', icon: Settings }
+      { title: 'Users', url: '/landlord/team' },
+      { title: 'Audit Log', url: '/landlord/audit' },
+      { title: 'Settings', url: '/landlord/settings' }
     ]
   }
 ];
@@ -53,26 +57,18 @@ function NavItem({ item }: { item: any }) {
       to={item.url}
       end={item.url === '/landlord'}
       className={({ isActive }) => cn(
-        "group relative flex items-center gap-3 pl-12 pr-6 py-3 text-sm transition-all",
+        "group relative flex items-center gap-3 pl-[48px] pr-6 py-2 text-[13px] transition-all",
         isActive 
-          ? "text-bizrent-navy font-bold" 
-          : "text-muted-foreground font-medium hover:text-bizrent-navy"
+          ? "text-bizrent-blue font-bold bg-bizrent-blue/10" 
+          : "text-muted-foreground font-medium hover:text-bizrent-navy hover:bg-muted/40"
       )}
     >
       {({ isActive }) => (
         <>
-          {/* Active Line on absolute left */}
-          {isActive && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-bizrent-blue" />}
-          
-          {item.icon && (
-            <item.icon 
-              className={cn("h-[18px] w-[18px] shrink-0 transition-colors", 
-                isActive ? "text-bizrent-blue" : "text-muted-foreground group-hover:text-bizrent-navy", 
-                item.highlight && "text-[#ffcc00] group-hover:text-[#e6b800]"
-              )} 
-              strokeWidth={isActive ? 2.5 : 1.5} 
-            />
+          {isActive && (
+            <div className="absolute left-[32.5px] top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-bizrent-blue z-10" />
           )}
+          
           <span className="flex-1">{item.title}</span>
           
           {item.highlight && (
@@ -91,10 +87,10 @@ function NavSection({ section, currentPath }: { section: any, currentPath: strin
   const [isOpen, setIsOpen] = useState(isSectionActive || section.label === 'Home');
 
   return (
-    <div className="mb-2">
+    <div className="mb-1">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-6 py-3 text-sm font-semibold text-bizrent-navy hover:text-bizrent-blue transition-colors outline-none"
+        className="w-full flex items-center justify-between px-6 py-2.5 text-sm font-semibold text-bizrent-navy hover:text-bizrent-blue transition-colors outline-none"
       >
         <div className="flex items-center gap-3">
           <section.icon className={cn("h-5 w-5", isSectionActive ? "text-bizrent-blue" : "text-muted-foreground")} strokeWidth={1.5} />
@@ -104,7 +100,9 @@ function NavSection({ section, currentPath }: { section: any, currentPath: strin
       </button>
       
       {isOpen && (
-        <div className="space-y-1 py-1">
+        <div className="relative py-1 space-y-0.5">
+          {/* Vertical Guide Line */}
+          <div className="absolute left-[33px] top-0 bottom-3 w-px bg-border/80" />
           {section.items.map((item: any) => <NavItem key={item.title} item={item} />)}
         </div>
       )}
