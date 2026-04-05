@@ -576,35 +576,13 @@ export function useDashboardStats() {
   return useQuery({
     queryKey: ['dashboard-stats', orgId],
     queryFn: async () => {
-      const [propertiesRes, unitsRes, paymentsRes, invoicesRes] = await Promise.all([
-        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('org_id', orgId!).eq('is_active', true),
-        supabase.from('units').select('status').eq('org_id', orgId!).eq('is_active', true),
-        supabase.from('payments').select('id', { count: 'exact', head: true }).eq('org_id', orgId!).eq('status', 'PENDING' as any),
-        supabase.from('invoices').select('amount_due, amount_paid, status').eq('org_id', orgId!),
-      ]);
-
-      const units = unitsRes.data || [];
-      const totalUnits = units.length;
-      const occupiedUnits = units.filter(u => u.status === 'OCCUPIED').length;
-      const vacantUnits = units.filter(u => u.status === 'VACANT').length;
-
-      const invoices = invoicesRes.data || [];
-      const totalDue = invoices.reduce((s, i) => s + Number(i.amount_due), 0);
-      const totalPaid = invoices.reduce((s, i) => s + Number(i.amount_paid), 0);
-      const collectionRate = totalDue > 0 ? Math.round((totalPaid / totalDue) * 100) : 0;
-      const outstanding = totalDue - totalPaid;
-
-      return {
-        totalProperties: propertiesRes.count || 0,
-        totalUnits,
-        occupiedUnits,
-        vacantUnits,
-        pendingPayments: paymentsRes.count || 0,
-        collectionRate,
-        outstanding,
-      };
+      const { data, error } = await supabase.rpc('get_dashboard_stats', { p_org_id: orgId! });
+      if (error) throw error;
+      return data;
     },
     enabled: !!orgId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 }
 
