@@ -13,10 +13,12 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   isPendingApproval: boolean;
   impersonatedOrgId: string | null;
+  impersonatedUser: User | null;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   switchRole: (role: UserRole) => void;
   impersonate: (orgId: string) => void;
+  impersonateUser: (targetUser: User) => void;
   stopImpersonating: () => void;
 }
 
@@ -30,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isPendingApproval, setIsPendingApproval] = useState(false);
   const [impersonatedOrgId, setImpersonatedOrgId] = useState<string | null>(null);
+  const [impersonatedUser, setImpersonatedUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserProfile = useCallback(async (userId: string) => {
@@ -137,25 +140,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setImpersonatedOrgId(targetOrgId);
   }, [isSuperAdmin]);
 
+  const impersonateUser = useCallback((targetUser: User) => {
+    if (!isSuperAdmin) return;
+    setImpersonatedUser(targetUser);
+  }, [isSuperAdmin]);
+
   const stopImpersonating = useCallback(() => {
     setImpersonatedOrgId(null);
+    setImpersonatedUser(null);
   }, []);
 
   return (
     <AuthContext.Provider value={{
-      user,
+      user: impersonatedUser || user,
       session,
-      orgId: impersonatedOrgId || orgId,
-      orgRole: impersonatedOrgId ? 'OWNER' : orgRole,
+      orgId: impersonatedUser?.organisationId || impersonatedOrgId || orgId,
+      orgRole: impersonatedUser ? (impersonatedUser.role === 'tenant' ? 'TENANT' : 'OWNER') : (impersonatedOrgId ? 'OWNER' : orgRole),
       isAuthenticated: !!session && !!user,
       isLoading,
       isSuperAdmin,
       isPendingApproval,
       impersonatedOrgId,
+      impersonatedUser,
       login,
       logout,
       switchRole,
       impersonate,
+      impersonateUser,
       stopImpersonating,
     }}>
       {children}

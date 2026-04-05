@@ -11,7 +11,9 @@ import {
   ShieldCheck,
   History,
   Activity,
-  Globe
+  Globe,
+  Radio,
+  SlidersHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +26,8 @@ const navItems = [
   { icon: Building2, label: "Organizations", href: "/super-admin/organizations" },
   { icon: Users, label: "Platform Users", href: "/super-admin/users" },
   { icon: History, label: "System Audit", href: "/super-admin/audit" },
+  { icon: Radio, label: "Job Monitor", href: "/super-admin/monitor" },
+  { icon: SlidersHorizontal, label: "Global Config", href: "/super-admin/config" },
   { icon: Settings, label: "Config & Tiers", href: "/super-admin/settings" },
 ];
 

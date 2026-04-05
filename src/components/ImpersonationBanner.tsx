@@ -1,13 +1,13 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, LogOut, Building2 } from "lucide-react";
+import { ShieldAlert, LogOut, Building2, User } from "lucide-react";
 import { useOrganisation } from "@/hooks/useSupabaseData";
 
 export default function ImpersonationBanner() {
-  const { impersonatedOrgId, stopImpersonating, isSuperAdmin } = useAuth();
+  const { impersonatedOrgId, impersonatedUser, stopImpersonating, isSuperAdmin } = useAuth();
   const { data: org } = useOrganisation(); // This will fetch the impersonated org because orgId is swapped in context
 
-  if (!isSuperAdmin || !impersonatedOrgId) return null;
+  if (!isSuperAdmin || (!impersonatedOrgId && !impersonatedUser)) return null;
 
   return (
     <div className="bg-amber-500 text-white py-2 px-4 sticky top-0 z-[100] shadow-md border-b border-amber-600 animate-in slide-in-from-top duration-300">
@@ -19,9 +19,19 @@ export default function ImpersonationBanner() {
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
             <span className="font-bold text-sm tracking-tight uppercase">Admin Impersonation Active</span>
             <span className="hidden md:block h-3 w-px bg-white/30" />
-            <div className="flex items-center gap-1.5 text-xs font-semibold bg-white/10 px-2 py-0.5 rounded-full">
-              <Building2 size={12} />
-              Viewing as: <span className="underline decoration-white/50 underline-offset-2">{org?.name || "Loading organization..."}</span>
+            <div className="flex items-center gap-3">
+              {impersonatedUser && (
+                <div className="flex items-center gap-1.5 text-xs font-semibold bg-white/10 px-2 py-0.5 rounded-full">
+                  <User size={12} />
+                  Login As: <span className="underline decoration-white/50 underline-offset-2">{impersonatedUser.name}</span>
+                </div>
+              )}
+              {org && (
+                <div className="flex items-center gap-1.5 text-xs font-semibold bg-white/10 px-2 py-0.5 rounded-full">
+                  <Building2 size={12} />
+                  Workspace: <span className="underline decoration-white/50 underline-offset-2">{org.name}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -33,7 +43,7 @@ export default function ImpersonationBanner() {
           className="bg-white text-amber-700 hover:bg-amber-50 border-none h-8 font-bold text-xs"
         >
           <LogOut size={14} className="mr-2" />
-          Exit Session
+          Stop & Return to Admin
         </Button>
       </div>
     </div>

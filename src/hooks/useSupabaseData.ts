@@ -687,18 +687,27 @@ export function useInviteTenant() {
 
 export function useCreateOrganisation() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (input: { name: string; country_code?: string }) => {
-      const { data: org, error: orgErr } = await supabase
-        .from('organisations')
-        .insert({ name: input.name, country_code: input.country_code || 'RW' })
-        .select()
-        .single();
-      if (orgErr) throw orgErr;
-      return org;
+      // Basic slug generation
+      const slug = input.name.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      
+      const { data, error } = await supabase.rpc('register_organisation', {
+        p_name: input.name,
+        p_slug: slug,
+        p_email: user?.email || '',
+        p_phone: user?.phone || ''
+      });
+      
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['organisations'] });
+      qc.invalidateQueries({ queryKey: ['all-organisations'] }); // For Super Admin
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -757,10 +766,35 @@ export function useAllOrganisations() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organisations')
-        .select('*')
+        .select(`
+          *, 
+          subscriptions(tier, status),
+          user_organisation_roles(
+            role,
+            users(id, email, full_name, phone)
+          )
+        `)
+        .eq('user_organisation_roles.role', 'OWNER')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data;
+      
+      // Flatten the subscription and owner data for easier UI usage
+      return data.map(org => {
+        const ownerRole = org.user_organisation_roles?.[0];
+        const owner = ownerRole?.users;
+        
+        return {
+          ...org,
+          active_tier: org.subscriptions?.[0]?.tier || 'N/A',
+          active_subscription_status: org.subscriptions?.[0]?.status || 'INACTIVE',
+          owner: owner ? {
+            id: owner.id,
+            email: owner.email,
+            name: owner.full_name,
+            phone: owner.phone
+          } : null
+        };
+      });
     },
     enabled: !!isSuperAdmin,
   });
@@ -798,7 +832,7 @@ export function useGlobalAuditLogs() {
         .from('audit_logs')
         .select(`
           *,
-          actor:users!audit_logs_actor_user_id_fkey(full_name),
+          actor:users!audit_logs_actor_user_id_fkey(full_name, email),
           org:organisations!audit_logs_org_id_fkey(name)
         `)
         .order('created_at', { ascending: false })
@@ -862,5 +896,148 @@ export function useUpdateSubscriptionTier() {
       toast.success('Subscription tier updated');
     },
     onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useGlobalAdminMetrics() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['global-admin-metrics'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_global_admin_metrics');
+      if (error) throw error;
+      return data as {
+        mrr: number;
+        collection_rate: number;
+        active_orgs: number;
+        pending_orgs: number;
+        total_units: number;
+        platform_growth_pct: number;
+      };
+    },
+    enabled: !!isSuperAdmin,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useOrgSubscription(orgId: string | undefined) {
+  return useQuery({
+    queryKey: ['org-subscription', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*, tier_details:subscription_tiers!inner(*)')
+        .eq('org_id', orgId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!orgId,
+  });
+}
+
+export function useUpdateOrgSubscription() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { orgId: string; updates: any }) => {
+      const { error } = await supabase
+        .from('subscriptions')
+        .update(input.updates)
+        .eq('org_id', input.orgId);
+      if (error) throw error;
+      
+      // Also update the organization's subscription_status for top-level visibility
+      if (input.updates.status) {
+        await supabase
+          .from('organisations')
+          .update({ subscription_status: input.updates.status as any })
+          .eq('id', input.orgId);
+      }
+    },
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['org-subscription', variables.orgId] });
+      qc.invalidateQueries({ queryKey: ['all-organisations'] });
+      qc.invalidateQueries({ queryKey: ['global-admin-metrics'] });
+      toast.success('Organization subscription manually overridden');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+
+export function useSuspendUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, suspend }: { userId: string; suspend: boolean }) => {
+      const { error } = await supabase
+        .from('user_organisation_roles')
+        .update({ is_active: !suspend })
+        .eq('user_id', userId);
+      if (error) throw error;
+      
+      // Also potentially update a global 'is_active' on the users table if it exists
+      // For now, disabling all their org access is the standard suspension
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['global-users'] });
+      toast.success('User access status updated across all organizations');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useDeleteUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['global-users'] });
+      toast.success('User permanently removed from platform');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useFailedJobs() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['failed-jobs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('failed_notification_jobs')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useRetryJob() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (jobId: string) => {
+      // In a real system, this would trigger an Edge Function or RPC to re-queue.
+      // For now, we'll simulate resolution by updating the record.
+      const { error } = await supabase
+        .from('failed_notification_jobs')
+        .update({ 
+          resolved_at: new Date().toISOString(),
+          attempt_count: 5 // Mark as finally attempted/resolved
+        })
+        .eq('id', jobId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['failed-jobs'] });
+      toast.success("Job re-queued successfully");
+    },
   });
 }

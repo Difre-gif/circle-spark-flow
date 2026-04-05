@@ -42,6 +42,8 @@ import SuperAdminOrganizations from "@/pages/super-admin/Organizations";
 import SuperAdminUsers from "@/pages/super-admin/Users";
 import SuperAdminAuditLogs from "@/pages/super-admin/AuditLogs";
 import SuperAdminSettings from "@/pages/super-admin/Settings";
+import SuperAdminMonitor from "@/pages/super-admin/Monitor";
+import GlobalConfig from "@/pages/super-admin/GlobalConfig";
 import PendingApproval from "@/pages/auth/PendingApproval";
 
 // Tenant pages
@@ -99,6 +101,8 @@ function AppRoutes() {
         <Route path="organizations" element={<SuperAdminOrganizations />} />
         <Route path="users" element={<SuperAdminUsers />} />
         <Route path="audit" element={<SuperAdminAuditLogs />} />
+        <Route path="monitor" element={<SuperAdminMonitor />} />
+        <Route path="config" element={<GlobalConfig />} />
         <Route path="settings" element={<SuperAdminSettings />} />
       </Route>
 
