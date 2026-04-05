@@ -251,11 +251,10 @@ export function usePayment(id: string | undefined) {
 }
 
 export function useApprovePayment() {
-  const { user } = useAuth();
+  const { user, orgId, orgRole } = useAuth();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (paymentId: string) => {
-      // Get the payment first to know the invoice
       const { data: payment, error: fetchErr } = await supabase
         .from('payments')
         .select('invoice_id, amount')
@@ -273,7 +272,7 @@ export function useApprovePayment() {
         .eq('id', paymentId);
       if (error) throw error;
 
-      // Update invoice
+      // Update invoice — do NOT set balance (it's a GENERATED column)
       const { data: invoice } = await supabase
         .from('invoices')
         .select('amount_paid, amount_due')
@@ -284,14 +283,26 @@ export function useApprovePayment() {
         const newStatus = newPaid >= Number(invoice.amount_due) ? 'PAID' : 'PARTIAL';
         await supabase
           .from('invoices')
-          .update({ amount_paid: newPaid, balance: Number(invoice.amount_due) - newPaid, status: newStatus as any })
+          .update({ amount_paid: newPaid, status: newStatus as any })
           .eq('id', payment.invoice_id);
       }
+
+      // Insert audit log
+      await supabase.from('audit_logs').insert({
+        action: 'PAYMENT_APPROVED',
+        target_type: 'PAYMENT',
+        target_id: paymentId,
+        actor_user_id: user!.id,
+        actor_role: orgRole as any,
+        org_id: orgId!,
+        metadata: { amount: payment.amount, invoice_id: payment.invoice_id },
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payments'] });
       qc.invalidateQueries({ queryKey: ['invoices'] });
-      toast.success('Payment approved');
+      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      toast.success('Payment approved. Receipt is being generated.');
     },
     onError: (e: Error) => toast.error(e.message),
   });
