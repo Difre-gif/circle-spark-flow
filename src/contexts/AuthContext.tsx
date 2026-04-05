@@ -10,9 +10,14 @@ interface AuthContextType {
   orgRole: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isSuperAdmin: boolean;
+  isPendingApproval: boolean;
+  impersonatedOrgId: string | null;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   switchRole: (role: UserRole) => void;
+  impersonate: (orgId: string) => void;
+  stopImpersonating: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +27,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [orgId, setOrgId] = useState<string | null>(null);
   const [orgRole, setOrgRole] = useState<string | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
+  const [impersonatedOrgId, setImpersonatedOrgId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserProfile = useCallback(async (userId: string) => {
@@ -32,9 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (userError || !userData) {
-        console.error('Failed to fetch user profile:', userError);
-        return;
+      if (userData.email === 'fredricknjorogekariuki@gmail.com') {
+        setIsSuperAdmin(true);
       }
 
       const { data: roleData } = await supabase
@@ -45,7 +52,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .limit(1)
         .single();
 
-      const role: UserRole = roleData?.role === 'TENANT' ? 'tenant' : 'landlord';
+      if (roleData?.org_id) {
+        const { data: orgData } = await supabase
+          .from('organisations')
+          .select('subscription_status')
+          .eq('id', roleData.org_id)
+          .single();
+        
+        if (orgData?.subscription_status === 'PENDING_APPROVAL') {
+          setIsPendingApproval(true);
+        }
+      }
+
+      const role: UserRole = userData.email === 'fredricknjorogekariuki@gmail.com' 
+        ? 'super-admin' 
+        : (roleData?.role === 'TENANT' ? 'tenant' : 'landlord');
 
       setUser({
         id: userData.id,
@@ -103,23 +124,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
     setOrgId(null);
     setOrgRole(null);
+    setIsSuperAdmin(false);
+    setIsPendingApproval(false);
   }, []);
 
   const switchRole = useCallback((_role: UserRole) => {
     // No-op in real auth — role comes from database
   }, []);
 
+  const impersonate = useCallback((targetOrgId: string) => {
+    if (!isSuperAdmin) return;
+    setImpersonatedOrgId(targetOrgId);
+  }, [isSuperAdmin]);
+
+  const stopImpersonating = useCallback(() => {
+    setImpersonatedOrgId(null);
+  }, []);
+
   return (
     <AuthContext.Provider value={{
       user,
       session,
-      orgId,
-      orgRole,
+      orgId: impersonatedOrgId || orgId,
+      orgRole: impersonatedOrgId ? 'OWNER' : orgRole,
       isAuthenticated: !!session && !!user,
       isLoading,
+      isSuperAdmin,
+      isPendingApproval,
+      impersonatedOrgId,
       login,
       logout,
       switchRole,
+      impersonate,
+      stopImpersonating,
     }}>
       {children}
     </AuthContext.Provider>

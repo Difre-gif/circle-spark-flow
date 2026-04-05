@@ -11,10 +11,12 @@ import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
+import ImpersonationBanner from "@/components/ImpersonationBanner";
 
 // Layouts
 import { LandlordLayout } from "@/components/layouts/LandlordLayout";
 import { TenantLayout } from "@/components/layouts/TenantLayout";
+import { SuperAdminLayout } from "@/components/layouts/SuperAdminLayout";
 
 // Landlord pages
 import LandlordDashboard from "@/pages/landlord/Dashboard";
@@ -33,6 +35,14 @@ import TeamManagement from "@/pages/landlord/TeamManagement";
 import AuditLogs from "@/pages/landlord/AuditLogs";
 import Settings from "@/pages/landlord/Settings";
 import Notifications from "@/pages/landlord/Notifications";
+
+// Super Admin pages
+import SuperAdminDashboard from "@/pages/super-admin/Dashboard";
+import SuperAdminOrganizations from "@/pages/super-admin/Organizations";
+import SuperAdminUsers from "@/pages/super-admin/Users";
+import SuperAdminAuditLogs from "@/pages/super-admin/AuditLogs";
+import SuperAdminSettings from "@/pages/super-admin/Settings";
+import PendingApproval from "@/pages/auth/PendingApproval";
 
 // Tenant pages
 import TenantDashboard from "@/pages/tenant/Dashboard";
@@ -69,9 +79,28 @@ function AppRoutes() {
       {/* Root redirect */}
       <Route path="/" element={
         isAuthenticated
-          ? <Navigate to={user?.role === 'tenant' ? '/tenant' : '/landlord'} replace />
+          ? (user?.role === 'super-admin' 
+              ? <Navigate to="/super-admin" replace />
+              : <Navigate to={user?.role === 'tenant' ? '/tenant' : '/landlord'} replace />)
           : <Navigate to="/login" replace />
       } />
+
+      {/* Special states */}
+      <Route path="/pending-approval" element={<PendingApproval />} />
+
+      {/* Super Admin portal */}
+      <Route path="/super-admin" element={
+        <ProtectedRoute>
+          {/* ProtectedRoute already allows all if isSuperAdmin is true */}
+          <SuperAdminLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<SuperAdminDashboard />} />
+        <Route path="organizations" element={<SuperAdminOrganizations />} />
+        <Route path="users" element={<SuperAdminUsers />} />
+        <Route path="audit" element={<SuperAdminAuditLogs />} />
+        <Route path="settings" element={<SuperAdminSettings />} />
+      </Route>
 
       {/* Landlord portal */}
       <Route path="/landlord" element={
@@ -123,6 +152,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ImpersonationBanner />
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>

@@ -704,3 +704,163 @@ export function useCreateOrganisation() {
   });
 }
 
+// ─── Super Admin Hooks ───
+export function usePendingOrganisations() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['pending-organisations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organisations')
+        .select('*')
+        .eq('subscription_status', 'PENDING_APPROVAL')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useApproveOrganisation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (orgId: string) => {
+      const { error } = await supabase
+        .from('organisations')
+        .update({ 
+          subscription_status: 'TRIAL' as any,
+          trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() 
+        })
+        .eq('id', orgId);
+      if (error) throw error;
+      
+      // Also ensure a subscription record exists and is active
+      await supabase
+        .from('subscriptions')
+        .update({ status: 'TRIAL' as any, trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() })
+        .eq('org_id', orgId);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['pending-organisations'] });
+      qc.invalidateQueries({ queryKey: ['organisations'] });
+      toast.success('Organisation approved and trial started.');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useAllOrganisations() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['all-organisations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organisations')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function usePlatformStats() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['platform-stats'],
+    queryFn: async () => {
+      const { count: orgCount } = await supabase.from('organisations').select('*', { count: 'exact', head: true });
+      const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
+      const { count: unitCount } = await supabase.from('units').select('*', { count: 'exact', head: true });
+      const { data: payments } = await supabase.from('payments').select('amount').eq('status', 'APPROVED');
+      
+      const totalVolume = payments?.reduce((acc, p) => acc + Number(p.amount), 0) || 0;
+
+      return {
+        orgCount: orgCount || 0,
+        userCount: userCount || 0,
+        unitCount: unitCount || 0,
+        totalVolume: totalVolume,
+      };
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useGlobalAuditLogs() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['global-audit-logs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select(`
+          *,
+          actor:users!audit_logs_actor_user_id_fkey(full_name),
+          org:organisations!audit_logs_org_id_fkey(name)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useGlobalUsers() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['global-users'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select(`
+          *,
+          roles:user_organisation_roles(
+            role,
+            is_active,
+            org:organisations(name)
+          )
+        `)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useSubscriptionTiers() {
+  return useQuery({
+    queryKey: ['subscription-tiers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subscription_tiers')
+        .select('*')
+        .order('monthly_price_rwf', { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useUpdateSubscriptionTier() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string; updates: any }) => {
+      const { error } = await supabase
+        .from('subscription_tiers')
+        .update(input.updates)
+        .eq('id', input.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['subscription-tiers'] });
+      toast.success('Subscription tier updated');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
