@@ -31,7 +31,7 @@ import {
   UserCheck,
   Trash2,
   Key,
-  ShieldSlash,
+  ShieldOff,
   Fingerprint
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -164,7 +164,7 @@ export default function SuperAdminUsers() {
                             <div key={idx} className={`flex flex-col p-2 rounded-xl border transition-all ${r.is_active ? 'border-slate-100 bg-white' : 'border-red-100 bg-red-50/30 opacity-70'} min-w-[140px] shadow-sm`}>
                               <div className="flex items-center justify-between gap-2 mb-1.5">
                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] truncate max-w-[80px]">{r.org?.name || "Global"}</span>
-                                {!r.is_active && <ShieldSlash size={10} className="text-red-500" />}
+                                {!r.is_active && <ShieldOff size={10} className="text-red-500" />}
                               </div>
                               <Badge variant="outline" className={`${getRoleBadge(r.role)} border-none text-[9px] font-black uppercase tracking-widest px-2 h-5 w-fit rounded-lg`}>
                                 {r.role}
