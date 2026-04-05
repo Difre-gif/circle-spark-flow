@@ -9,6 +9,8 @@ export interface AuthState {
   session: Session | null;
   orgId: string | null;
   orgRole: string | null;
+  orgCurrency: string;
+  orgTimezone: string;
   isAuthenticated: boolean;
   isLoading: boolean;
   isSuperAdmin: boolean;
@@ -37,6 +39,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   orgId: null,
   orgRole: null,
+  orgCurrency: 'RWF',
+  orgTimezone: 'Africa/Kigali',
   isAuthenticated: false,
   isLoading: true,
   isSuperAdmin: false,
@@ -53,6 +57,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     session: null,
     orgId: null,
     orgRole: null,
+    orgCurrency: 'RWF',
+    orgTimezone: 'Africa/Kigali',
     isAuthenticated: false,
     isSuperAdmin: false,
     isPendingApproval: false,
@@ -81,13 +87,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         .maybeSingle();
 
       let isPendingApproval = false;
+      let orgCurrency = 'RWF';
+      let orgTimezone = 'Africa/Kigali';
+
       if (roleData?.org_id) {
         const { data: orgData } = await supabase
           .from('organisations')
-          .select('subscription_status')
+          .select('subscription_status, currency_code, timezone')
           .eq('id', roleData.org_id)
           .single();
-        isPendingApproval = orgData?.subscription_status === 'PENDING_APPROVAL';
+        isPendingApproval = orgData?.subscription_status === ('PENDING_APPROVAL' as any);
+        if (orgData?.currency_code) orgCurrency = orgData.currency_code;
+        if (orgData?.timezone) orgTimezone = orgData.timezone;
       }
 
       const role: UserRole = isSuperAdmin 
@@ -107,6 +118,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: userObj,
         orgId: roleData?.org_id || null,
         orgRole: roleData?.role || null,
+        orgCurrency,
+        orgTimezone,
         isSuperAdmin,
         isPendingApproval,
         isAuthenticated: !!get().session,

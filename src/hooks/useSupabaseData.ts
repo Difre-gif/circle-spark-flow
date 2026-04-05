@@ -2,13 +2,28 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useAuthStore } from '@/stores/authStore';
+import { format as dateFnsFormat } from 'date-fns';
+import { toDate } from 'date-fns-tz';
 
 // ─── Helpers ───
-export const formatRWF = (amount: number): string =>
-  `RWF ${Number(amount).toLocaleString('en-US')}`;
+export const formatCurrency = (amount: number | string): string => {
+  const currency = useAuthStore.getState().orgCurrency || 'RWF';
+  return `${currency} ${Number(amount).toLocaleString('en-US')}`;
+};
 
-export const formatDate = (dateStr: string): string =>
-  new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+export const formatRWF = formatCurrency;
+
+export const formatDate = (dateStr: string | null | undefined): string => {
+  if (!dateStr) return '';
+  try {
+    const tz = useAuthStore.getState().orgTimezone || 'Africa/Kigali';
+    const date = toDate(dateStr, { timeZone: tz });
+    return dateFnsFormat(date, 'd MMMM yyyy');
+  } catch (err) {
+    return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+};
 
 // ─── Properties ───
 export function useProperties() {
@@ -57,11 +72,17 @@ export function useCreateProperty() {
         .insert({ ...input, org_id: orgId!, property_type: input.property_type as any })
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505' && (error.message?.includes('properties_name_org_id_key') || error.message?.includes('unique'))) {
+          throw new Error('A property with this name already exists in your organisation.');
+        }
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['properties'] });
+      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
       toast.success('Property created');
     },
     onError: (e: Error) => toast.error(e.message),
@@ -99,12 +120,18 @@ export function useCreateUnit() {
         .insert({ ...input, org_id: orgId!, unit_type: input.unit_type as any })
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505' && (error.message?.includes('units_unit_number_property_id_key') || error.message?.includes('unique'))) {
+          throw new Error('This unit number already exists in this property.');
+        }
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['units'] });
       qc.invalidateQueries({ queryKey: ['properties'] });
+      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
       toast.success('Unit created');
     },
     onError: (e: Error) => toast.error(e.message),
@@ -150,6 +177,7 @@ export function useCreateTenancy() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tenancies'] });
       qc.invalidateQueries({ queryKey: ['units'] });
+      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
       toast.success('Tenancy created');
     },
     onError: (e: Error) => toast.error(e.message),
@@ -302,6 +330,7 @@ export function useApprovePayment() {
       qc.invalidateQueries({ queryKey: ['payments'] });
       qc.invalidateQueries({ queryKey: ['invoices'] });
       qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      qc.invalidateQueries({ queryKey: ['receipts'] });
       toast.success('Payment approved. Receipt is being generated.');
     },
     onError: (e: Error) => toast.error(e.message),
@@ -401,6 +430,7 @@ export function useSubmitPayment() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payments'] });
       qc.invalidateQueries({ queryKey: ['invoices'] });
+      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
       toast.success('Payment submitted for review');
     },
     onError: (e: Error) => toast.error(e.message),
