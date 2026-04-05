@@ -49,16 +49,25 @@
     /* Increased radius for the pill-shape / bubbly aesthetic */
     --radius: 1rem;
 
-    /* BizRent custom tokens */
-    --bizrent-navy: 222 72% 33%;
-    --bizrent-blue: 222 72% 48%;
-    --bizrent-emerald: 160 84% 39%;
-    --bizrent-forest: 163 90% 20%;
-    --bizrent-amber: 38 92% 50%;
-    --bizrent-red: 0 79% 50%;
-    --bizrent-overdue: 21 90% 48%;
-    --bizrent-slate: 222 47% 11%;
-    --bizrent-light: 210 40% 98%;
+    /* BizRent required tokens */
+    --color-primary: #1E3A8A;
+    --color-secondary: #065F46;
+    --color-accent: #10B981;
+    --color-interactive: #1D4ED8;
+    --color-pending: #F59E0B;
+    --color-approved: #10B981;
+    --color-rejected: #DC2626;
+    --color-overdue: #EA580C;
+    --color-surface: #F8FAFC;
+    --color-surface-raised: #FFFFFF;
+    --color-border: #E2E8F0;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #64748B;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
   }
 
   .dark {
