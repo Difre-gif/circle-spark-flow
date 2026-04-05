@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -25,38 +25,59 @@ export default function Properties() {
     setForm({ name: '', property_type: '', address_line1: '', city: 'Kigali', district: '' });
   };
 
-  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold">Properties</h1>
-          <p className="text-muted-foreground">{properties?.length ?? 0} properties in your portfolio</p>
+          <h1 className="page-title">Properties</h1>
+          <p className="page-description">Manage {properties?.length ?? 0} properties in your portfolio</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" /> Add Property</Button>
+        <Button className="bg-bizrent-blue hover:bg-bizrent-navy text-white shadow-sm" onClick={() => setDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Property
+        </Button>
       </div>
 
-      <Card>
+      <Card className="shadow-sm border-border/50 overflow-hidden">
         <CardContent className="p-0">
           <Table>
-            <TableHeader>
-              <TableRow className="bg-primary/5">
-                <TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead>Location</TableHead><TableHead>Units</TableHead><TableHead>Status</TableHead>
+            <TableHeader className="bg-muted/30">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="font-semibold text-bizrent-navy py-4">Property Name</TableHead>
+                <TableHead className="font-semibold text-bizrent-navy py-4">Type</TableHead>
+                <TableHead className="font-semibold text-bizrent-navy py-4">Location</TableHead>
+                <TableHead className="font-semibold text-bizrent-navy py-4 text-center">Total Units</TableHead>
+                <TableHead className="font-semibold text-bizrent-navy py-4">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {(properties ?? []).map(p => (
-                <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/landlord/properties/${p.id}`)}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell>{p.property_type}</TableCell>
+                <TableRow key={p.id} className="cursor-pointer transition-colors hover:bg-muted/50" onClick={() => navigate(`/landlord/properties/${p.id}`)}>
+                  <TableCell className="font-bold text-bizrent-navy">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-bizrent-navy/5 rounded-md">
+                        <Building className="h-4 w-4 text-bizrent-blue" />
+                      </div>
+                      {p.name}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-medium">{p.property_type.replace('_', ' ')}</TableCell>
                   <TableCell className="text-muted-foreground">{p.district}, {p.city}</TableCell>
-                  <TableCell>{p.total_units}</TableCell>
+                  <TableCell className="text-center font-medium">{p.total_units}</TableCell>
                   <TableCell><StatusBadge status={p.is_active ? 'ACTIVE' : 'INACTIVE'} /></TableCell>
                 </TableRow>
               ))}
               {(!properties || properties.length === 0) && (
-                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No properties yet. Add your first property!</TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={5} className="h-48 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <Building className="h-10 w-10 mb-3 text-muted-foreground/50" />
+                      <p className="text-lg font-medium text-bizrent-navy">No properties yet</p>
+                      <p className="text-sm">Add your first property to get started.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
@@ -64,29 +85,51 @@ export default function Properties() {
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Add Property</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2"><Label>Property Name</Label><Input placeholder="e.g. Sunrise Apartments" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
-            <div className="space-y-2"><Label>Type</Label>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-bizrent-navy">Add New Property</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5 py-4">
+            <div className="space-y-2">
+              <Label className="font-semibold">Property Name</Label>
+              <Input placeholder="e.g. Sunrise Apartments" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+            </div>
+            <div className="space-y-2">
+              <Label className="font-semibold">Property Type</Label>
               <Select value={form.property_type} onValueChange={v => setForm(f => ({ ...f, property_type: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                <SelectTrigger className="focus:ring-bizrent-blue">
+                  <SelectValue placeholder="Select property type" />
+                </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="APARTMENT">Apartment</SelectItem>
-                  <SelectItem value="COMMERCIAL">Commercial</SelectItem>
-                  <SelectItem value="OFFICE">Office</SelectItem>
-                  <SelectItem value="KIOSK">Kiosk</SelectItem>
-                  <SelectItem value="MIXED_USE">Mixed Use</SelectItem>
+                  <SelectItem value="APARTMENT">Apartment Building</SelectItem>
+                  <SelectItem value="COMMERCIAL">Commercial Plaza</SelectItem>
+                  <SelectItem value="OFFICE">Office Block</SelectItem>
+                  <SelectItem value="MIXED_USE">Mixed Use Building</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2"><Label>Address</Label><Input placeholder="KG 11 Ave" value={form.address_line1} onChange={e => setForm(f => ({ ...f, address_line1: e.target.value }))} /></div>
+            <div className="space-y-2">
+              <Label className="font-semibold">Address Line 1</Label>
+              <Input placeholder="e.g. KG 11 Ave" value={form.address_line1} onChange={e => setForm(f => ({ ...f, address_line1: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+            </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>City</Label><Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} /></div>
-              <div className="space-y-2"><Label>District</Label><Input placeholder="Gasabo" value={form.district} onChange={e => setForm(f => ({ ...f, district: e.target.value }))} /></div>
+              <div className="space-y-2">
+                <Label className="font-semibold">City</Label>
+                <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-semibold">District</Label>
+                <Input placeholder="e.g. Gasabo" value={form.district} onChange={e => setForm(f => ({ ...f, district: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+              </div>
             </div>
           </div>
-          <DialogFooter><Button onClick={handleCreate} disabled={createProperty.isPending}>{createProperty.isPending ? 'Saving...' : 'Save Property'}</Button></DialogFooter>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button className="bg-bizrent-blue hover:bg-bizrent-navy" onClick={handleCreate} disabled={createProperty.isPending}>
+              {createProperty.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {createProperty.isPending ? 'Saving...' : 'Save Property'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

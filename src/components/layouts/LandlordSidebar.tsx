@@ -36,33 +36,34 @@ export function LandlordSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r-0">
-      <SidebarHeader className="p-4">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-bizrent-navy shadow-xl">
+      <SidebarHeader className="p-4 flex items-center justify-center h-16 border-b border-white/10">
         {collapsed ? (
-          <BizRentLogo variant="icon" size="sm" className="text-sidebar-foreground" />
+          <BizRentLogo variant="icon" size="sm" className="text-white drop-shadow-md" />
         ) : (
-          <BizRentLogo variant="full" size="md" className="text-sidebar-foreground" />
+          <BizRentLogo variant="full" size="md" className="text-white drop-shadow-md" />
         )}
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-3 py-4">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1">
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.url)}
                     tooltip={item.title}
+                    className="h-10 transition-all duration-200"
                   >
                     <NavLink
                       to={item.url}
                       end={item.url === '/landlord'}
-                      className="hover:bg-sidebar-accent/50"
-                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      className="hover:bg-white/10 text-white/80 hover:text-white rounded-lg"
+                      activeClassName="bg-bizrent-blue text-white font-semibold shadow-sm"
                     >
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      <item.icon className="h-[18px] w-[18px]" />
+                      {!collapsed && <span className="ml-1 tracking-wide">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -4,25 +4,29 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    /* Main Background - Soft light gray/blue to make cards pop */
+    --background: 210 40% 96.1%;
     --foreground: 222 47% 11%;
 
+    /* Cards */
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
+    /* Brand Primary (Navy) */
     --primary: 222 72% 33%;
     --primary-foreground: 0 0% 100%;
 
+    /* Brand Secondary (Forest) */
     --secondary: 163 90% 20%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
+    --muted: 210 40% 92%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 210 40% 92%;
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 79% 50%;
@@ -32,7 +36,7 @@
     --input: 214 32% 91%;
     --ring: 222 72% 48%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     /* BizRent custom tokens */
     --bizrent-navy: 222 72% 33%;
@@ -45,11 +49,12 @@
     --bizrent-slate: 222 47% 11%;
     --bizrent-light: 210 40% 98%;
 
+    /* Sidebar - Navy Theme */
     --sidebar-background: 222 72% 33%;
-    --sidebar-foreground: 0 0% 100%;
+    --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 222 72% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 72% 28%;
+    --sidebar-accent: 222 72% 25%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 222 72% 28%;
     --sidebar-ring: 222 72% 48%;
@@ -101,12 +106,26 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
+    @apply text-bizrent-navy dark:text-white;
+  }
+}
+
+/* Custom Utilities for the Template */
+@layer utilities {
+  .page-header {
+    @apply flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8;
+  }
+  .page-title {
+    @apply text-3xl font-bold tracking-tight text-bizrent-navy;
+  }
+  .page-description {
+    @apply text-muted-foreground mt-1;
   }
 }

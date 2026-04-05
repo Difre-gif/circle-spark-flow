@@ -13,21 +13,24 @@ interface StatCardProps {
 
 export function StatCard({ title, value, subtitle, icon: Icon, trend, className }: StatCardProps) {
   return (
-    <Card className={cn('border shadow-sm', className)}>
+    <Card className={cn('border shadow-sm transition-all hover:shadow-md', className)}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold">{value}</p>
-            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          <div className="space-y-1.5">
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{title}</p>
+            <p className="text-3xl font-bold text-bizrent-navy">{value}</p>
+            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
             {trend && (
-              <p className={cn('text-xs font-medium', trend.positive ? 'text-bizrent-emerald' : 'text-bizrent-red')}>
-                {trend.positive ? '↑' : '↓'} {trend.value}
+              <p className={cn('text-sm font-medium flex items-center mt-2', trend.positive ? 'text-bizrent-emerald' : 'text-bizrent-red')}>
+                <span className={cn("mr-1 rounded-full p-0.5", trend.positive ? "bg-bizrent-emerald/10" : "bg-bizrent-red/10")}>
+                  {trend.positive ? '↑' : '↓'}
+                </span>
+                {trend.value}
               </p>
             )}
           </div>
-          <div className="rounded-lg bg-primary/10 p-3">
-            <Icon className="h-6 w-6 text-primary" />
+          <div className="rounded-xl bg-bizrent-navy/5 p-4 ring-1 ring-bizrent-navy/10">
+            <Icon className="h-7 w-7 text-bizrent-navy" />
           </div>
         </div>
       </CardContent>
