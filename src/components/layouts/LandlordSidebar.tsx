@@ -3,12 +3,9 @@ import {
   BarChart3, Receipt, Shield, ScrollText, Settings, Home
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
-import { useLocation } from 'react-router-dom';
 import { BizRentLogo } from '@/components/BizRentLogo';
-import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, useSidebar,
-} from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const navItems = [
   { title: 'Dashboard', url: '/landlord', icon: LayoutDashboard },
@@ -22,56 +19,55 @@ const navItems = [
   { title: 'Receipts', url: '/landlord/receipts', icon: Receipt },
   { title: 'Team', url: '/landlord/team', icon: Shield },
   { title: 'Audit Log', url: '/landlord/audit', icon: ScrollText },
-  { title: 'Settings', url: '/landlord/settings', icon: Settings },
 ];
 
 export function LandlordSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === 'collapsed';
-  const location = useLocation();
-
-  const isActive = (url: string) => {
-    if (url === '/landlord') return location.pathname === '/landlord';
-    return location.pathname.startsWith(url);
-  };
-
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-bizrent-navy shadow-xl">
-      <SidebarHeader className="p-4 flex items-center justify-center h-16 border-b border-white/10">
-        {collapsed ? (
-          <BizRentLogo variant="icon" size="sm" className="text-white drop-shadow-md" />
-        ) : (
-          <BizRentLogo variant="full" size="md" className="text-white drop-shadow-md" />
-        )}
-      </SidebarHeader>
-      <SidebarContent className="px-3 py-4">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    tooltip={item.title}
-                    className="h-10 transition-all duration-200"
-                  >
-                    <NavLink
-                      to={item.url}
-                      end={item.url === '/landlord'}
-                      className="hover:bg-white/10 text-white/80 hover:text-white rounded-lg"
-                      activeClassName="bg-bizrent-blue text-white font-semibold shadow-sm"
-                    >
-                      <item.icon className="h-[18px] w-[18px]" />
-                      {!collapsed && <span className="ml-1 tracking-wide">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <aside className="hidden md:flex flex-col w-20 bg-background border-r border-border/50 h-screen py-6 items-center z-20">
+      <div className="mb-8">
+        <BizRentLogo variant="icon" size="md" className="text-bizrent-navy" />
+      </div>
+      
+      <div className="flex-1 flex flex-col gap-4 w-full px-3 overflow-y-auto no-scrollbar items-center">
+        {navItems.map((item) => (
+          <Tooltip key={item.title} delayDuration={0}>
+            <TooltipTrigger asChild>
+              <NavLink
+                to={item.url}
+                end={item.url === '/landlord'}
+                className={({ isActive }) => cn(
+                  "flex items-center justify-center h-12 w-12 rounded-2xl transition-all duration-200 group",
+                  isActive 
+                    ? "bg-bizrent-navy text-white shadow-md shadow-bizrent-navy/20" 
+                    : "text-muted-foreground hover:bg-white hover:text-bizrent-navy hover:shadow-sm"
+                )}
+              >
+                <item.icon className={cn("h-5 w-5 transition-transform group-hover:scale-110")} />
+              </NavLink>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="font-semibold">{item.title}</TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
+
+      <div className="mt-auto pt-4 px-3 w-full flex justify-center">
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <NavLink
+              to="/landlord/settings"
+              className={({ isActive }) => cn(
+                "flex items-center justify-center h-12 w-12 rounded-2xl transition-all duration-200 group",
+                isActive 
+                  ? "bg-muted text-bizrent-navy" 
+                  : "text-muted-foreground hover:bg-white hover:text-bizrent-navy hover:shadow-sm"
+              )}
+            >
+              <Settings className="h-5 w-5 transition-transform group-hover:rotate-45" />
+            </NavLink>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="font-semibold">Settings</TooltipContent>
+        </Tooltip>
+      </div>
+    </aside>
   );
 }

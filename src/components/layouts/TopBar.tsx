@@ -3,13 +3,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { NavLink } from '@/components/NavLink';
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks/useSupabaseData';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { formatDistanceToNow } from 'date-fns';
+import { BizRentLogo } from '../BizRentLogo';
+import { cn } from '@/lib/utils';
 
 export function TopBar() {
   const { user, logout } = useAuth();
@@ -27,51 +29,75 @@ export function TopBar() {
   };
 
   const handleNotificationClick = (notification: any) => {
-    if (!notification.is_read) {
-      markRead.mutate(notification.id);
-    }
-    if (notification.reference_type === 'PAYMENT' && notification.reference_id) {
-      navigate(`/landlord/payments/${notification.reference_id}`);
-    } else if (notification.reference_type === 'INVOICE' && notification.reference_id) {
-      navigate(`/landlord/invoices/${notification.reference_id}`);
-    } else if (notification.reference_type === 'RECEIPT') {
-      navigate('/landlord/receipts');
-    } else {
-      navigate('/landlord/notifications');
-    }
+    if (!notification.is_read) markRead.mutate(notification.id);
+    if (notification.reference_type === 'PAYMENT' && notification.reference_id) navigate(`/landlord/payments/${notification.reference_id}`);
+    else if (notification.reference_type === 'INVOICE' && notification.reference_id) navigate(`/landlord/invoices/${notification.reference_id}`);
+    else if (notification.reference_type === 'RECEIPT') navigate('/landlord/receipts');
+    else navigate('/landlord/notifications');
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border/40 bg-white/95 px-6 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <SidebarTrigger className="md:hidden" />
-      
-      <div className="hidden md:flex md:flex-1">
-        <div className="relative w-full max-w-md group">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-bizrent-navy" />
-          <Input 
-            placeholder="Search properties, tenants, invoices..." 
-            className="pl-9 bg-muted/50 border-transparent focus-visible:bg-white focus-visible:ring-bizrent-navy/20 transition-all" 
-          />
-        </div>
+    <header className="sticky top-0 z-30 flex h-20 items-center justify-between px-6 bg-background/80 backdrop-blur-md">
+      {/* Left: Mobile Logo */}
+      <div className="md:hidden flex items-center">
+        <BizRentLogo variant="full" size="sm" className="text-bizrent-navy" />
       </div>
 
-      <div className="flex flex-1 items-center justify-end gap-3">
+      {/* Center: Pill Navigation (Hidden on mobile) */}
+      <div className="hidden md:flex flex-1 justify-start ml-2">
+        <nav className="flex items-center gap-1 bg-white rounded-full p-1.5 shadow-sm border border-border/50">
+          {[
+            { name: 'Overview', path: '/landlord' },
+            { name: 'Properties', path: '/landlord/properties' },
+            { name: 'Invoices', path: '/landlord/invoices' },
+            { name: 'Payments', path: '/landlord/payments' },
+            { name: 'Reports', path: '/landlord/reports' },
+          ].map((item) => (
+            <NavLink
+              key={item.name}
+              to={item.path}
+              end={item.path === '/landlord'}
+              className={({ isActive }) => cn(
+                "px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200",
+                isActive 
+                  ? "bg-bizrent-navy text-white shadow-sm" 
+                  : "text-muted-foreground hover:text-bizrent-navy hover:bg-muted/50"
+              )}
+            >
+              {item.name}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-4">
+        {/* Search */}
+        <div className="relative hidden lg:block w-64 group">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-bizrent-navy" />
+          <Input 
+            placeholder="Search..." 
+            className="pl-10 h-10 rounded-full bg-white border-transparent shadow-sm focus-visible:ring-bizrent-navy/20 transition-all" 
+          />
+        </div>
+
+        {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative hover:bg-bizrent-navy/5 rounded-full">
-              <Bell className="h-5 w-5 text-bizrent-slate" />
+            <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full bg-white shadow-sm border border-border/50 hover:bg-muted">
+              <Bell className="h-5 w-5 text-bizrent-navy" />
               {unreadCount > 0 && (
-                <span className="absolute 1 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-bizrent-red text-[10px] font-bold text-white ring-2 ring-white">
+                <span className="absolute 0 top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-bizrent-red text-[10px] font-bold text-white ring-2 ring-white">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <div className="flex items-center justify-between px-4 py-3">
+          <DropdownMenuContent align="end" className="w-80 rounded-2xl p-2">
+            <div className="flex items-center justify-between px-3 py-2">
               <p className="text-sm font-bold text-bizrent-navy">Notifications</p>
               {unreadCount > 0 && (
-                <Button variant="ghost" size="sm" className="text-xs h-auto py-1 text-bizrent-blue hover:text-bizrent-navy" onClick={() => markAllRead.mutate()}>
+                <Button variant="ghost" size="sm" className="text-xs h-auto py-1 text-bizrent-blue" onClick={() => markAllRead.mutate()}>
                   Mark all read
                 </Button>
               )}
@@ -82,48 +108,46 @@ export function TopBar() {
                 <div className="px-4 py-8 text-center text-sm text-muted-foreground">You're all caught up!</div>
               ) : (
                 recentNotifications.map(n => (
-                  <DropdownMenuItem key={n.id} className="flex flex-col items-start gap-1 cursor-pointer p-4 focus:bg-bizrent-navy/5" onClick={() => handleNotificationClick(n)}>
+                  <DropdownMenuItem key={n.id} className="flex flex-col items-start gap-1 cursor-pointer p-3 rounded-xl focus:bg-muted/50" onClick={() => handleNotificationClick(n)}>
                     <div className="flex items-center gap-2 w-full">
                       {!n.is_read && <div className="h-2 w-2 rounded-full bg-bizrent-blue flex-shrink-0" />}
                       <span className="text-sm font-semibold truncate flex-1">{n.title}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{n.body}</p>
-                    <p className="text-xs text-muted-foreground/80 font-medium">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{n.body}</p>
+                    <p className="text-[10px] text-muted-foreground/80 font-medium mt-1">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</p>
                   </DropdownMenuItem>
                 ))
               )}
             </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="justify-center text-bizrent-blue font-medium text-sm cursor-pointer py-3 hover:text-bizrent-navy hover:bg-bizrent-navy/5" onClick={() => navigate('/landlord/notifications')}>
-              View all notifications
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="hidden sm:block w-px h-6 bg-border mx-1"></div>
-
+        {/* User Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 flex items-center gap-2 pl-2 pr-4 rounded-full hover:bg-bizrent-navy/5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-bizrent-navy text-white text-xs font-bold ring-2 ring-white shadow-sm">
+            <Button variant="ghost" className="h-10 pl-2 pr-4 rounded-full bg-white shadow-sm border border-border/50 hover:bg-muted flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-bizrent-navy text-white text-xs font-bold">
                 {user?.name?.charAt(0) || 'U'}
               </div>
-              <span className="text-sm font-medium text-bizrent-slate hidden md:block">
-                {user?.name?.split(' ')[0]}
-              </span>
+              <div className="hidden sm:flex flex-col items-start">
+                <span className="text-sm font-bold text-bizrent-navy leading-none">
+                  {user?.name?.split(' ')[0]}
+                </span>
+                <span className="text-[10px] text-muted-foreground font-medium mt-0.5">Landlord</span>
+              </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 mt-1">
-            <div className="px-3 py-2.5">
+          <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl p-2">
+            <div className="px-3 py-2">
               <p className="text-sm font-bold text-bizrent-navy">{user?.name}</p>
               <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer py-2" onClick={() => navigate('/landlord/settings')}>
+            <DropdownMenuItem className="cursor-pointer py-2 rounded-xl focus:bg-muted" onClick={() => navigate('/landlord/settings')}>
               <UserIcon className="mr-2 h-4 w-4 text-muted-foreground" /> Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer py-2 text-bizrent-red focus:text-bizrent-red focus:bg-bizrent-red/5" onClick={handleLogout}>
+            <DropdownMenuItem className="cursor-pointer py-2 rounded-xl text-bizrent-red focus:text-bizrent-red focus:bg-bizrent-red/10" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" /> Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
