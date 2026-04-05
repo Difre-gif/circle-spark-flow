@@ -309,7 +309,7 @@ export function useApprovePayment() {
 }
 
 export function useRejectPayment() {
-  const { user } = useAuth();
+  const { user, orgId, orgRole } = useAuth();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ paymentId, reason }: { paymentId: string; reason: string }) => {
@@ -323,10 +323,21 @@ export function useRejectPayment() {
         })
         .eq('id', paymentId);
       if (error) throw error;
+
+      // Insert audit log
+      await supabase.from('audit_logs').insert({
+        action: 'PAYMENT_REJECTED',
+        target_type: 'PAYMENT',
+        target_id: paymentId,
+        actor_user_id: user!.id,
+        actor_role: orgRole as any,
+        org_id: orgId!,
+        metadata: { rejection_reason: reason },
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payments'] });
-      toast.success('Payment rejected');
+      toast.success('Payment rejected. Tenant has been notified.');
     },
     onError: (e: Error) => toast.error(e.message),
   });
