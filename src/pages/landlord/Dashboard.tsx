@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Send, Wallet, Activity, Download, Loader2, Search } from 'lucide-react';
+import { ArrowRightLeft, Send, Wallet, Activity, Download, Loader2, Search, Home } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -28,6 +28,7 @@ export default function LandlordDashboard() {
     return (
       <div className="space-y-6 pb-12">
         <div className="mb-8 space-y-3">
+          <Skeleton className="h-4 w-48" />
           <Skeleton className="h-10 w-72" />
           <Skeleton className="h-4 w-96" />
         </div>
@@ -47,9 +48,14 @@ export default function LandlordDashboard() {
 
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-500">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-bizrent-navy">Good morning, {org?.name || 'Landlord'}</h1>
-        <p className="text-muted-foreground mt-1 text-sm font-medium">Stay on top of your properties, monitor payments, and track status.</p>
+      <div className="page-header">
+        <div>
+          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest flex items-center gap-1.5 mb-1">
+            <Home className="h-3.5 w-3.5" /> Home / Overview
+          </p>
+          <h1 className="page-title">Good morning, {org?.name || 'Landlord'}</h1>
+          <p className="page-description">Stay on top of your properties, monitor payments, and track status.</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
@@ -231,7 +237,7 @@ export default function LandlordDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
+                    <tr className="bg-muted/20 text-muted-foreground font-semibold border-b border-border/40">
                       <th className="text-left px-8 py-4 whitespace-nowrap">Transaction ID</th>
                       <th className="text-left px-4 py-4">Tenant</th>
                       <th className="text-left px-4 py-4 text-right">Amount</th>
@@ -239,7 +245,7 @@ export default function LandlordDashboard() {
                       <th className="text-left px-8 py-4">Date</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
                     {(recentPayments ?? []).slice(0, 6).map((p, idx) => (
                       <tr key={p.id} className="border-b border-border/20 hover:bg-muted/30 transition-colors group">
                         <td className="px-8 py-4">

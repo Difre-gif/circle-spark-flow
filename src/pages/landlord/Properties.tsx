@@ -35,7 +35,7 @@ export default function Properties() {
           </div>
           <Skeleton className="h-10 w-32 rounded-xl" />
         </div>
-        <Skeleton className="h-[500px] w-full rounded-xl" />
+        <Skeleton className="h-[500px] w-full rounded-2xl" />
       </div>
     );
   }
@@ -44,15 +44,16 @@ export default function Properties() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
+          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">Management / Properties</p>
           <h1 className="page-title">Properties</h1>
           <p className="page-description">Manage {properties?.length ?? 0} properties in your portfolio</p>
         </div>
-        <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold" onClick={() => setDialogOpen(true)}>
+        <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Property
         </Button>
       </div>
 
-      <Card className="overflow-hidden border-0">
+      <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

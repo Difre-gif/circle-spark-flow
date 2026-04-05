@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -15,38 +15,65 @@ export default function Tenants() {
            user?.email?.toLowerCase().includes(search.toLowerCase());
   });
 
-  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Tenants</h1>
-        <p className="text-muted-foreground">{tenants?.length ?? 0} tenants</p>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="page-header">
+        <div>
+          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">Management / Tenants</p>
+          <h1 className="page-title">Tenants</h1>
+          <p className="page-description">View {tenants?.length ?? 0} active tenants</p>
+        </div>
       </div>
-      <Input placeholder="Search tenants..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
-      <Card>
+      
+      <div className="flex items-center max-w-sm relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input 
+          placeholder="Search by name or email..." 
+          value={search} 
+          onChange={e => setSearch(e.target.value)} 
+          className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium" 
+        />
+      </div>
+
+      <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-primary/5">
-                <TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Phone</TableHead><TableHead>Joined</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map(t => {
-                const user = t.user as any;
-                return (
-                  <TableRow key={t.user_id}>
-                    <TableCell className="font-medium">{user?.full_name ?? '—'}</TableCell>
-                    <TableCell className="text-muted-foreground">{user?.email ?? '—'}</TableCell>
-                    <TableCell>{user?.phone ?? '—'}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{formatDate(t.created_at)}</TableCell>
-                  </TableRow>
-                );
-              })}
-              {filtered.length === 0 && <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No tenants found</TableCell></TableRow>}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
+                  <th className="text-left px-6 py-4 whitespace-nowrap">Name</th>
+                  <th className="text-left px-6 py-4">Email</th>
+                  <th className="text-left px-6 py-4">Phone</th>
+                  <th className="text-left px-6 py-4">Joined</th>
+                </tr>
+              </thead>
+              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+                {filtered.map(t => {
+                  const user = t.user as any;
+                  return (
+                    <tr key={t.user_id} className="transition-colors hover:bg-muted/30 border-b border-border/20">
+                      <td className="px-6 py-4 font-bold text-bizrent-navy">{user?.full_name ?? '—'}</td>
+                      <td className="px-6 py-4 text-muted-foreground font-medium">{user?.email ?? '—'}</td>
+                      <td className="px-6 py-4 font-medium text-bizrent-slate">{user?.phone ?? '—'}</td>
+                      <td className="px-6 py-4 text-muted-foreground text-xs font-semibold">{formatDate(t.created_at)}</td>
+                    </tr>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-16 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center">
+                        <p className="font-medium text-bizrent-navy">No tenants found</p>
+                        <p className="text-sm mt-1">Try adjusting your search criteria.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

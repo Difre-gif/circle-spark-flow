@@ -30,7 +30,7 @@ export default function Invoices() {
           <Skeleton className="h-10 w-64 rounded-full" />
           <Skeleton className="h-10 w-48 rounded-lg" />
         </div>
-        <Skeleton className="h-[500px] w-full rounded-xl" />
+        <Skeleton className="h-[500px] w-full rounded-2xl" />
       </div>
     );
   }
@@ -39,6 +39,7 @@ export default function Invoices() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
+          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">Collections / Invoices</p>
           <h1 className="page-title">Invoices</h1>
           <p className="page-description">Track and manage {invoices?.length ?? 0} billing records</p>
         </div>
@@ -46,16 +47,16 @@ export default function Invoices() {
       
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Search by tenant or invoice #..." 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
-            className="pl-9 h-10 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20" 
+            className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium" 
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48 h-10 bg-white border-border/50 shadow-sm focus:ring-bizrent-navy/20">
+          <SelectTrigger className="w-full sm:w-48 h-11 bg-white border-border/50 shadow-sm focus:ring-bizrent-navy/20 font-medium">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -68,7 +69,7 @@ export default function Invoices() {
         </Select>
       </div>
 
-      <Card className="overflow-hidden border-0">
+      <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

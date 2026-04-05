@@ -36,79 +36,82 @@ export default function Units() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
+          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">Management / Units</p>
           <h1 className="page-title">Units</h1>
           <p className="page-description">Manage {units?.length ?? 0} individual rental units</p>
         </div>
-        <Button className="bg-bizrent-blue hover:bg-bizrent-navy text-white shadow-sm" onClick={() => setDialogOpen(true)}>
+        <Button className="bg-bizrent-blue hover:bg-bizrent-navy text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Unit
         </Button>
       </div>
 
       <div className="flex items-center max-w-sm relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Search by unit number or property..." 
           value={search} 
           onChange={e => setSearch(e.target.value)} 
-          className="pl-9 bg-white shadow-sm focus-visible:ring-bizrent-blue" 
+          className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium" 
         />
       </div>
 
-      <Card className="shadow-sm border-border/50 overflow-hidden">
+      <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-bizrent-navy py-4">Unit #</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Property</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Type</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Monthly Rent</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map(u => (
-                <TableRow key={u.id} className="transition-colors hover:bg-muted/50">
-                  <TableCell className="font-bold text-bizrent-navy">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-bizrent-blue/10 rounded-md">
-                        <Home className="h-4 w-4 text-bizrent-blue" />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
+                  <th className="text-left px-6 py-4 whitespace-nowrap">Unit #</th>
+                  <th className="text-left px-6 py-4">Property</th>
+                  <th className="text-left px-6 py-4">Type</th>
+                  <th className="text-left px-6 py-4">Monthly Rent</th>
+                  <th className="text-center px-6 py-4">Status</th>
+                </tr>
+              </thead>
+              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+                {filtered.map(u => (
+                  <tr key={u.id} className="transition-colors hover:bg-muted/30 border-b border-border/20">
+                    <td className="px-6 py-4 font-bold text-bizrent-navy">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-bizrent-blue/10 rounded-md">
+                          <Home className="h-4 w-4 text-bizrent-blue" />
+                        </div>
+                        {u.unit_number}
                       </div>
-                      {u.unit_number}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium text-muted-foreground">{(u as any).properties?.name ?? '—'}</TableCell>
-                  <TableCell className="text-muted-foreground">{u.unit_type}</TableCell>
-                  <TableCell className="font-semibold">{formatRWF(u.monthly_rent)}</TableCell>
-                  <TableCell><StatusBadge status={u.status} /></TableCell>
-                </TableRow>
-              ))}
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-48 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center">
-                      <Home className="h-10 w-10 mb-3 text-muted-foreground/50" />
-                      <p className="text-lg font-medium text-bizrent-navy">No units found</p>
-                      <p className="text-sm">Try adjusting your search or add a new unit.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-muted-foreground">{(u as any).properties?.name ?? '—'}</td>
+                    <td className="px-6 py-4 text-muted-foreground capitalize">{u.unit_type.toLowerCase()}</td>
+                    <td className="px-6 py-4 font-semibold text-bizrent-slate font-tabular-nums">{formatRWF(u.monthly_rent)}</td>
+                    <td className="px-6 py-4 text-center"><StatusBadge status={u.status} /></td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-16 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center">
+                        <Home className="h-8 w-8 mb-2 opacity-20" />
+                        <p className="font-medium text-bizrent-navy">No units found</p>
+                        <p className="text-sm mt-1">Try adjusting your search or add a new unit.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-bizrent-navy">Add New Unit</DialogTitle>
           </DialogHeader>
           <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label className="font-semibold">Select Property</Label>
+              <Label className="font-semibold text-bizrent-navy">Select Property</Label>
               <Select value={form.property_id} onValueChange={v => setForm(f => ({ ...f, property_id: v }))}>
-                <SelectTrigger className="focus:ring-bizrent-blue">
+                <SelectTrigger className="focus:ring-bizrent-blue/20">
                   <SelectValue placeholder="Choose a property" />
                 </SelectTrigger>
                 <SelectContent>
@@ -118,13 +121,13 @@ export default function Units() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="font-semibold">Unit Number/Name</Label>
-                <Input placeholder="e.g. A-301" value={form.unit_number} onChange={e => setForm(f => ({ ...f, unit_number: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+                <Label className="font-semibold text-bizrent-navy">Unit Number/Name</Label>
+                <Input placeholder="e.g. A-301" value={form.unit_number} onChange={e => setForm(f => ({ ...f, unit_number: e.target.value }))} className="focus-visible:ring-bizrent-blue/20" />
               </div>
               <div className="space-y-2">
-                <Label className="font-semibold">Unit Type</Label>
+                <Label className="font-semibold text-bizrent-navy">Unit Type</Label>
                 <Select value={form.unit_type} onValueChange={v => setForm(f => ({ ...f, unit_type: v }))}>
-                  <SelectTrigger className="focus:ring-bizrent-blue">
+                  <SelectTrigger className="focus:ring-bizrent-blue/20">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -140,13 +143,13 @@ export default function Units() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="font-semibold">Monthly Rent (RWF)</Label>
-              <Input type="number" placeholder="e.g. 300000" value={form.monthly_rent || ''} onChange={e => setForm(f => ({ ...f, monthly_rent: Number(e.target.value) }))} className="focus-visible:ring-bizrent-blue font-mono" />
+              <Label className="font-semibold text-bizrent-navy">Monthly Rent (RWF)</Label>
+              <Input type="number" placeholder="e.g. 300000" value={form.monthly_rent || ''} onChange={e => setForm(f => ({ ...f, monthly_rent: Number(e.target.value) }))} className="focus-visible:ring-bizrent-blue/20 font-mono" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-bizrent-blue hover:bg-bizrent-navy" onClick={handleCreate} disabled={createUnit.isPending}>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button className="bg-bizrent-blue hover:bg-bizrent-navy rounded-xl font-semibold" onClick={handleCreate} disabled={createUnit.isPending}>
               {createUnit.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {createUnit.isPending ? 'Saving...' : 'Save Unit'}
             </Button>

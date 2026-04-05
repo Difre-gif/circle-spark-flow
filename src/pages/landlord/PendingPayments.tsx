@@ -36,11 +36,11 @@ export default function PendingPayments() {
           <Skeleton className="h-4 w-72" />
         </div>
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-          <Skeleton className="h-32 w-full rounded-xl" />
-          <Skeleton className="h-32 w-full rounded-xl" />
-          <Skeleton className="h-32 w-full rounded-xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
         </div>
-        <Skeleton className="h-[400px] w-full rounded-xl mt-8" />
+        <Skeleton className="h-[400px] w-full rounded-2xl mt-8" />
       </div>
     );
   }
@@ -76,15 +76,16 @@ export default function PendingPayments() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
+          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">Collections / Payments</p>
           <h1 className="page-title">Payments Queue</h1>
           <p className="page-description">Review and process tenant payment submissions</p>
         </div>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-        <StatCard title="Pending Review" value={String((pendingPayments ?? []).length)} icon={CreditCard} />
-        <StatCard title="Approved" value={String(approvedCount)} icon={CheckCircle} />
-        <StatCard title="Rejected" value={String(rejectedCount)} icon={XCircle} />
+        <StatCard title="Pending Review" value={String((pendingPayments ?? []).length)} icon={CreditCard} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
+        <StatCard title="Approved" value={String(approvedCount)} icon={CheckCircle} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
+        <StatCard title="Rejected" value={String(rejectedCount)} icon={XCircle} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
       </div>
 
       {(pendingPayments ?? []).length > 0 ? (
@@ -92,7 +93,7 @@ export default function PendingPayments() {
           <h2 className="text-lg font-bold text-bizrent-navy">Awaiting Your Review</h2>
           <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
             {(pendingPayments ?? []).map(p => (
-              <Card key={p.id} className="overflow-hidden">
+              <Card key={p.id} className="overflow-hidden rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
@@ -123,7 +124,7 @@ export default function PendingPayments() {
                   <div className="flex gap-3 pt-2">
                     <Button
                       size="sm"
-                      className="flex-1 bg-[#ffcc00] hover:bg-[#e6b800] text-bizrent-navy font-bold shadow-sm"
+                      className="flex-1 bg-[#ffcc00] hover:bg-[#e6b800] text-bizrent-navy font-bold shadow-sm rounded-xl"
                       disabled={processingId === p.id}
                       onClick={() => handleApprove(p.id)}
                     >
@@ -132,13 +133,13 @@ export default function PendingPayments() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1 border-border text-bizrent-red hover:bg-red-50 hover:text-bizrent-red font-semibold"
+                      className="flex-1 border-border/80 text-bizrent-red hover:bg-red-50 hover:text-bizrent-red font-semibold rounded-xl"
                       disabled={processingId === p.id}
                       onClick={() => setRejectModal({ open: true, paymentId: p.id })}
                     >
                       <XCircle className="mr-1.5 h-4 w-4" /> Reject
                     </Button>
-                    <Button size="sm" variant="ghost" className="hover:bg-muted/80 rounded-lg" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
+                    <Button size="sm" variant="ghost" className="hover:bg-muted/80 rounded-xl px-3" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
                       <Eye className="h-4 w-4 text-bizrent-navy" />
                     </Button>
                   </div>
@@ -148,7 +149,7 @@ export default function PendingPayments() {
           </div>
         </div>
       ) : (
-        <Card className="border-dashed border-2 border-border/60 bg-transparent shadow-none">
+        <Card className="border-dashed border-2 border-border/60 bg-transparent shadow-none rounded-2xl">
           <CardContent className="py-16 text-center">
             <div className="mx-auto w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
               <CheckCircle className="h-8 w-8 text-emerald-600" />
@@ -160,13 +161,13 @@ export default function PendingPayments() {
       )}
 
       {/* All Payments Table */}
-      <Card>
-        <CardHeader><CardTitle className="text-lg">All Payments</CardTitle></CardHeader>
+      <Card className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden">
+        <CardHeader className="pb-4 pt-6 px-6 border-b border-border/40"><CardTitle className="text-base font-bold text-bizrent-navy">All Payments History</CardTitle></CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
+                <tr className="bg-muted/20 text-muted-foreground font-semibold border-b border-border/40">
                   <th className="text-left px-6 py-4">Tenant</th>
                   <th className="text-left px-6 py-4 text-right">Amount</th>
                   <th className="text-left px-6 py-4">Transaction ID</th>

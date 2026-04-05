@@ -1,51 +1,75 @@
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTeamMembers, formatDate } from '@/hooks/useSupabaseData';
 
 export default function TeamManagement() {
   const { data: members, isLoading } = useTeamMembers();
 
-  if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Team Management</h1>
-        <p className="text-muted-foreground">Manage your organisation's team members and roles</p>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="page-header">
+        <div>
+          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">System / Users</p>
+          <h1 className="page-title">Staff & Users</h1>
+          <p className="page-description">Manage your organisation's team members and roles</p>
+        </div>
       </div>
 
-      <Card>
+      <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-primary/5">
-                <TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Role</TableHead><TableHead>Joined</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {(members ?? []).map(m => (
-                <TableRow key={m.id}>
-                  <TableCell className="font-medium">{(m.user as any)?.full_name ?? '—'}</TableCell>
-                  <TableCell className="text-muted-foreground">{(m.user as any)?.email ?? '—'}</TableCell>
-                  <TableCell><StatusBadge status={m.role} /></TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDate(m.created_at)}</TableCell>
-                </TableRow>
-              ))}
-              {(!members || members.length === 0) && <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No team members</TableCell></TableRow>}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
+                  <th className="text-left px-6 py-4 whitespace-nowrap">Name</th>
+                  <th className="text-left px-6 py-4">Email</th>
+                  <th className="text-left px-6 py-4">Role</th>
+                  <th className="text-left px-6 py-4">Joined</th>
+                </tr>
+              </thead>
+              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+                {(members ?? []).map(m => (
+                  <tr key={m.id} className="transition-colors hover:bg-muted/30 border-b border-border/20">
+                    <td className="px-6 py-4 font-bold text-bizrent-navy">{(m.user as any)?.full_name ?? '—'}</td>
+                    <td className="px-6 py-4 text-muted-foreground font-medium">{(m.user as any)?.email ?? '—'}</td>
+                    <td className="px-6 py-4"><StatusBadge status={m.role} /></td>
+                    <td className="px-6 py-4 text-muted-foreground text-xs font-semibold">{formatDate(m.created_at)}</td>
+                  </tr>
+                ))}
+                {(!members || members.length === 0) && (
+                  <tr>
+                    <td colSpan={4} className="py-16 text-center text-muted-foreground font-medium">
+                      No team members found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader><CardTitle>Role Permissions</CardTitle></CardHeader>
-        <CardContent>
-          <div className="space-y-4 text-sm">
-            <div><span className="font-semibold text-primary">Owner</span> — Full access: manage properties, units, tenants, invoices, payments, team, settings</div>
-            <div><span className="font-semibold text-bizrent-blue">Manager</span> — Manage properties, units, tenants, invoices, and approve/reject payments</div>
-            <div><span className="font-semibold text-bizrent-forest">Accountant</span> — View-only properties; manage invoices, payments, receipts, and reports</div>
+      <Card className="border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
+        <CardHeader className="border-b border-border/40 pb-4 pt-6 px-6">
+          <CardTitle className="text-base font-bold text-bizrent-navy">Role Permissions</CardTitle>
+        </CardHeader>
+        <CardContent className="px-6 pt-6 pb-6">
+          <div className="space-y-5 text-sm">
+            <div className="bg-muted/30 p-4 rounded-xl">
+              <span className="font-bold text-bizrent-navy block mb-1">Owner</span>
+              <span className="text-muted-foreground font-medium">Full access: manage properties, units, tenants, invoices, payments, team, settings.</span>
+            </div>
+            <div className="bg-muted/30 p-4 rounded-xl">
+              <span className="font-bold text-bizrent-blue block mb-1">Manager</span>
+              <span className="text-muted-foreground font-medium">Manage properties, units, tenants, invoices, and approve/reject payments.</span>
+            </div>
+            <div className="bg-muted/30 p-4 rounded-xl">
+              <span className="font-bold text-bizrent-forest block mb-1">Accountant</span>
+              <span className="text-muted-foreground font-medium">View-only properties; manage invoices, payments, receipts, and reports.</span>
+            </div>
           </div>
         </CardContent>
       </Card>
