@@ -636,3 +636,51 @@ export function useCollectionSummary() {
     enabled: !!orgId,
   });
 }
+
+
+//  Invitations 
+export function useInvitations() {
+  const { orgId } = useAuth();
+  return useQuery({
+    queryKey: [" invitations\, orgId],
+ queryFn: async () => {
+ const { data, error } = await supabase
+ .from(\invitations\)
+ .select(\*\)
+ .eq(\org_id\, orgId!)
+ .eq(\status\, \PENDING\ as any)
+ .order(\created_at\, { ascending: false });
+ if (error) throw error;
+ return data;
+ },
+ enabled: !!orgId,
+ });
+}
+
+export function useInviteTenant() {
+ const { orgId, user } = useAuth();
+ const qc = useQueryClient();
+ return useMutation({
+ mutationFn: async (input: { email: string; unit_id?: string }) => {
+ const { error } = await supabase
+ .from(\invitations\)
+ .insert({
+ email: input.email.toLowerCase(),
+ unit_id: input.unit_id || null,
+ org_id: orgId!,
+ invited_by: user!.id,
+ role: \TENANT\ as any,
+ status: \PENDING\ as any,
+ });
+ if (error) {
+ if (error.code === \23505\) throw new Error(\This user has already been invited to your organisation.\);
+ throw error;
+ }
+ },
+ onSuccess: () => {
+ qc.invalidateQueries({ queryKey: [\invitations\] });
+ toast.success(\Invitation saved. The tenant will be linked automatically when they sign up.\);
+ },
+ onError: (e: Error) => toast.error(e.message),
+ });
+}
