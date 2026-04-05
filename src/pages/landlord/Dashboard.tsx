@@ -3,14 +3,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDashboardStats, usePayments, useOccupancySummary, useOrganisation, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { useDashboardStats, usePayments, useOccupancySummary, useOrganisation, formatRWF, formatDate, useInvoices } from '@/hooks/useSupabaseData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 export default function LandlordDashboard() {
+  const navigate = useNavigate();
+  const [reminderOpen, setReminderOpen] = useState(false);
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: recentPayments, isLoading: paymentsLoading } = usePayments();
   const { data: occupancy, isLoading: occLoading } = useOccupancySummary();
   const { data: org } = useOrganisation();
+  const { data: overdueInvoices } = useInvoices({ status: 'OVERDUE' });
 
   // Granular loading per widget instead of a global blocker
   // const isLoading = statsLoading || paymentsLoading || occLoading;
@@ -66,10 +73,17 @@ export default function LandlordDashboard() {
               </p>
               
               <div className="flex flex-col gap-3 mt-8">
-                <Button className="w-full rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-sm">
+                <Button 
+                  className="w-full rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-sm"
+                  onClick={() => setReminderOpen(true)}
+                >
                   <Send className="mr-2 h-4 w-4" /> Send Reminders
                 </Button>
-                <Button variant="outline" className="w-full rounded-xl border-border/60 hover:bg-muted font-semibold h-12">
+                <Button 
+                  variant="outline" 
+                  className="w-full rounded-xl border-border/60 hover:bg-muted font-semibold h-12"
+                  onClick={() => navigate('/landlord/payments')}
+                >
                   <ArrowRightLeft className="mr-2 h-4 w-4" /> Collect Rent
                 </Button>
               </div>
@@ -311,9 +325,54 @@ export default function LandlordDashboard() {
               </div>
             </CardContent>
           </Card>
-          
-        </div>
       </div>
+
+      <Dialog open={reminderOpen} onOpenChange={setReminderOpen}>
+        <DialogContent className="sm:max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Rent Reminders</DialogTitle>
+            <DialogDescription className="font-medium">
+              We found {(overdueInvoices ?? []).length} overdue invoices that need follow-up.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="max-h-[300px] overflow-y-auto my-4 space-y-3 pr-2 custom-scrollbar">
+            {(overdueInvoices ?? []).map(inv => (
+              <div key={inv.id} className="p-3 rounded-xl border border-border/50 bg-muted/20 flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-bold text-bizrent-navy">{(inv.tenant as any)?.full_name}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium">{inv.invoice_number} · Overdue {formatDate(inv.due_date)}</p>
+                </div>
+                <p className="text-sm font-extrabold text-bizrent-red">{formatRWF(inv.amount_due - (inv.amount_paid ?? 0))}</p>
+              </div>
+            ))}
+            {(overdueInvoices ?? []).length === 0 && (
+              <div className="text-center py-8">
+                <Activity className="h-8 w-8 mx-auto mb-2 opacity-20 text-bizrent-emerald" />
+                <p className="text-sm font-bold text-bizrent-navy">Zero Overdue Invoices!</p>
+                <p className="text-xs text-muted-foreground">Everyone is paid up or waiting on due dates.</p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="sm:justify-between py-2 border-t mt-4 gap-3">
+            <Button variant="ghost" className="rounded-xl font-bold text-xs" onClick={() => setReminderOpen(false)}>
+              Discard
+            </Button>
+            <Button 
+              className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-bold px-6 h-11"
+              disabled={(overdueInvoices ?? []).length === 0}
+              onClick={() => {
+                toast.success(`Success! Sent reminders to ${(overdueInvoices ?? []).length} tenants.`);
+                setReminderOpen(false);
+              }}
+            >
+              <Send className="h-4 w-4 mr-2" /> Send All Reminders
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  );
+  </div>
+);
 }

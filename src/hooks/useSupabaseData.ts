@@ -684,3 +684,23 @@ export function useInviteTenant() {
     onError: (e: Error) => toast.error(e.message),
   });
 }
+
+export function useCreateOrganisation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { name: string; country_code?: string }) => {
+      const { data: org, error: orgErr } = await supabase
+        .from('organisations')
+        .insert({ name: input.name, country_code: input.country_code || 'RW' })
+        .select()
+        .single();
+      if (orgErr) throw orgErr;
+      return org;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['organisations'] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+

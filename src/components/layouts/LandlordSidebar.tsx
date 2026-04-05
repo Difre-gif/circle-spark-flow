@@ -18,8 +18,13 @@ import {
 } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { useOrganisation } from '@/hooks/useSupabaseData';
+import { useOrganisation, useCreateOrganisation } from '@/hooks/useSupabaseData';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 const navigationItems = [
   { title: 'Dashboard', url: '/landlord', icon: LayoutDashboard },
@@ -41,6 +46,21 @@ export function LandlordSidebar() {
   const location = useLocation();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const [createOrgOpen, setCreateOrgOpen] = useState(false);
+  const [newOrgName, setNewOrgName] = useState('');
+  const createOrg = useCreateOrganisation();
+
+  const handleCreateOrg = async () => {
+    if (!newOrgName.trim()) return;
+    try {
+      await createOrg.mutateAsync({ name: newOrgName, country_code: 'RW' });
+      toast.success(`Organization "${newOrgName}" created!`);
+      setCreateOrgOpen(false);
+      setNewOrgName('');
+    } catch (error) {
+      toast.error('Failed to create organization');
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -79,12 +99,48 @@ export function LandlordSidebar() {
               <span className="truncate">{org?.name}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="my-1.5 opacity-50" />
-            <DropdownMenuItem className="text-muted-foreground font-semibold py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5">
+            <DropdownMenuItem 
+              className="text-muted-foreground font-semibold py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5"
+              onClick={() => setCreateOrgOpen(true)}
+            >
               <div className="h-6 w-6 rounded flex items-center justify-center border border-dashed border-muted-foreground/30"><Plus className="h-3.5 w-3.5" /></div>
               <span>Add Organization</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Dialog open={createOrgOpen} onOpenChange={setCreateOrgOpen}>
+          <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-8">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-extrabold text-bizrent-navy">New Workspace</DialogTitle>
+              <DialogDescription className="font-medium">
+                Create a new organization to manage separate portfolios.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-bizrent-navy font-bold px-1">Organization Name</Label>
+                <Input 
+                  id="name" 
+                  placeholder="e.g. Blue Sky Properties" 
+                  className="rounded-2xl h-12 border-border/60 focus-visible:ring-bizrent-blue/20"
+                  value={newOrgName}
+                  onChange={(e) => setNewOrgName(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-3">
+              <Button variant="ghost" className="rounded-xl font-bold" onClick={() => setCreateOrgOpen(false)}>Cancel</Button>
+              <Button 
+                className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-bold h-12 px-8 shadow-lg shadow-bizrent-navy/10"
+                onClick={handleCreateOrg}
+                disabled={createOrg.isPending || !newOrgName.trim()}
+              >
+                {createOrg.isPending ? 'Creating...' : 'Create Workspace'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </SidebarHeader>
 
       {/* 2. Primary Navigation */}

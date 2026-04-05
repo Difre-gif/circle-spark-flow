@@ -7,13 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useOrganisation, useUpdateOrganisation, useSubscription } from '@/hooks/useSupabaseData';
+import { useOrganisation, useUpdateOrganisation, useSubscription, formatRWF } from '@/hooks/useSupabaseData';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Check, Zap, Shield, Crown } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Settings() {
   const { data: org, isLoading: orgLoading } = useOrganisation();
   const { data: subscription } = useSubscription();
   const updateOrg = useUpdateOrganisation();
   const [form, setForm] = useState<{ name: string; email: string; phone: string } | null>(null);
+  const [pricingOpen, setPricingOpen] = useState(false);
 
   if (orgLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
 
@@ -89,7 +93,13 @@ export default function Settings() {
                 <span className="font-bold text-bizrent-slate">{(subscription.tier_details as any)?.max_units ?? '—'}</span>
               </div>
             </>}
-            <Button variant="outline" className="w-full mt-2 rounded-xl font-semibold border-border/80 text-bizrent-navy hover:bg-slate-50">Upgrade Plan</Button>
+            <Button 
+              variant="outline" 
+              className="w-full mt-2 rounded-xl font-semibold border-border/80 text-bizrent-navy hover:bg-slate-50"
+              onClick={() => setPricingOpen(true)}
+            >
+              Upgrade Plan
+            </Button>
           </CardContent>
         </Card>
 
@@ -116,6 +126,75 @@ export default function Settings() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
+        <DialogContent className="sm:max-w-4xl rounded-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="text-center pb-6">
+            <DialogTitle className="text-3xl font-extrabold text-bizrent-navy">Upgrade Your Business</DialogTitle>
+            <DialogDescription className="text-md font-medium">
+              Choose the perfect tier for your expanding property portfolio.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
+            {/* Basic */}
+            <Card className="border border-border/50 rounded-2xl p-6 space-y-4 hover:shadow-lg transition-shadow">
+              <div className="p-3 bg-bizrent-blue/10 rounded-xl w-fit">
+                <Zap className="h-6 w-6 text-bizrent-blue" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-bizrent-navy">Startup</h3>
+                <p className="text-2xl font-black mt-2 text-bizrent-navy">{formatRWF(15000)}<span className="text-xs font-medium text-muted-foreground">/mo</span></p>
+              </div>
+              <Separator />
+              <ul className="space-y-3">
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> 1-5 Units</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> MoMo Integration</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> 1 Staff Account</li>
+              </ul>
+              <Button className="w-full rounded-xl" variant="outline" onClick={() => {toast.info('Contact sales to downgrade'); setPricingOpen(false);}}>Current Plan</Button>
+            </Card>
+
+            {/* Pro */}
+            <Card className="border-2 border-bizrent-blue rounded-2xl p-6 space-y-4 shadow-xl relative overflow-hidden bg-slate-50/50">
+              <div className="absolute top-3 right-3 bg-bizrent-blue text-white text-[10px] font-bold px-2 py-1 rounded">POPULAR</div>
+              <div className="p-3 bg-bizrent-blue rounded-xl w-fit">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-bizrent-navy">Enterprise</h3>
+                <p className="text-2xl font-black mt-2 text-bizrent-navy">{formatRWF(45000)}<span className="text-xs font-medium text-muted-foreground">/mo</span></p>
+              </div>
+              <Separator />
+              <ul className="space-y-3">
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> Up to 50 Units</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> SMS Reminders</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> Unlimited Staff</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> Custom Reports</li>
+              </ul>
+              <Button className="w-full rounded-xl bg-bizrent-blue hover:bg-bizrent-blue/90" onClick={() => {toast.success('Upgrade request sent!'); setPricingOpen(false);}}>Upgrade Now</Button>
+            </Card>
+
+            {/* Custom */}
+            <Card className="border border-border/50 rounded-2xl p-6 space-y-4 hover:shadow-lg transition-shadow">
+              <div className="p-3 bg-bizrent-navy/10 rounded-xl w-fit">
+                <Crown className="h-6 w-6 text-bizrent-navy" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-bizrent-navy">Custom</h3>
+                <p className="text-2xl font-black mt-2 text-bizrent-navy">Contact Us</p>
+              </div>
+              <Separator />
+              <ul className="space-y-3">
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> 50+ Units</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> API Access</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><Check className="h-4 w-4 text-bizrent-emerald" /> Dedicated Support</li>
+              </ul>
+              <Button className="w-full rounded-xl" variant="outline" onClick={() => {toast.info('Redirecting to support...'); setPricingOpen(false);}}>Talk to Sales</Button>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
