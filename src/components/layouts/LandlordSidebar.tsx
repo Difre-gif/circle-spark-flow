@@ -49,38 +49,40 @@ const navSections = [
   }
 ];
 
-function NavItem({ item }: { item: any }) {
+function NavItem({ item }: any) {
   return (
-    <NavLink
-      to={item.url}
-      end={item.url === '/landlord'}
-      className={({ isActive }) => cn(
-        "group relative flex items-center gap-3 pl-[64px] pr-6 py-2 text-[13px] transition-all rounded-r-full mr-2",
-        isActive 
-          ? "text-bizrent-blue font-bold bg-bizrent-blue/5" 
-          : "text-muted-foreground font-medium hover:text-bizrent-navy hover:bg-muted/30"
-      )}
-    >
-      {({ isActive }) => (
-        <>
-          {isActive && (
-            <div className="absolute left-[31px] top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-bizrent-blue z-10 shadow-[0_0_8px_rgba(30,64,175,0.4)]" />
-          )}
-          
-          <span className="flex-1">{item.title}</span>
-          
-          {item.highlight && (
-            <span className="bg-[#ffcc00]/20 text-bizrent-navy text-[9px] px-1.5 py-0.5 rounded-md flex items-center font-bold uppercase tracking-wider">
-              MoMo
-            </span>
-          )}
-        </>
-      )}
-    </NavLink>
+    <div className="w-full">
+      <NavLink
+        to={item.url}
+        end={item.url === '/landlord'}
+        className={({ isActive }) => cn(
+          "group relative flex items-center gap-3 pl-[64px] pr-4 py-2.5 text-[13px] transition-all rounded-r-full mr-2",
+          isActive 
+            ? "text-bizrent-blue font-bold bg-bizrent-blue/5" 
+            : "text-muted-foreground font-medium hover:text-bizrent-navy hover:bg-muted/30"
+        )}
+      >
+        {({ isActive }) => (
+          <>
+            {isActive && (
+              <div className="absolute left-[31px] top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-bizrent-blue z-10 shadow-[0_0_8px_rgba(30,64,175,0.4)]" />
+            )}
+            
+            <span className="flex-1 truncate">{item.title}</span>
+            
+            {item.highlight && (
+              <span className="bg-[#ffcc00]/20 text-bizrent-navy text-[9px] px-1.5 py-0.5 rounded-md flex items-center font-bold uppercase tracking-wider shrink-0">
+                MoMo
+              </span>
+            )}
+          </>
+        )}
+      </NavLink>
+    </div>
   );
 }
 
-function NavSection({ section, currentPath }: { section: any, currentPath: string }) {
+function NavSection({ section, currentPath }: any) {
   const isSectionActive = section.items.some((i: any) => i.url === currentPath || (i.url !== '/landlord' && currentPath.startsWith(i.url)));
   const [isOpen, setIsOpen] = useState(isSectionActive || section.label === 'Home');
 
@@ -101,10 +103,12 @@ function NavSection({ section, currentPath }: { section: any, currentPath: strin
       </button>
       
       {isOpen && (
-        <div className="relative py-1 space-y-0.5">
+        <div className="relative py-1 flex flex-col space-y-0.5">
           {/* Vertical Guide Line */}
           <div className="absolute left-[34px] top-0 bottom-4 w-[1px] bg-border/60" />
-          {section.items.map((item: any) => <NavItem key={item.title} item={item} />)}
+          {section.items.map((item: any) => (
+            <NavItem key={item.title} item={item} />
+          ))}
         </div>
       )}
     </div>
