@@ -3,21 +3,43 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { mockNotifications } from '@/data/mockData';
+import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks/useSupabaseData';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { formatDistanceToNow } from 'date-fns';
 
 export function TopBar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const unreadCount = mockNotifications.filter(n => !n.read).length;
+  const { data: notifications } = useNotifications();
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
+
+  const unreadCount = (notifications ?? []).filter(n => !n.is_read).length;
+  const recentNotifications = (notifications ?? []).slice(0, 10);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
+  };
+
+  const handleNotificationClick = (notification: any) => {
+    if (!notification.is_read) {
+      markRead.mutate(notification.id);
+    }
+    // Deep-link based on reference_type
+    if (notification.reference_type === 'PAYMENT' && notification.reference_id) {
+      navigate(`/landlord/payments/${notification.reference_id}`);
+    } else if (notification.reference_type === 'INVOICE' && notification.reference_id) {
+      navigate(`/landlord/invoices/${notification.reference_id}`);
+    } else if (notification.reference_type === 'RECEIPT') {
+      navigate('/landlord/receipts');
+    } else {
+      navigate('/landlord/notifications');
+    }
   };
 
   return (
@@ -30,14 +52,47 @@ export function TopBar() {
         </div>
       </div>
       <div className="flex flex-1 items-center justify-end gap-2">
-        <Button variant="ghost" size="icon" className="relative" onClick={() => navigate('/landlord/notifications')}>
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-bizrent-red text-[10px] font-bold text-primary-foreground">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80">
+            <div className="flex items-center justify-between px-3 py-2">
+              <p className="text-sm font-semibold">Notifications</p>
+              {unreadCount > 0 && (
+                <Button variant="ghost" size="sm" className="text-xs h-auto py-1" onClick={() => markAllRead.mutate()}>
+                  Mark all read
+                </Button>
+              )}
+            </div>
+            <DropdownMenuSeparator />
+            {recentNotifications.length === 0 ? (
+              <div className="px-3 py-6 text-center text-sm text-muted-foreground">No notifications</div>
+            ) : (
+              recentNotifications.map(n => (
+                <DropdownMenuItem key={n.id} className="flex flex-col items-start gap-1 cursor-pointer p-3" onClick={() => handleNotificationClick(n)}>
+                  <div className="flex items-center gap-2 w-full">
+                    {!n.is_read && <div className="h-2 w-2 rounded-full bg-bizrent-amber flex-shrink-0" />}
+                    <span className="text-sm font-medium truncate flex-1">{n.title}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{n.body}</p>
+                  <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</p>
+                </DropdownMenuItem>
+              ))
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="justify-center text-primary text-sm cursor-pointer" onClick={() => navigate('/landlord/notifications')}>
+              View all notifications
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
