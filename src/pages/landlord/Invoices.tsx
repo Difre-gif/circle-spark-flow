@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Search, FileText } from 'lucide-react';
+import { Search, FileText } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -19,7 +19,21 @@ export default function Invoices() {
     return name.toLowerCase().includes(search.toLowerCase()) || inv.invoice_number.toLowerCase().includes(search.toLowerCase());
   });
 
-  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2 mb-8">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+        <div className="flex gap-4">
+          <Skeleton className="h-10 w-64 rounded-full" />
+          <Skeleton className="h-10 w-48 rounded-lg" />
+        </div>
+        <Skeleton className="h-[500px] w-full rounded-xl" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -37,11 +51,11 @@ export default function Invoices() {
             placeholder="Search by tenant or invoice #..." 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
-            className="pl-9 bg-white shadow-sm focus-visible:ring-bizrent-blue" 
+            className="pl-9 h-10 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20" 
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm focus:ring-bizrent-blue">
+          <SelectTrigger className="w-full sm:w-48 h-10 bg-white border-border/50 shadow-sm focus:ring-bizrent-navy/20">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -54,50 +68,52 @@ export default function Invoices() {
         </Select>
       </div>
 
-      <Card className="shadow-sm border-border/50 overflow-hidden">
+      <Card className="overflow-hidden border-0">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-bizrent-navy py-4">Invoice #</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Tenant</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Unit</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4 text-right">Amount</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4 text-right">Balance</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4 text-center">Status</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Due Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map(inv => (
-                <TableRow key={inv.id} className="cursor-pointer transition-colors hover:bg-muted/50" onClick={() => navigate(`/landlord/invoices/${inv.id}`)}>
-                  <TableCell className="font-bold text-bizrent-blue">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-bizrent-blue/70" />
-                      {inv.invoice_number}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{(inv.tenant as any)?.full_name ?? '—'}</TableCell>
-                  <TableCell className="text-muted-foreground">{(inv.unit as any)?.unit_number ?? '—'}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{formatRWF(inv.amount_due)}</TableCell>
-                  <TableCell className="text-right font-bold text-bizrent-navy">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</TableCell>
-                  <TableCell className="text-center"><StatusBadge status={inv.status} /></TableCell>
-                  <TableCell className="text-sm text-muted-foreground font-medium">{formatDate(inv.due_date)}</TableCell>
-                </TableRow>
-              ))}
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={8} className="h-48 text-center">
-                    <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <FileText className="h-10 w-10 mb-3 text-muted-foreground/50" />
-                      <p className="text-lg font-medium text-bizrent-navy">No invoices found</p>
-                      <p className="text-sm">Try adjusting your search filters.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
+                  <th className="text-left px-6 py-4 whitespace-nowrap">Invoice #</th>
+                  <th className="text-left px-6 py-4">Tenant</th>
+                  <th className="text-left px-6 py-4">Unit</th>
+                  <th className="text-left px-6 py-4 text-right">Amount</th>
+                  <th className="text-left px-6 py-4 text-right">Balance</th>
+                  <th className="text-left px-6 py-4 text-center">Status</th>
+                  <th className="text-left px-6 py-4">Due Date</th>
+                </tr>
+              </thead>
+              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+                {filtered.map(inv => (
+                  <tr key={inv.id} className="cursor-pointer transition-colors hover:bg-muted/30 border-b border-border/20" onClick={() => navigate(`/landlord/invoices/${inv.id}`)}>
+                    <td className="px-6 py-4 font-bold text-bizrent-navy">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-bizrent-blue/70" />
+                        {inv.invoice_number}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-bizrent-navy">{(inv.tenant as any)?.full_name ?? '—'}</td>
+                    <td className="px-6 py-4 text-muted-foreground font-medium">{(inv.unit as any)?.unit_number ?? '—'}</td>
+                    <td className="px-6 py-4 text-right font-medium text-muted-foreground font-tabular-nums">{formatRWF(inv.amount_due)}</td>
+                    <td className="px-6 py-4 text-right font-extrabold text-bizrent-navy font-tabular-nums">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</td>
+                    <td className="px-6 py-4 text-center"><StatusBadge status={inv.status} /></td>
+                    <td className="px-6 py-4 text-xs font-semibold text-muted-foreground">{formatDate(inv.due_date)}</td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="py-16 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center">
+                        <FileText className="h-8 w-8 mb-2 opacity-20" />
+                        <p className="font-medium text-bizrent-navy">No invoices found</p>
+                        <p className="text-sm mt-1">Try adjusting your search filters.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

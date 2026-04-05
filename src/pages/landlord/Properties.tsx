@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Loader2, Building } from 'lucide-react';
+import { Plus, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,20 @@ export default function Properties() {
     setForm({ name: '', property_type: '', address_line1: '', city: 'Kigali', district: '' });
   };
 
-  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between mb-8">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-xl" />
+        </div>
+        <Skeleton className="h-[500px] w-full rounded-xl" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -34,70 +47,72 @@ export default function Properties() {
           <h1 className="page-title">Properties</h1>
           <p className="page-description">Manage {properties?.length ?? 0} properties in your portfolio</p>
         </div>
-        <Button className="bg-bizrent-blue hover:bg-bizrent-navy text-white shadow-sm" onClick={() => setDialogOpen(true)}>
+        <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold" onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Property
         </Button>
       </div>
 
-      <Card className="shadow-sm border-border/50 overflow-hidden">
+      <Card className="overflow-hidden border-0">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-bizrent-navy py-4">Property Name</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Type</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Location</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4 text-center">Total Units</TableHead>
-                <TableHead className="font-semibold text-bizrent-navy py-4">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {(properties ?? []).map(p => (
-                <TableRow key={p.id} className="cursor-pointer transition-colors hover:bg-muted/50" onClick={() => navigate(`/landlord/properties/${p.id}`)}>
-                  <TableCell className="font-bold text-bizrent-navy">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-bizrent-navy/5 rounded-md">
-                        <Building className="h-4 w-4 text-bizrent-blue" />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
+                  <th className="text-left px-6 py-4 whitespace-nowrap">Property Name</th>
+                  <th className="text-left px-6 py-4">Type</th>
+                  <th className="text-left px-6 py-4">Location</th>
+                  <th className="text-center px-6 py-4">Total Units</th>
+                  <th className="text-center px-6 py-4">Status</th>
+                </tr>
+              </thead>
+              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+                {(properties ?? []).map(p => (
+                  <tr key={p.id} className="cursor-pointer transition-colors hover:bg-muted/30 border-b border-border/20" onClick={() => navigate(`/landlord/properties/${p.id}`)}>
+                    <td className="px-6 py-4 font-bold text-bizrent-navy">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-bizrent-navy/5 rounded-md">
+                          <Building className="h-4 w-4 text-bizrent-blue" />
+                        </div>
+                        {p.name}
                       </div>
-                      {p.name}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground font-medium">{p.property_type.replace('_', ' ')}</TableCell>
-                  <TableCell className="text-muted-foreground">{p.district}, {p.city}</TableCell>
-                  <TableCell className="text-center font-medium">{p.total_units}</TableCell>
-                  <TableCell><StatusBadge status={p.is_active ? 'ACTIVE' : 'INACTIVE'} /></TableCell>
-                </TableRow>
-              ))}
-              {(!properties || properties.length === 0) && (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-48 text-center">
-                    <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <Building className="h-10 w-10 mb-3 text-muted-foreground/50" />
-                      <p className="text-lg font-medium text-bizrent-navy">No properties yet</p>
-                      <p className="text-sm">Add your first property to get started.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground font-medium capitalize">{p.property_type.toLowerCase().replace('_', ' ')}</td>
+                    <td className="px-6 py-4 text-muted-foreground font-medium">{p.district ? `${p.district}, ` : ''}{p.city}</td>
+                    <td className="px-6 py-4 text-center font-bold text-bizrent-navy font-tabular-nums">{p.total_units}</td>
+                    <td className="px-6 py-4 text-center"><StatusBadge status={p.is_active ? 'ACTIVE' : 'INACTIVE'} /></td>
+                  </tr>
+                ))}
+                {(!properties || properties.length === 0) && (
+                  <tr>
+                    <td colSpan={5} className="py-16 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center">
+                        <Building className="h-8 w-8 mb-2 opacity-20" />
+                        <p className="font-medium text-bizrent-navy">No properties yet</p>
+                        <p className="text-sm mt-1">Add your first property to get started.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-bizrent-navy">Add New Property</DialogTitle>
           </DialogHeader>
           <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label className="font-semibold">Property Name</Label>
-              <Input placeholder="e.g. Sunrise Apartments" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+              <Label className="font-semibold text-bizrent-navy">Property Name</Label>
+              <Input placeholder="e.g. Sunrise Apartments" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="focus-visible:ring-bizrent-blue/20" />
             </div>
             <div className="space-y-2">
-              <Label className="font-semibold">Property Type</Label>
+              <Label className="font-semibold text-bizrent-navy">Property Type</Label>
               <Select value={form.property_type} onValueChange={v => setForm(f => ({ ...f, property_type: v }))}>
-                <SelectTrigger className="focus:ring-bizrent-blue">
+                <SelectTrigger className="focus:ring-bizrent-blue/20">
                   <SelectValue placeholder="Select property type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -109,24 +124,23 @@ export default function Properties() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="font-semibold">Address Line 1</Label>
-              <Input placeholder="e.g. KG 11 Ave" value={form.address_line1} onChange={e => setForm(f => ({ ...f, address_line1: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+              <Label className="font-semibold text-bizrent-navy">Address Line 1</Label>
+              <Input placeholder="e.g. KG 11 Ave" value={form.address_line1} onChange={e => setForm(f => ({ ...f, address_line1: e.target.value }))} className="focus-visible:ring-bizrent-blue/20" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="font-semibold">City</Label>
-                <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+                <Label className="font-semibold text-bizrent-navy">City</Label>
+                <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className="focus-visible:ring-bizrent-blue/20" />
               </div>
               <div className="space-y-2">
-                <Label className="font-semibold">District</Label>
-                <Input placeholder="e.g. Gasabo" value={form.district} onChange={e => setForm(f => ({ ...f, district: e.target.value }))} className="focus-visible:ring-bizrent-blue" />
+                <Label className="font-semibold text-bizrent-navy">District</Label>
+                <Input placeholder="e.g. Gasabo" value={form.district} onChange={e => setForm(f => ({ ...f, district: e.target.value }))} className="focus-visible:ring-bizrent-blue/20" />
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-bizrent-blue hover:bg-bizrent-navy" onClick={handleCreate} disabled={createProperty.isPending}>
-              {createProperty.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 rounded-xl font-semibold" onClick={handleCreate} disabled={createProperty.isPending}>
               {createProperty.isPending ? 'Saving...' : 'Save Property'}
             </Button>
           </DialogFooter>

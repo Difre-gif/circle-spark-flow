@@ -1,21 +1,18 @@
-import { ArrowRightLeft, Send, Wallet, Activity, TrendingUp, AlertCircle, Download, Loader2, Search } from 'lucide-react';
+import { ArrowRightLeft, Send, Wallet, Activity, Download, Loader2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useDashboardStats, usePayments, useOccupancySummary, useOrganisation, formatRWF, formatDate } from '@/hooks/useSupabaseData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function LandlordDashboard() {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: recentPayments, isLoading: paymentsLoading } = usePayments();
-  const { data: occupancy } = useOccupancySummary();
+  const { data: occupancy, isLoading: occLoading } = useOccupancySummary();
   const { data: org } = useOrganisation();
 
-  const isLoading = statsLoading || paymentsLoading;
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
-  }
+  const isLoading = statsLoading || paymentsLoading || occLoading;
 
   // Mocking past 6 months data for the visual chart based on template
   const mockChartData = [
@@ -26,6 +23,27 @@ export default function LandlordDashboard() {
     { month: 'May', collected: 280, outstanding: 140 },
     { month: 'Jun', collected: 320, outstanding: 80 },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 pb-12">
+        <div className="mb-8 space-y-3">
+          <Skeleton className="h-10 w-72" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div className="xl:col-span-4 flex flex-col gap-6">
+            <Skeleton className="h-64 rounded-3xl w-full" />
+            <Skeleton className="h-64 rounded-3xl w-full" />
+          </div>
+          <div className="xl:col-span-8 flex flex-col gap-6">
+            <Skeleton className="h-64 rounded-3xl w-full" />
+            <Skeleton className="h-96 rounded-3xl w-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-500">
@@ -40,21 +58,21 @@ export default function LandlordDashboard() {
         <div className="xl:col-span-4 flex flex-col gap-6">
           
           {/* Outstanding Balance Widget */}
-          <Card className="rounded-3xl border-0 card-shadow bg-white">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
             <CardContent className="p-6 sm:p-8">
               <div className="flex justify-between items-start mb-4">
-                <p className="text-sm font-semibold text-muted-foreground">Total Outstanding Rent</p>
-                <div className="bg-muted px-3 py-1 rounded-full text-xs font-bold text-bizrent-navy flex items-center gap-1">
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total Outstanding Rent</p>
+                <div className="bg-muted/50 px-3 py-1 rounded-full text-xs font-bold text-bizrent-navy flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-bizrent-red"></span> RWF
                 </div>
               </div>
-              <h2 className="text-4xl font-extrabold text-bizrent-navy tracking-tight">{formatRWF(stats?.outstanding ?? 0)}</h2>
-              <p className="text-sm font-medium text-bizrent-red mt-2 bg-bizrent-red/10 inline-block px-2 py-0.5 rounded-md">
+              <h2 className="text-4xl font-extrabold text-bizrent-navy tracking-tight font-tabular-nums">{formatRWF(stats?.outstanding ?? 0)}</h2>
+              <p className="text-xs font-bold text-bizrent-red mt-3 bg-bizrent-red/10 inline-block px-2.5 py-1 rounded-md">
                 Requires Attention
               </p>
               
               <div className="flex gap-3 mt-8">
-                <Button className="flex-1 rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-md">
+                <Button className="flex-1 rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-sm">
                   <Send className="mr-2 h-4 w-4" /> Send Reminders
                 </Button>
                 <Button variant="outline" className="flex-1 rounded-xl border-border/60 hover:bg-muted font-semibold h-12">
@@ -65,14 +83,14 @@ export default function LandlordDashboard() {
           </Card>
 
           {/* Top Properties / Wallets Widget */}
-          <Card className="rounded-3xl border-0 card-shadow bg-white">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
             <CardHeader className="pb-2 pt-6 px-6 flex flex-row justify-between items-center">
               <CardTitle className="text-base font-bold text-bizrent-navy">Top Properties</CardTitle>
             </CardHeader>
             <CardContent className="px-6 pb-6 pt-2">
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {(occupancy ?? []).slice(0, 3).map((prop, idx) => (
-                  <div key={prop.property_id} className="flex items-center justify-between p-3 rounded-2xl border border-border/40 hover:bg-muted/30 transition-colors">
+                  <div key={prop.property_id} className="flex items-center justify-between p-3 rounded-xl border border-border/40 hover:bg-muted/30 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg
                         ${idx === 0 ? 'bg-bizrent-navy text-white' : idx === 1 ? 'bg-bizrent-emerald text-white' : 'bg-bizrent-blue text-white'}`}>
@@ -80,12 +98,12 @@ export default function LandlordDashboard() {
                       </div>
                       <div>
                         <p className="font-bold text-sm text-bizrent-navy truncate max-w-[120px]">{prop.property_name}</p>
-                        <p className="text-xs text-muted-foreground">{prop.occupied_units}/{prop.total_units} Occupied</p>
+                        <p className="text-xs text-muted-foreground font-medium">{prop.occupied_units}/{prop.total_units} Occupied</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-sm text-bizrent-navy">{prop.occupancy_rate_pct}%</p>
-                      <p className="text-[10px] font-semibold text-bizrent-emerald">Active</p>
+                      <p className="font-bold text-sm text-bizrent-navy font-tabular-nums">{prop.occupancy_rate_pct}%</p>
+                      <p className="text-[10px] font-bold text-bizrent-emerald uppercase">Active</p>
                     </div>
                   </div>
                 ))}
@@ -97,7 +115,7 @@ export default function LandlordDashboard() {
           </Card>
 
           {/* MoMo Cards Widget */}
-          <Card className="rounded-3xl border-0 card-shadow bg-white overflow-hidden">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden">
             <CardHeader className="flex flex-row justify-between items-center pb-2 pt-6 px-6">
               <CardTitle className="text-base font-bold text-bizrent-navy flex items-center gap-2">
                 <Wallet className="h-5 w-5" /> Payment Accounts
@@ -105,8 +123,8 @@ export default function LandlordDashboard() {
             </CardHeader>
             <CardContent className="p-6 pt-2 space-y-4">
               {/* Primary MoMo Card (BizRent Amber/Yellow to mimic MTN MoMo) */}
-              <div className="bg-bizrent-amber rounded-2xl p-5 shadow-lg relative overflow-hidden text-bizrent-navy">
-                <div className="absolute -right-4 -top-4 opacity-20">
+              <div className="bg-[#ffcc00] rounded-2xl p-5 shadow-sm relative overflow-hidden text-bizrent-navy">
+                <div className="absolute -right-4 -top-4 opacity-10">
                   <div className="w-24 h-24 rounded-full border-4 border-bizrent-navy"></div>
                 </div>
                 <div className="flex justify-between items-center mb-6">
@@ -117,7 +135,7 @@ export default function LandlordDashboard() {
                 <p className="text-3xl font-mono font-bold tracking-widest">{org?.momo_merchant_number || '000000'}</p>
                 <div className="mt-4 flex justify-between items-end text-xs font-bold opacity-80">
                   <p>{org?.name}</p>
-                  <p className="px-2 py-1 bg-bizrent-navy text-white rounded-md text-[10px]">ACTIVE</p>
+                  <p className="px-2 py-1 bg-bizrent-navy text-white rounded-md text-[10px] uppercase">Active</p>
                 </div>
               </div>
             </CardContent>
@@ -133,52 +151,52 @@ export default function LandlordDashboard() {
             {/* 4 Colored Stats Grid */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-4">
               {/* Highlight Stat (Amber) */}
-              <div className="bg-bizrent-amber rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy">
-                <p className="text-xs font-bold opacity-80 mb-2">Pending Payments</p>
-                <h3 className="text-3xl font-extrabold">{stats?.pendingPayments ?? 0}</h3>
-                <p className="text-[10px] font-bold mt-2 bg-bizrent-navy/10 self-start px-2 py-1 rounded-md">
+              <div className="bg-[#ffcc00] rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy">
+                <p className="text-xs font-bold opacity-80 mb-2 uppercase tracking-wide">Pending Payments</p>
+                <h3 className="text-3xl font-extrabold font-tabular-nums">{stats?.pendingPayments ?? 0}</h3>
+                <p className="text-[10px] font-bold mt-3 bg-bizrent-navy/10 self-start px-2.5 py-1 rounded-md uppercase">
                   Requires Review
                 </p>
               </div>
               
               {/* White Stat 1 */}
-              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center card-shadow border border-border/30">
-                <p className="text-xs font-bold text-muted-foreground mb-2">Collection Rate</p>
-                <h3 className="text-3xl font-extrabold text-bizrent-navy">{stats?.collectionRate ?? 0}%</h3>
-                <p className="text-[10px] font-bold mt-2 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2 py-1 rounded-md">
+              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
+                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Collection Rate</p>
+                <h3 className="text-3xl font-extrabold text-bizrent-navy font-tabular-nums">{stats?.collectionRate ?? 0}%</h3>
+                <p className="text-[10px] font-bold mt-3 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2.5 py-1 rounded-md uppercase">
                   ↑ This month
                 </p>
               </div>
 
               {/* White Stat 2 */}
-              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center card-shadow border border-border/30">
-                <p className="text-xs font-bold text-muted-foreground mb-2">Occupied Units</p>
-                <h3 className="text-3xl font-extrabold text-bizrent-navy">{stats?.occupiedUnits ?? 0}</h3>
-                <p className="text-[10px] font-bold mt-2 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2 py-1 rounded-md">
+              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
+                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Occupied Units</p>
+                <h3 className="text-3xl font-extrabold text-bizrent-navy font-tabular-nums">{stats?.occupiedUnits ?? 0}</h3>
+                <p className="text-[10px] font-bold mt-3 text-bizrent-blue flex items-center bg-bizrent-blue/10 self-start px-2.5 py-1 rounded-md uppercase">
                   out of {stats?.totalUnits ?? 0}
                 </p>
               </div>
 
               {/* White Stat 3 */}
-              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center card-shadow border border-border/30">
-                <p className="text-xs font-bold text-muted-foreground mb-2">Vacant Units</p>
-                <h3 className="text-3xl font-extrabold text-bizrent-navy">{stats?.vacantUnits ?? 0}</h3>
-                <p className="text-[10px] font-bold mt-2 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2 py-1 rounded-md">
+              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
+                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Vacant Units</p>
+                <h3 className="text-3xl font-extrabold text-bizrent-navy font-tabular-nums">{stats?.vacantUnits ?? 0}</h3>
+                <p className="text-[10px] font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
                   Lost Revenue
                 </p>
               </div>
             </div>
 
             {/* Collections Chart */}
-            <Card className="lg:col-span-3 rounded-3xl border-0 card-shadow bg-white">
+            <Card className="lg:col-span-3 rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
               <CardHeader className="pb-0 pt-6 px-6">
                 <CardTitle className="text-base font-bold text-bizrent-navy">Revenue Overview</CardTitle>
                 <p className="text-xs text-muted-foreground font-medium">View your collections over the last 6 months</p>
               </CardHeader>
               <CardContent className="px-6 pt-6 pb-2">
                 <div className="flex justify-end gap-4 mb-4 text-xs font-bold">
-                  <div className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-bizrent-blue"></span> Collected</div>
-                  <div className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-bizrent-slate"></span> Outstanding</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-blue"></span> Collected</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-slate"></span> Outstanding</div>
                 </div>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -198,13 +216,13 @@ export default function LandlordDashboard() {
           </div>
 
           {/* Recent Activities Table */}
-          <Card className="rounded-3xl border-0 card-shadow bg-white flex-1">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white flex-1">
             <CardHeader className="flex flex-row justify-between items-center pb-4 pt-6 px-8 border-b border-border/40">
               <CardTitle className="text-base font-bold text-bizrent-navy">Recent Activities</CardTitle>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                  <input type="text" placeholder="Search" className="pl-9 pr-4 py-1.5 text-sm rounded-full bg-muted/50 border-none outline-none focus:ring-2 focus:ring-bizrent-navy/20 transition-all w-32 md:w-48" />
+                  <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 text-sm rounded-full bg-muted/30 border border-transparent outline-none focus:ring-2 focus:ring-bizrent-navy/20 transition-all w-32 md:w-48" />
                 </div>
                 <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-muted"><Download className="h-4 w-4" /></Button>
               </div>
@@ -213,49 +231,43 @@ export default function LandlordDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border/40 text-muted-foreground font-semibold">
+                    <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
                       <th className="text-left px-8 py-4 whitespace-nowrap">Transaction ID</th>
                       <th className="text-left px-4 py-4">Tenant</th>
-                      <th className="text-left px-4 py-4">Amount</th>
-                      <th className="text-left px-4 py-4">Status</th>
+                      <th className="text-left px-4 py-4 text-right">Amount</th>
+                      <th className="text-left px-4 py-4 text-center">Status</th>
                       <th className="text-left px-8 py-4">Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(recentPayments ?? []).slice(0, 6).map((p, idx) => (
-                      <tr key={p.id} className="border-b border-border/20 hover:bg-muted/20 transition-colors group">
+                      <tr key={p.id} className="border-b border-border/20 hover:bg-muted/30 transition-colors group">
                         <td className="px-8 py-4">
-                          <code className="font-mono text-xs bg-muted/50 px-2 py-1 rounded-md text-bizrent-navy font-bold group-hover:bg-white transition-colors">
+                          <code className="font-mono text-[11px] font-bold bg-muted/50 px-2 py-1 rounded-md text-bizrent-navy group-hover:bg-white transition-colors">
                             {p.transaction_id || `TXN_${idx}00${idx}`}
                           </code>
                         </td>
                         <td className="px-4 py-4 font-bold text-bizrent-navy whitespace-nowrap">
                           {(p.tenant as any)?.full_name ?? '—'}
                         </td>
-                        <td className="px-4 py-4 font-semibold text-bizrent-slate whitespace-nowrap">
+                        <td className="px-4 py-4 font-semibold text-bizrent-slate whitespace-nowrap text-right font-tabular-nums">
                           {formatRWF(p.amount)}
                         </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${
-                              p.status === 'APPROVED' ? 'bg-bizrent-emerald' : 
-                              p.status === 'PENDING' ? 'bg-bizrent-amber' : 
-                              'bg-bizrent-red'
-                            }`}></span>
-                            <span className="font-semibold text-xs text-muted-foreground capitalize">
-                              {p.status.toLowerCase()}
-                            </span>
-                          </div>
+                        <td className="px-4 py-4 text-center">
+                          <StatusBadge status={p.status} />
                         </td>
-                        <td className="px-8 py-4 text-muted-foreground font-medium whitespace-nowrap">
+                        <td className="px-8 py-4 text-muted-foreground font-medium whitespace-nowrap text-xs">
                           {formatDate(p.submitted_at)}
                         </td>
                       </tr>
                     ))}
                     {(!recentPayments || recentPayments.length === 0) && (
                       <tr>
-                        <td colSpan={5} className="py-12 text-center text-muted-foreground font-medium">
-                          No recent activities found
+                        <td colSpan={5} className="py-16 text-center text-muted-foreground">
+                          <div className="flex flex-col items-center justify-center">
+                            <Activity className="h-8 w-8 mb-2 opacity-20" />
+                            <p className="font-medium text-bizrent-navy">No recent activities found</p>
+                          </div>
                         </td>
                       </tr>
                     )}

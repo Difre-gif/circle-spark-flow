@@ -4,40 +4,33 @@ import { cn } from '@/lib/utils';
 type StatusType = string;
 
 const statusStyles: Record<string, string> = {
-  PAID: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
-  APPROVED: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
-  ACTIVE: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
-  OCCUPIED: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
-  CURRENT: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
-  RESOLVED: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
-  DUE: 'bg-bizrent-blue text-primary-foreground hover:bg-bizrent-blue/90',
-  UPCOMING: 'bg-bizrent-blue text-primary-foreground hover:bg-bizrent-blue/90',
-  PENDING: 'bg-bizrent-amber text-primary-foreground hover:bg-bizrent-amber/90',
-  PARTIAL: 'bg-bizrent-amber text-primary-foreground hover:bg-bizrent-amber/90',
-  LATE: 'bg-bizrent-amber text-primary-foreground hover:bg-bizrent-amber/90',
-  IN_PROGRESS: 'bg-bizrent-amber text-primary-foreground hover:bg-bizrent-amber/90',
-  INVITED: 'bg-bizrent-amber text-primary-foreground hover:bg-bizrent-amber/90',
-  MEDIUM: 'bg-bizrent-amber text-primary-foreground hover:bg-bizrent-amber/90',
-  OVERDUE: 'bg-bizrent-red text-primary-foreground hover:bg-bizrent-red/90',
-  REJECTED: 'bg-bizrent-red text-primary-foreground hover:bg-bizrent-red/90',
-  TERMINATED: 'bg-muted text-muted-foreground',
-  INACTIVE: 'bg-muted text-muted-foreground',
-  VACANT: 'bg-muted text-muted-foreground',
-  MAINTENANCE: 'bg-bizrent-overdue text-primary-foreground',
-  OPEN: 'bg-bizrent-blue text-primary-foreground',
-  HIGH: 'bg-bizrent-overdue text-primary-foreground',
-  URGENT: 'bg-bizrent-red text-primary-foreground',
-  LOW: 'bg-muted text-muted-foreground',
-  OWNER: 'bg-bizrent-navy text-primary-foreground',
-  MANAGER: 'bg-bizrent-blue text-primary-foreground',
-  ACCOUNTANT: 'bg-bizrent-forest text-primary-foreground',
-  AUTO_APPROVED: 'bg-bizrent-emerald text-primary-foreground hover:bg-bizrent-emerald/90',
-  CANCELLED: 'bg-muted text-muted-foreground',
-  EXPIRED: 'bg-muted text-muted-foreground',
-  TRIAL: 'bg-bizrent-blue text-primary-foreground',
-  LAPSED: 'bg-bizrent-amber text-primary-foreground',
-  TENANT: 'bg-bizrent-blue text-primary-foreground',
-  SUPER_ADMIN: 'bg-bizrent-navy text-primary-foreground',
+  PAID: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-transparent',
+  APPROVED: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-transparent',
+  ACTIVE: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-transparent',
+  OCCUPIED: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-transparent',
+  CURRENT: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-transparent',
+  RESOLVED: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-transparent',
+  AUTO_APPROVED: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-transparent',
+  
+  DUE: 'bg-blue-100 text-blue-800 hover:bg-blue-200 border-transparent',
+  UPCOMING: 'bg-blue-100 text-blue-800 hover:bg-blue-200 border-transparent',
+  OPEN: 'bg-blue-100 text-blue-800 hover:bg-blue-200 border-transparent',
+  
+  PENDING: 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-transparent',
+  PARTIAL: 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-transparent',
+  LATE: 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-transparent',
+  IN_PROGRESS: 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-transparent',
+  INVITED: 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-transparent',
+  
+  OVERDUE: 'bg-red-100 text-red-800 hover:bg-red-200 border-transparent',
+  REJECTED: 'bg-red-100 text-red-800 hover:bg-red-200 border-transparent',
+  URGENT: 'bg-red-100 text-red-800 hover:bg-red-200 border-transparent',
+  
+  TERMINATED: 'bg-slate-100 text-slate-700 border-transparent',
+  INACTIVE: 'bg-slate-100 text-slate-700 border-transparent',
+  VACANT: 'bg-slate-100 text-slate-700 border-transparent',
+  CANCELLED: 'bg-slate-100 text-slate-700 border-transparent',
+  EXPIRED: 'bg-slate-100 text-slate-700 border-transparent',
 };
 
 interface StatusBadgeProps {
@@ -47,7 +40,7 @@ interface StatusBadgeProps {
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
-    <Badge className={cn('text-xs font-semibold', statusStyles[status] || 'bg-muted text-muted-foreground', className)}>
+    <Badge variant="outline" className={cn('text-[11px] px-2.5 py-0.5 font-bold uppercase tracking-wider', statusStyles[status] || 'bg-slate-100 text-slate-700', className)}>
       {status.replace('_', ' ')}
     </Badge>
   );

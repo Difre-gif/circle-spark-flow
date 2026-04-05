@@ -37,15 +37,15 @@ export function TopBar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 items-center justify-between px-6 bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-30 flex h-20 items-center justify-between px-4 md:px-8 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
       {/* Left: Mobile Logo */}
       <div className="md:hidden flex items-center">
         <BizRentLogo variant="full" size="sm" className="text-bizrent-navy" />
       </div>
 
       {/* Center: Pill Navigation (Hidden on mobile) */}
-      <div className="hidden md:flex flex-1 justify-start ml-2">
-        <nav className="flex items-center gap-1 bg-white rounded-full p-1.5 shadow-sm border border-border/50">
+      <div className="hidden md:flex flex-1 justify-start">
+        <nav className="flex items-center gap-1 bg-white rounded-full p-1.5 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border/50">
           {[
             { name: 'Overview', path: '/landlord' },
             { name: 'Properties', path: '/landlord/properties' },
@@ -61,7 +61,7 @@ export function TopBar() {
                 "px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200",
                 isActive 
                   ? "bg-bizrent-navy text-white shadow-sm" 
-                  : "text-muted-foreground hover:text-bizrent-navy hover:bg-muted/50"
+                  : "text-muted-foreground hover:text-bizrent-navy hover:bg-muted/80"
               )}
             >
               {item.name}
@@ -73,11 +73,11 @@ export function TopBar() {
       {/* Right: Actions */}
       <div className="flex items-center gap-4">
         {/* Search */}
-        <div className="relative hidden lg:block w-64 group">
+        <div className="relative hidden xl:block w-64 group">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-bizrent-navy" />
           <Input 
             placeholder="Search..." 
-            className="pl-10 h-10 rounded-full bg-white border-transparent shadow-sm focus-visible:ring-bizrent-navy/20 transition-all" 
+            className="pl-10 h-10 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 transition-all" 
           />
         </div>
 
@@ -87,7 +87,7 @@ export function TopBar() {
             <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full bg-white shadow-sm border border-border/50 hover:bg-muted">
               <Bell className="h-5 w-5 text-bizrent-navy" />
               {unreadCount > 0 && (
-                <span className="absolute 0 top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-bizrent-red text-[10px] font-bold text-white ring-2 ring-white">
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-bizrent-red text-[10px] font-bold text-white shadow-sm border-2 border-white">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -133,7 +133,7 @@ export function TopBar() {
                 <span className="text-sm font-bold text-bizrent-navy leading-none">
                   {user?.name?.split(' ')[0]}
                 </span>
-                <span className="text-[10px] text-muted-foreground font-medium mt-0.5">Landlord</span>
+                <span className="text-[10px] text-muted-foreground font-medium mt-0.5 capitalize">{user?.role}</span>
               </div>
             </Button>
           </DropdownMenuTrigger>
