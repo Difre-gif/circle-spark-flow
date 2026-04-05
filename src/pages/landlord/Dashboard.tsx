@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Send, Wallet, Activity, TrendingUp, AlertCircle, Download, Loader2 } from 'lucide-react';
+import { ArrowRightLeft, Send, Wallet, Activity, TrendingUp, AlertCircle, Download, Loader2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
