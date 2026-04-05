@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useDashboardStats, usePayments, useOccupancySummary, useOrganisation, formatRWF, formatDate } from '@/hooks/useSupabaseData';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function LandlordDashboard() {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
