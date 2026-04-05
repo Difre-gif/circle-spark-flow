@@ -1359,6 +1359,15 @@ export type Database = {
       generate_receipt_number: { Args: never; Returns: string }
       get_current_org_id: { Args: never; Returns: string }
       get_current_user_id: { Args: never; Returns: string }
+      register_organisation: {
+        Args: {
+          p_email: string
+          p_name: string
+          p_phone?: string
+          p_slug: string
+        }
+        Returns: string
+      }
       set_org_context: {
         Args: { p_org_id: string; p_role: string; p_user_id: string }
         Returns: undefined
