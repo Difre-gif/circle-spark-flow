@@ -58,6 +58,15 @@ export default function Register() {
         throw new Error(orgError.message);
       }
 
+      // Fire-and-forget: welcome email to new landlord
+      supabase.functions.invoke('send-email', {
+        body: {
+          to: form.email,
+          type: 'welcome-landlord',
+          data: { name: form.name, orgName: form.organisation },
+        },
+      }).catch(() => { /* ignore */ });
+
       navigate('/landlord');
     } catch (err: any) {
       setError(err.message || 'Registration failed.');

@@ -325,6 +325,40 @@ export function useApprovePayment() {
         org_id: orgId!,
         metadata: { amount: payment.amount, invoice_id: payment.invoice_id },
       });
+
+      // Fire-and-forget: payment-approved email to tenant
+      void (async () => {
+        try {
+          const { data: pm } = await supabase
+            .from('payments')
+            .select('transaction_id, tenant:users!payments_tenant_user_id_fkey(email, full_name), invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
+            .eq('id', paymentId)
+            .single();
+          const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
+          const tenant = (pm?.tenant as any);
+          if (tenant?.email && pm) {
+            const inv = (pm.invoice as any);
+            const unit = inv?.unit;
+            await supabase.functions.invoke('send-email', {
+              body: {
+                to: tenant.email,
+                type: 'payment-approved',
+                data: {
+                  tenantName: tenant.full_name || tenant.email,
+                  orgName: (org as any)?.name || 'BizRent',
+                  amount: Number(payment.amount),
+                  invoiceNumber: inv?.invoice_number || '',
+                  propertyUnit: unit ? (unit.property?.name + ' — Unit ' + unit.unit_number) : '',
+                  period: inv?.billing_period_start || '',
+                  transactionId: pm.transaction_id || undefined,
+                  approvedBy: user!.user_metadata?.full_name || user!.email || 'Management',
+                  approvedAt: new Date().toISOString(),
+                },
+              },
+            });
+          }
+        } catch { /* ignore email errors */ }
+      })();
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payments'] });
@@ -363,6 +397,39 @@ export function useRejectPayment() {
         org_id: orgId!,
         metadata: { rejection_reason: reason },
       });
+
+      // Fire-and-forget: payment-rejected email to tenant
+      void (async () => {
+        try {
+          const { data: pm } = await supabase
+            .from('payments')
+            .select('amount, transaction_id, tenant:users!payments_tenant_user_id_fkey(email, full_name), invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
+            .eq('id', paymentId)
+            .single();
+          const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
+          const tenant = (pm?.tenant as any);
+          if (tenant?.email && pm) {
+            const inv = (pm.invoice as any);
+            const unit = inv?.unit;
+            await supabase.functions.invoke('send-email', {
+              body: {
+                to: tenant.email,
+                type: 'payment-rejected',
+                data: {
+                  tenantName: tenant.full_name || tenant.email,
+                  orgName: (org as any)?.name || 'BizRent',
+                  amount: Number(pm.amount),
+                  invoiceNumber: inv?.invoice_number || '',
+                  propertyUnit: unit ? (unit.property?.name + ' — Unit ' + unit.unit_number) : '',
+                  period: inv?.billing_period_start || '',
+                  transactionId: pm.transaction_id || undefined,
+                  rejectionReason: reason,
+                },
+              },
+            });
+          }
+        } catch { /* ignore email errors */ }
+      })();
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payments'] });
@@ -426,6 +493,44 @@ export function useSubmitPayment() {
         }
         throw error;
       }
+
+      // Fire-and-forget: payment-submitted alert to org owner/landlord
+      void (async () => {
+        try {
+          const { data: inv } = await supabase
+            .from('invoices')
+            .select('invoice_number, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name))')
+            .eq('id', input.invoice_id)
+            .single();
+          const { data: ownerRow } = await supabase
+            .from('user_organisation_roles')
+            .select('user:users!user_organisation_roles_user_id_fkey(email, full_name)')
+            .eq('org_id', orgId!)
+            .eq('role', 'OWNER' as any)
+            .limit(1)
+            .single();
+          const owner = (ownerRow?.user as any);
+          if (owner?.email) {
+            const unit = (inv?.unit as any);
+            const tenantName = user!.user_metadata?.full_name || user!.email || 'Tenant';
+            await supabase.functions.invoke('send-email', {
+              body: {
+                to: owner.email,
+                type: 'payment-submitted',
+                data: {
+                  landlordName: owner.full_name || owner.email,
+                  tenantName,
+                  amount: input.amount,
+                  propertyUnit: unit ? (unit.property?.name + ' — Unit ' + unit.unit_number) : '',
+                  invoiceNumber: inv?.invoice_number || '',
+                  transactionId: input.transaction_id.toUpperCase() || undefined,
+                  submittedAt: new Date().toISOString(),
+                },
+              },
+            });
+          }
+        } catch { /* ignore email errors */ }
+      })();
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payments'] });
@@ -706,6 +811,37 @@ export function useInviteTenant() {
         if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
         throw error;
       }
+
+      // Fire-and-forget: tenant-invitation email
+      void (async () => {
+        try {
+          const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
+          let unitInfo: string | undefined;
+          if (input.unit_id) {
+            const { data: unitRow } = await supabase
+              .from('units')
+              .select('unit_number, property:properties!units_property_id_fkey(name)')
+              .eq('id', input.unit_id)
+              .single();
+            if (unitRow) {
+              const prop = (unitRow.property as any);
+              unitInfo = prop ? (prop.name + ' — Unit ' + unitRow.unit_number) : ('Unit ' + unitRow.unit_number);
+            }
+          }
+          const inviterName = user!.user_metadata?.full_name || user!.email || 'Management';
+          await supabase.functions.invoke('send-email', {
+            body: {
+              to: input.email.toLowerCase(),
+              type: 'tenant-invitation',
+              data: {
+                orgName: (org as any)?.name || 'BizRent',
+                inviterName,
+                unitInfo,
+              },
+            },
+          });
+        } catch { /* ignore email errors */ }
+      })();
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invitations'] });
@@ -733,6 +869,25 @@ export function useInviteStaff() {
         if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
         throw error;
       }
+
+      // Fire-and-forget: staff-invitation email
+      void (async () => {
+        try {
+          const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
+          const inviterName = user!.user_metadata?.full_name || user!.email || 'Management';
+          await supabase.functions.invoke('send-email', {
+            body: {
+              to: input.email.toLowerCase(),
+              type: 'staff-invitation',
+              data: {
+                orgName: (org as any)?.name || 'BizRent',
+                inviterName,
+                role: input.role,
+              },
+            },
+          });
+        } catch { /* ignore email errors */ }
+      })();
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invitations'] });
