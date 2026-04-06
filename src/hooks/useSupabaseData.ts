@@ -715,6 +715,33 @@ export function useInviteTenant() {
   });
 }
 
+export function useInviteStaff() {
+  const { orgId, user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { email: string; role: 'MANAGER' | 'ACCOUNTANT' }) => {
+      const { error } = await supabase
+        .from('invitations')
+        .insert({
+          email: input.email.toLowerCase(),
+          org_id: orgId!,
+          invited_by: user!.id,
+          role: input.role as any,
+          status: 'PENDING' as any,
+        });
+      if (error) {
+        if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['invitations'] });
+      toast.success('Staff invitation sent. They will be linked automatically when they sign up.');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
 export function useCreateOrganisation() {
   const qc = useQueryClient();
   const { user } = useAuth();

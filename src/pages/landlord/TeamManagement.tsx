@@ -1,22 +1,32 @@
-import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Loader2, UserPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTeamMembers, formatDate } from '@/hooks/useSupabaseData';
+import { InviteStaffModal } from '@/components/layouts/InviteStaffModal';
 
 export default function TeamManagement() {
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const { data: members, isLoading } = useTeamMembers();
 
   if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="page-header">
+      <div className="page-header flex justify-between items-start">
         <div>
           <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">System / Users</p>
           <h1 className="page-title">Staff & Users</h1>
           <p className="page-description">Manage your organisation's team members and roles</p>
         </div>
+        <Button onClick={() => setIsInviteModalOpen(true)} className="bg-bizrent-navy hover:bg-bizrent-navy/90 gap-2">
+          <UserPlus className="h-4 w-4" />
+          Invite Staff
+        </Button>
       </div>
+
+      <InviteStaffModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
 
       <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
