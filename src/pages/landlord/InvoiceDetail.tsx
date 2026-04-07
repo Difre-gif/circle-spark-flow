@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -18,27 +18,59 @@ export default function InvoiceDetail() {
   if (!invoice) return <div className="text-center py-12 text-muted-foreground">Invoice not found</div>;
 
   const balance = Number(invoice.balance ?? (invoice.amount_due - invoice.amount_paid));
+  const orgName = (invoice.unit as any)?.property?.organisation?.name ?? 'BizRent';
+  const propertyName = (invoice.unit as any)?.property?.name ?? '';
+  const unitNumber = (invoice.unit as any)?.unit_number ?? '';
+  const tenantName = (invoice.tenant as any)?.full_name ?? '—';
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <>
+      {/* ── Print-only styles injected inline ── */}
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          #invoice-printable, #invoice-printable * { visibility: visible; }
+          #invoice-printable { position: fixed; inset: 0; padding: 40px; background: white; }
+          .no-print { display: none !important; }
+          .print-header { display: flex !important; }
+        }
+        .print-header { display: none; }
+      `}</style>
+
+    <div className="space-y-6" id="invoice-printable">
+      <div className="flex items-center gap-4 no-print">
         <Button variant="ghost" size="icon" onClick={() => navigate('/landlord/invoices')}><ArrowLeft className="h-5 w-5" /></Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{invoice.invoice_number}</h1>
-          <p className="text-muted-foreground">{(invoice.unit as any)?.property?.name ?? ''}</p>
+          <p className="text-muted-foreground">{propertyName}</p>
         </div>
         <StatusBadge status={invoice.status} />
+        <Button variant="outline" className="gap-2 rounded-xl font-semibold" onClick={() => window.print()}>
+          <Printer className="h-4 w-4" /> Export PDF
+        </Button>
+      </div>
+
+      {/* Print header (visible only when printing) */}
+      <div className="print-header items-start justify-between border-b pb-6 mb-2">
+        <div>
+          <p className="text-2xl font-black text-slate-900">BizRent</p>
+          <p className="text-sm text-slate-500">{orgName}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-3xl font-extrabold text-slate-900">{invoice.invoice_number}</p>
+          <p className="text-sm text-slate-500">Status: {invoice.status}</p>
+        </div>
       </div>
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <Card>
           <CardHeader><CardTitle>Invoice Details</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between"><span className="text-muted-foreground">Tenant</span><span className="font-medium">{(invoice.tenant as any)?.full_name ?? '—'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Tenant</span><span className="font-medium">{tenantName}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Unit</span><span>{(invoice.unit as any)?.unit_number ?? '—'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Unit</span><span>{unitNumber || '—'}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Property</span><span>{(invoice.unit as any)?.property?.name ?? '—'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Property</span><span>{propertyName || '—'}</span></div>
             <Separator />
             <div className="flex justify-between"><span className="text-muted-foreground">Due Date</span><span>{formatDate(invoice.due_date)}</span></div>
             <Separator />
@@ -72,5 +104,6 @@ export default function InvoiceDetail() {
         </Card>
       </div>
     </div>
+    </>
   );
 }

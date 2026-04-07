@@ -46,7 +46,13 @@ import SuperAdminAuditLogs from "@/pages/super-admin/AuditLogs";
 import SuperAdminSettings from "@/pages/super-admin/Settings";
 import SuperAdminMonitor from "@/pages/super-admin/Monitor";
 import GlobalConfig from "@/pages/super-admin/GlobalConfig";
+import GhostEngine from "@/pages/super-admin/GhostEngine";
+import FinancialOverride from "@/pages/super-admin/FinancialOverride";
+import SystemVitals from "@/pages/super-admin/SystemVitals";
+import FraudDetection from "@/pages/super-admin/FraudDetection";
+import PropertyControl from "@/pages/super-admin/PropertyControl";
 import PendingApproval from "@/pages/auth/PendingApproval";
+import AcceptInvite from "@/pages/auth/AcceptInvite";
 
 // Tenant pages
 import TenantDashboard from "@/pages/tenant/Dashboard";
@@ -107,6 +113,11 @@ function AppRoutes() {
         <Route path="monitor" element={<SuperAdminMonitor />} />
         <Route path="config" element={<GlobalConfig />} />
         <Route path="settings" element={<SuperAdminSettings />} />
+        <Route path="ghost" element={<GhostEngine />} />
+        <Route path="financial" element={<FinancialOverride />} />
+        <Route path="vitals" element={<SystemVitals />} />
+        <Route path="fraud" element={<FraudDetection />} />
+        <Route path="property-control" element={<PropertyControl />} />
       </Route>
 
       {/* Landlord portal */}

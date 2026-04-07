@@ -1,113 +1,179 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Building2, CheckCircle2, Loader2 } from 'lucide-react';
 import { BizRentLogo } from '@/components/BizRentLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 
+interface InvitationDetails {
+  id: string;
+  email: string;
+  org_name: string;
+  unit_info: string | null;
+  role: string;
+  is_valid: boolean;
+}
+
 export default function AcceptInvite() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
   const navigate = useNavigate();
+  const token = searchParams.get('token');
 
-  const [form, setForm] = useState({ name: '', phone: '', password: '', confirm: '' });
-  const [showPassword, setShowPassword] = useState(false);
+  const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [fetching, setFetching] = useState(true);
+
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, string>>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [globalError, setGlobalError] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
 
-  const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm(f => ({ ...f, [field]: e.target.value }));
-    setFieldErrors(fe => ({ ...fe, [field]: undefined }));
-    setError(null);
+  // Step 1: fetch invitation details using the public RPC
+  useEffect(() => {
+    if (!token) { setFetchError('Invalid invitation link — no token found.'); setFetching(false); return; }
+
+    (async () => {
+      const { data, error } = await supabase.rpc('get_invitation_by_token', { p_token: token });
+      if (error || !data || data.length === 0 || !data[0].is_valid) {
+        setFetchError('This invitation link is invalid or has already been used.');
+      } else {
+        setInvitation(data[0] as InvitationDetails);
+      }
+      setFetching(false);
+    })();
+  }, [token]);
+
+  // Step 2: if the user is already signed in when they land here (e.g. after email
+  // confirmation redirect), complete the invitation automatically.
+  useEffect(() => {
+    if (!token || fetching || !invitation) return;
+
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await completeInvitation(token, '');
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, fetching, invitation]);
+
+  const completeInvitation = async (tok: string, fullName: string) => {
+    const { error } = await supabase.rpc('accept_invitation', {
+      p_token: tok,
+      p_full_name: fullName || undefined,
+    });
+    if (error) throw error;
+    // Reload the profile so the auth store picks up the new org + role
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.auth.refreshSession();
+    }
+    // Redirect based on role
+    const dest = invitation?.role === 'TENANT' ? '/tenant' : '/landlord';
+    navigate(dest, { replace: true });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) {
-      setError('Invalid or missing invitation token.');
-      return;
-    }
-    
-    setError(null);
+    setGlobalError(null);
+    if (!invitation || !token) return;
 
-    // Per-field validation
-    const errs: Partial<Record<string, string>> = {};
-    if (!form.name.trim()) errs.name = 'Full name is required.';
-    if (!form.password) errs.password = 'Password is required.';
-    else if (form.password.length < 8) errs.password = 'Password must be at least 8 characters.';
-    if (!form.confirm) errs.confirm = 'Please confirm your password.';
-    else if (form.password !== form.confirm) errs.confirm = 'Passwords do not match.';
-    setFieldErrors(errs);
+    // Validate
+    const errs: Record<string, string> = {};
+    if (!name.trim()) errs.name = 'Full name is required.';
+    if (!password) errs.password = 'Password is required.';
+    else if (password.length < 8) errs.password = 'Password must be at least 8 characters.';
+    if (password !== confirm) errs.confirm = 'Passwords do not match.';
+    setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
     setLoading(true);
     try {
-      // 1. Fetch invitation email (RPC bypasses RLS safely)
-      const { data: invEmail, error: getErr } = await supabase.rpc('get_invitation_email', { p_token: token });
-      if (getErr || !invEmail) {
-        throw new Error('Invalid or expired invitation. Please request a new invite.');
-      }
-
-      // 2. Sign up the user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: invEmail,
-        password: form.password,
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: invitation.email,
+        password,
         options: {
-          data: {
-            full_name: form.name,
-            phone: form.phone
-          }
-        }
+          data: { full_name: name.trim() },
+          // After email confirmation Supabase will redirect here with an active session
+          emailRedirectTo: `${window.location.origin}/accept-invite?token=${token}`,
+        },
       });
 
-      if (authError) {
-        if (authError.message.includes('already registered')) {
-          // If already registered, they should just login and we accept the invite with their session
-          throw new Error('An account with this email already exists. Please log in directly.');
+      if (signUpError) {
+        // If the user already exists, try signing in instead
+        if (signUpError.message.toLowerCase().includes('already registered') ||
+            signUpError.message.toLowerCase().includes('already been registered')) {
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: invitation.email,
+            password,
+          });
+          if (signInError) throw new Error('Account already exists but password is incorrect. Try signing in at /login.');
+          await completeInvitation(token, name.trim());
+          return;
         }
-        throw new Error(authError.message);
+        throw signUpError;
       }
 
-      // If email confirmation is required, warn them, otherwise proceed to accept
-      if (authData.user?.identities?.length === 0) {
-        throw new Error('Failed to register identity.');
+      if (data.session) {
+        // Email confirmation is disabled — user is immediately signed in
+        await completeInvitation(token, name.trim());
+      } else {
+        // Email confirmation is required
+        setEmailSent(true);
+        // Store token so we can complete after confirmation (handled in the useEffect above)
+        localStorage.setItem('pending_invite_token', token);
+        localStorage.setItem('pending_invite_name', name.trim());
       }
-
-      // 3. Immediately accept the invitation using the new session
-      const { error: acceptErr } = await supabase.rpc('accept_invitation', {
-        p_token: token,
-        p_name: form.name,
-        p_phone: form.phone || ''
-      });
-
-      if (acceptErr) {
-        // Edge case: Signed up but RPC failed
-        throw new Error(`Account created but couldn't link workspace: ${acceptErr.message}`);
-      }
-
-      navigate('/tenant');
-      
     } catch (err: any) {
-      setError(err.message || 'Registration failed.');
+      setGlobalError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!token) {
+  if (fetching) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-        <Card className="w-full max-w-md shadow-xl border-t-4 border-t-bizrent-red">
-          <CardContent className="pt-6 pb-8 text-center space-y-4">
-            <BizRentLogo size="lg" className="mx-auto" />
-            <h2 className="text-xl font-bold text-bizrent-navy">Invalid Invitation Link</h2>
-            <p className="text-muted-foreground text-sm">Please check your email and click the exact link provided.</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="py-12 space-y-4">
+            <div className="text-4xl">🔗</div>
+            <h2 className="text-xl font-bold">Invalid Invitation</h2>
+            <p className="text-muted-foreground text-sm">{fetchError}</p>
+            <Button onClick={() => navigate('/login')} variant="outline">Go to Login</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (emailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="py-12 space-y-4">
+            <CheckCircle2 className="h-12 w-12 mx-auto text-emerald-500" />
+            <h2 className="text-xl font-bold">Check your email</h2>
+            <p className="text-muted-foreground text-sm">
+              We've sent a confirmation link to <strong>{invitation?.email}</strong>.
+              Click it to confirm your account — you'll be automatically signed in and linked to <strong>{invitation?.org_name}</strong>.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -115,78 +181,94 @@ export default function AcceptInvite() {
   }
 
   return (
-    <div className="flex min-h-screen">
-      <div className="hidden lg:flex w-1/2 bg-bizrent-navy p-12 text-white flex-col justify-between relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-bizrent-blue/20 to-transparent" />
-        <div className="relative z-10">
-          <BizRentLogo size="lg" className="text-white" />
-          <div className="mt-20 max-w-lg space-y-6">
-            <h1 className="text-4xl font-extrabold tracking-tight">Welcome to BizRent.</h1>
-            <p className="text-lg text-white/80 leading-relaxed font-medium">
-              You've been invited to join an organisation workspace. Create your profile below to gain access to your properties, invoices, and payments in one secure portal.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex w-full lg:w-1/2 items-center justify-center bg-slate-50 p-4 sm:p-8">
-        <Card className="w-full max-w-[420px] shadow-xl border-0 bg-white">
-          <CardHeader className="space-y-3 pb-6">
-            <div className="lg:hidden flex justify-center mb-2">
-              <BizRentLogo size="lg" className="text-bizrent-navy" />
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center"><BizRentLogo size="lg" className="text-primary" /></div>
+          <div className="flex items-center justify-center gap-2 bg-muted rounded-xl px-4 py-3">
+            <Building2 className="h-5 w-5 text-muted-foreground" />
+            <div className="text-left">
+              <p className="text-xs font-semibold text-muted-foreground">You've been invited to</p>
+              <p className="font-bold text-sm">{invitation?.org_name}</p>
+              {invitation?.unit_info && <p className="text-xs text-muted-foreground">{invitation.unit_info}</p>}
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Accept Invitation</CardTitle>
-            <CardDescription className="text-center font-medium">Set up your profile to join the workspace.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {error && (
-              <Alert variant="destructive" className="mb-6 rounded-xl border-red-200 bg-red-50 text-red-900">
-                <AlertDescription className="font-semibold">{error}</AlertDescription>
+          </div>
+          <div>
+            <CardTitle className="text-2xl">Set up your account</CardTitle>
+            <CardDescription>
+              Creating account for <strong>{invitation?.email}</strong>
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <form onSubmit={handleSubmit} noValidate>
+          <CardContent className="space-y-4">
+            {globalError && (
+              <Alert variant="destructive">
+                <AlertDescription>{globalError}</AlertDescription>
               </Alert>
             )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <Label>Full Name <span className="text-red-500">*</span></Label>
-                <Input placeholder="John Doe" value={form.name} onChange={update('name')} aria-invalid={!!fieldErrors.name} />
-                {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
+            <div className="space-y-1">
+              <Label>Full Name <span className="text-red-500">*</span></Label>
+              <Input
+                placeholder="Jean-Pierre Habimana"
+                value={name}
+                onChange={e => { setName(e.target.value); setErrors(ev => ({ ...ev, name: '' })); }}
+                aria-invalid={!!errors.name}
+              />
+              {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
+            </div>
+            <div className="space-y-1">
+              <Label>Password <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <Input
+                  type={showPw ? 'text' : 'password'}
+                  placeholder="Min. 8 characters"
+                  value={password}
+                  onChange={e => { setPassword(e.target.value); setErrors(ev => ({ ...ev, password: '' })); }}
+                  className="pr-10"
+                  aria-invalid={!!errors.password}
+                />
+                <button type="button" onClick={() => setShowPw(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  tabIndex={-1}>
+                  {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
-
-              <div className="space-y-1">
-                <Label>Phone Number <span className="text-muted-foreground font-normal">(Optional)</span></Label>
-                <Input placeholder="+250 788 000 000" value={form.phone} onChange={update('phone')} />
+              {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
+            </div>
+            <div className="space-y-1">
+              <Label>Confirm Password <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <Input
+                  type={showConfirm ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={confirm}
+                  onChange={e => { setConfirm(e.target.value); setErrors(ev => ({ ...ev, confirm: '' })); }}
+                  className="pr-10"
+                  aria-invalid={!!errors.confirm}
+                />
+                <button type="button" onClick={() => setShowConfirm(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  tabIndex={-1}>
+                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
-              
-              <div className="space-y-1">
-                <Label>Set Password <span className="text-red-500">*</span></Label>
-                <div className="relative">
-                  <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={update('password')} aria-invalid={!!fieldErrors.password} className="pr-10" />
-                  <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
-              </div>
-
-              <div className="space-y-1">
-                <Label>Confirm Password <span className="text-red-500">*</span></Label>
-                <div className="relative">
-                  <Input type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={form.confirm} onChange={update('confirm')} aria-invalid={!!fieldErrors.confirm} className="pr-10" />
-                  <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                    {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {fieldErrors.confirm && <p className="text-xs text-red-500 mt-1">{fieldErrors.confirm}</p>}
-              </div>
-
-              <Button type="submit" className="w-full h-12 text-base font-bold bg-bizrent-navy hover:bg-bizrent-navy/90 rounded-xl mt-4" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-                {loading ? 'Creating Account...' : 'Join Workspace'}
-              </Button>
-            </form>
+              {errors.confirm && <p className="text-xs text-red-500">{errors.confirm}</p>}
+            </div>
           </CardContent>
-        </Card>
-      </div>
+          <div className="px-6 pb-6 space-y-3">
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating account...</> : 'Accept & Create Account'}
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              Already have an account?{' '}
+              <button type="button" onClick={() => navigate('/login')} className="text-primary hover:underline">
+                Sign in
+              </button>
+            </p>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 }

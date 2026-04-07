@@ -1,19 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Users, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import {
+  LayoutDashboard,
+  Building2,
+  Users,
+  Settings,
+  LogOut,
+  Menu,
   X,
-  ShieldCheck,
   History,
-  Activity,
-  Globe,
   Radio,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Ghost,
+  DollarSign,
+  Activity,
+  ShieldAlert,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,14 +23,39 @@ import { BizRentLogo } from "@/components/BizRentLogo";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Overview", href: "/super-admin" },
-  { icon: Building2, label: "Organizations", href: "/super-admin/organizations" },
-  { icon: Users, label: "Platform Users", href: "/super-admin/users" },
-  { icon: History, label: "System Audit", href: "/super-admin/audit" },
-  { icon: Radio, label: "Job Monitor", href: "/super-admin/monitor" },
-  { icon: SlidersHorizontal, label: "Global Config", href: "/super-admin/config" },
-  { icon: Settings, label: "Config & Tiers", href: "/super-admin/settings" },
+type NavGroup = {
+  label: string;
+  items: { icon: React.ElementType; label: string; href: string }[];
+};
+
+const navGroups: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { icon: LayoutDashboard, label: "Overview", href: "/super-admin" },
+      { icon: Building2, label: "Organizations", href: "/super-admin/organizations" },
+      { icon: Users, label: "Platform Users", href: "/super-admin/users" },
+    ],
+  },
+  {
+    label: "Sovereignty Tools",
+    items: [
+      { icon: Ghost, label: "Ghost Engine", href: "/super-admin/ghost" },
+      { icon: DollarSign, label: "Financial Override", href: "/super-admin/financial" },
+      { icon: Activity, label: "System Vitals", href: "/super-admin/vitals" },
+      { icon: ShieldAlert, label: "Fraud & Forensics", href: "/super-admin/fraud" },
+      { icon: Home, label: "Property Control", href: "/super-admin/property-control" },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { icon: History, label: "Audit Logs", href: "/super-admin/audit" },
+      { icon: Radio, label: "Job Monitor", href: "/super-admin/monitor" },
+      { icon: SlidersHorizontal, label: "Global Config", href: "/super-admin/config" },
+      { icon: Settings, label: "Config & Tiers", href: "/super-admin/settings" },
+    ],
+  },
 ];
 
 export function SuperAdminSidebar() {
@@ -72,30 +99,34 @@ export function SuperAdminSidebar() {
             </Link>
           </div>
 
-          <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            System Control
-          </div>
-
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-2 mt-2">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                    isActive 
-                      ? "bg-slate-800 text-white shadow-sm ring-1 ring-slate-700" 
-                      : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
-                  )}
-                >
-                  <item.icon size={18} className={cn("transition-colors", isActive ? "text-emerald-400" : "text-slate-500 group-hover:text-slate-300")} />
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="flex-1 overflow-y-auto px-3 py-2 mt-1 space-y-4">
+            {navGroups.map((group) => (
+              <div key={group.label}>
+                <p className="px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{group.label}</p>
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const isActive = location.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                          isActive
+                            ? "bg-slate-800 text-white shadow-sm ring-1 ring-slate-700"
+                            : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+                        )}
+                      >
+                        <item.icon size={18} className={cn("transition-colors", isActive ? "text-emerald-400" : "text-slate-500 group-hover:text-slate-300")} />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           {/* Footer User Profile */}

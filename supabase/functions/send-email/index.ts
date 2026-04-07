@@ -190,8 +190,10 @@ function buildWelcomeLandlord(data: { name: string; orgName: string }) {
 
 // ─── 2. tenant-invitation ─────────────────────────────────────────────────────
 function buildTenantInvitation(data: { orgName: string; inviterName: string; unitInfo?: string; invitationId?: string }) {
+  const acceptUrl = data.invitationId
+    ? `https://bizrent.rw/accept-invite?token=${data.invitationId}`
+    : `https://bizrent.rw/accept-invite`;
   const subject = `You've been invited to join ${data.orgName} on BizRent`;
-  const link = data.invitationId ? `https://bizrent.rw/accept-invite?token=${data.invitationId}` : `https://bizrent.rw/register`;
   const html = buildEmail({
     headerClass: "header-default",
     headerIcon: ICON.building,
@@ -199,26 +201,33 @@ function buildTenantInvitation(data: { orgName: string; inviterName: string; uni
     headerSubtitle: `${data.inviterName} has invited you to BizRent`,
     previewText: `${data.inviterName} from ${data.orgName} has invited you to manage your tenancy on BizRent.`,
     body: `
-      <p class="greeting">Hi there,</p>
+      <p class="greeting">Hello,</p>
       <p class="intro">
-        ${data.inviterName} has invited you to join <strong>${data.orgName}</strong> as a Tenant on BizRent.
-        ${data.unitInfo ? `<br><br>You'll be connected to <strong>${data.unitInfo}</strong>.` : ''}
-        <br><br>
-        Set up your password to gain access and start managing your payments.
+        <strong>${data.inviterName}</strong> from <strong>${data.orgName}</strong> has invited you to BizRent —
+        Rwanda's property management platform where you can view invoices, submit payments, and manage your tenancy.
       </p>
-      <div class="cta-wrap">
-        <a class="cta" href="${link}">Accept Invitation &amp; Set Password</a>
+      <table class="details-table">
+        <tr><td>Organisation</td><td>${data.orgName}</td></tr>
+        ${data.unitInfo ? `<tr><td>Your Unit</td><td>${data.unitInfo}</td></tr>` : ""}
+        <tr><td>Invited by</td><td>${data.inviterName}</td></tr>
+      </table>
+      <div class="alert alert-info">
+        <div class="alert-title">How it works</div>
+        Click the button below, set a password, and your account will be automatically linked to ${data.orgName}. No separate sign-up needed.
       </div>
+      <div class="cta-wrap">
+        <a class="cta" href="${acceptUrl}">Accept Invitation &amp; Set Password</a>
+      </div>
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin-top:8px;">This link is personal to you and expires in 7 days.</p>
     `,
   });
   return { subject, html };
 }
 
 // ─── 3. staff-invitation ──────────────────────────────────────────────────────
-function buildStaffInvitation(data: { orgName: string; inviterName: string; role: string; invitationId?: string }) {
+function buildStaffInvitation(data: { orgName: string; inviterName: string; role: string }) {
   const roleLabel = data.role === "MANAGER" ? "Property Manager" : data.role === "ACCOUNTANT" ? "Accountant" : data.role;
   const subject = `You've been invited to join ${data.orgName} as ${roleLabel}`;
-  const link = data.invitationId ? `https://bizrent.rw/accept-invite?token=${data.invitationId}` : `https://bizrent.rw/register`;
   const html = buildEmail({
     headerClass: "header-default",
     headerIcon: ICON.user,
@@ -238,10 +247,10 @@ function buildStaffInvitation(data: { orgName: string; inviterName: string; role
       </table>
       <div class="alert alert-info">
         <div class="alert-title">Getting started</div>
-        Set up your password with this email address and you will be automatically linked with the correct permissions.
+        Sign up with this email address and you will be automatically linked with the correct permissions.
       </div>
       <div class="cta-wrap">
-        <a class="cta" href="${link}">Accept Invitation &amp; Set Password</a>
+        <a class="cta" href="https://bizrent.rw/register">Accept Invitation &amp; Sign Up</a>
       </div>
     `,
   });

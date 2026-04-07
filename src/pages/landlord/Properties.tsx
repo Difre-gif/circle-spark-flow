@@ -5,25 +5,42 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/StatusBadge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useProperties, useCreateProperty } from '@/hooks/useSupabaseData';
+import { useProperties, useCreateProperty, useUpdateProperty, useDeleteProperty } from '@/hooks/useSupabaseData';
 
 export default function Properties() {
   const navigate = useNavigate();
   const { data: properties, isLoading } = useProperties();
   const createProperty = useCreateProperty();
+  const updateProperty = useUpdateProperty();
+  const deleteProperty = useDeleteProperty();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({ name: '', property_type: '', address_line1: '', city: 'Kigali', district: '' });
+  const [editTarget, setEditTarget] = useState<{ id: string; name: string; property_type: string; address_line1: string; city: string; district: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const handleCreate = async () => {
     if (!form.name || !form.property_type || !form.address_line1) return;
     await createProperty.mutateAsync(form);
     setDialogOpen(false);
     setForm({ name: '', property_type: '', address_line1: '', city: 'Kigali', district: '' });
+  };
+
+  const handleEditSave = async () => {
+    if (!editTarget) return;
+    await updateProperty.mutateAsync({ id: editTarget.id, name: editTarget.name, property_type: editTarget.property_type, address_line1: editTarget.address_line1, city: editTarget.city, district: editTarget.district });
+    setEditTarget(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    await deleteProperty.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   const vacantUnits = (properties ?? []).reduce((acc, p) => acc + (p.total_units - p.occupied_units), 0);
@@ -84,10 +101,10 @@ export default function Properties() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
-                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-navy transition-colors">
+                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-navy transition-colors" onClick={() => setEditTarget({ id: p.id, name: p.name, property_type: p.property_type, address_line1: (p as any).address_line1 ?? '', city: (p as any).city ?? 'Kigali', district: (p as any).district ?? '' })}>
                           <Edit2 className="h-4 w-4" /> Edit Property
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors">
+                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors" onClick={() => setDeleteTarget({ id: p.id, name: p.name })}>
                           <Trash2 className="h-4 w-4" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -175,6 +192,71 @@ export default function Properties() {
             <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setDialogOpen(false)}>Cancel</Button>
             <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 rounded-xl font-semibold" onClick={handleCreate} disabled={createProperty.isPending}>
               {createProperty.isPending ? 'Saving...' : 'Save Property'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Property Dialog */}
+      <Dialog open={!!editTarget} onOpenChange={open => { if (!open) setEditTarget(null); }}>
+        <DialogContent className="sm:max-w-[500px] rounded-2xl">
+          <DialogHeader><DialogTitle className="text-xl font-bold text-bizrent-navy">Edit Property</DialogTitle></DialogHeader>
+          {editTarget && (
+            <div className="space-y-5 py-4">
+              <div className="space-y-2">
+                <Label className="font-semibold text-bizrent-navy">Property Name <span className="text-red-500">*</span></Label>
+                <Input value={editTarget.name} onChange={e => setEditTarget(t => t ? { ...t, name: e.target.value } : t)} className="focus-visible:ring-bizrent-blue/20" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-semibold text-bizrent-navy">Property Type <span className="text-red-500">*</span></Label>
+                <Select value={editTarget.property_type} onValueChange={v => setEditTarget(t => t ? { ...t, property_type: v } : t)}>
+                  <SelectTrigger className="focus:ring-bizrent-blue/20"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="APARTMENT">Apartment Building</SelectItem>
+                    <SelectItem value="COMMERCIAL">Commercial Plaza</SelectItem>
+                    <SelectItem value="OFFICE">Office Block</SelectItem>
+                    <SelectItem value="MIXED_USE">Mixed Use Building</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-semibold text-bizrent-navy">Address Line 1</Label>
+                <Input value={editTarget.address_line1} onChange={e => setEditTarget(t => t ? { ...t, address_line1: e.target.value } : t)} className="focus-visible:ring-bizrent-blue/20" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="font-semibold text-bizrent-navy">City</Label>
+                  <Input value={editTarget.city} onChange={e => setEditTarget(t => t ? { ...t, city: e.target.value } : t)} className="focus-visible:ring-bizrent-blue/20" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-semibold text-bizrent-navy">District</Label>
+                  <Input value={editTarget.district} onChange={e => setEditTarget(t => t ? { ...t, district: e.target.value } : t)} className="focus-visible:ring-bizrent-blue/20" />
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setEditTarget(null)}>Cancel</Button>
+            <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 rounded-xl font-semibold" onClick={handleEditSave} disabled={updateProperty.isPending}>
+              {updateProperty.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={open => { if (!open) setDeleteTarget(null); }}>
+        <DialogContent className="sm:max-w-[420px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-bizrent-navy">Remove Property</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              Are you sure you want to remove <strong>{deleteTarget?.name}</strong>? It will be hidden from your portfolio but data will be retained.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 mt-2">
+            <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button variant="destructive" className="rounded-xl font-semibold" onClick={handleDeleteConfirm} disabled={deleteProperty.isPending}>
+              {deleteProperty.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Removing...</> : 'Remove Property'}
             </Button>
           </DialogFooter>
         </DialogContent>
