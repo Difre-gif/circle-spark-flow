@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Send, Wallet, Activity, Download, Loader2, Search, Home } from 'lucide-react';
+import { ArrowRightLeft, Send, Wallet, Activity, Download, Loader2, Search, Home, Building2, Users, FileText, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -44,6 +44,37 @@ export default function LandlordDashboard() {
           <p className="page-description">Stay on top of your properties, monitor payments, and track status.</p>
         </div>
       </div>
+
+      {/* Get Started — shown only when account has no properties yet */}
+      {!occLoading && (!occupancy || occupancy.length === 0) && (
+        <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] bg-gradient-to-r from-bizrent-navy to-bizrent-blue text-white overflow-hidden">
+          <CardContent className="p-8">
+            <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Welcome to BizRent</p>
+            <h2 className="text-2xl font-extrabold mb-1">Set up your first property</h2>
+            <p className="text-sm opacity-80 mb-6 max-w-lg">You're all set! Follow these three steps to start collecting rent and managing tenants.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { icon: Building2, step: '1', title: 'Add a Property', desc: 'Register your building or commercial space.', href: '/landlord/properties' },
+                { icon: Home, step: '2', title: 'Add Units', desc: 'Break your property into individual rentable units.', href: '/landlord/units' },
+                { icon: Users, step: '3', title: 'Invite Tenants', desc: 'Send email invites and assign them to units.', href: '/landlord/tenants' },
+              ].map(({ icon: Icon, step, title, desc, href }) => (
+                <button
+                  key={step}
+                  onClick={() => navigate(href)}
+                  className="text-left p-4 rounded-2xl bg-white/10 hover:bg-white/20 transition-colors flex flex-col gap-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="p-2 bg-white/20 rounded-xl"><Icon className="h-5 w-5" /></div>
+                    <ChevronRight className="h-4 w-4 opacity-60" />
+                  </div>
+                  <p className="font-bold text-sm">{step}. {title}</p>
+                  <p className="text-xs opacity-70">{desc}</p>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         

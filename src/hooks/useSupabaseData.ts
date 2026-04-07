@@ -1270,3 +1270,61 @@ export function useRetryJob() {
     },
   });
 }
+
+// ─── Notification Preferences ───
+export interface NotificationPrefs {
+  payment_submissions: boolean;
+  overdue_invoices: boolean;
+  invoice_reminders: boolean;
+  payment_status: boolean;
+}
+
+const DEFAULT_PREFS: NotificationPrefs = {
+  payment_submissions: true,
+  overdue_invoices: true,
+  invoice_reminders: true,
+  payment_status: true,
+};
+
+export function useNotificationPrefs() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ['notification-prefs', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('notification_prefs')
+        .eq('id', user!.id)
+        .single();
+      if (error) throw error;
+      return { ...DEFAULT_PREFS, ...(data?.notification_prefs ?? {}) } as NotificationPrefs;
+    },
+  });
+}
+
+export function useUpdateNotificationPrefs() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (prefs: Partial<NotificationPrefs>) => {
+      const { data: current } = await supabase
+        .from('users')
+        .select('notification_prefs')
+        .eq('id', user!.id)
+        .single();
+      const merged = { ...DEFAULT_PREFS, ...(current?.notification_prefs ?? {}), ...prefs };
+      const { error } = await supabase
+        .from('users')
+        .update({ notification_prefs: merged })
+        .eq('id', user!.id);
+      if (error) throw error;
+      return merged;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notification-prefs', user?.id] });
+      toast.success('Notification preferences saved.');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useOrganisation, useUpdateOrganisation, useSubscription, formatRWF } from '@/hooks/useSupabaseData';
+import { useOrganisation, useUpdateOrganisation, useSubscription, formatRWF, useNotificationPrefs, useUpdateNotificationPrefs } from '@/hooks/useSupabaseData';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Check, Zap, Shield, Crown } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,6 +17,8 @@ export default function Settings() {
   const { data: org, isLoading: orgLoading } = useOrganisation();
   const { data: subscription } = useSubscription();
   const updateOrg = useUpdateOrganisation();
+  const { data: notifPrefs } = useNotificationPrefs();
+  const updateNotifPrefs = useUpdateNotificationPrefs();
   const [form, setForm] = useState<{ name: string; email: string; phone: string } | null>(null);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
@@ -139,7 +141,11 @@ export default function Settings() {
                 <p className="font-bold text-bizrent-navy">Payment Submissions</p>
                 <p className="text-sm font-medium text-muted-foreground mt-0.5">Get notified when tenants submit payments</p>
               </div>
-              <Switch defaultChecked />
+              <Switch
+                checked={notifPrefs?.payment_submissions ?? true}
+                onCheckedChange={v => updateNotifPrefs.mutate({ payment_submissions: v })}
+                disabled={updateNotifPrefs.isPending}
+              />
             </div>
             <Separator className="bg-border/50" />
             <div className="flex items-center justify-between gap-4">
@@ -147,7 +153,11 @@ export default function Settings() {
                 <p className="font-bold text-bizrent-navy">Overdue Invoices</p>
                 <p className="text-sm font-medium text-muted-foreground mt-0.5">Alert when invoices become overdue</p>
               </div>
-              <Switch defaultChecked />
+              <Switch
+                checked={notifPrefs?.overdue_invoices ?? true}
+                onCheckedChange={v => updateNotifPrefs.mutate({ overdue_invoices: v })}
+                disabled={updateNotifPrefs.isPending}
+              />
             </div>
           </CardContent>
         </Card>

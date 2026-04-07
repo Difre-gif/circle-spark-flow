@@ -9,9 +9,12 @@ import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useNotificationPrefs, useUpdateNotificationPrefs } from '@/hooks/useSupabaseData';
 
 export default function TenantProfile() {
   const { user } = useAuth();
+  const { data: notifPrefs } = useNotificationPrefs();
+  const updateNotifPrefs = useUpdateNotificationPrefs();
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
   const [pwErrors, setPwErrors] = useState<Partial<Record<string, string>>>({});
   const [pwLoading, setPwLoading] = useState(false);
@@ -100,12 +103,20 @@ export default function TenantProfile() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div><p className="font-medium">Invoice Reminders</p><p className="text-sm text-muted-foreground">Get reminded before due dates</p></div>
-            <Switch defaultChecked />
+            <Switch
+              checked={notifPrefs?.invoice_reminders ?? true}
+              onCheckedChange={v => updateNotifPrefs.mutate({ invoice_reminders: v })}
+              disabled={updateNotifPrefs.isPending}
+            />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <div><p className="font-medium">Payment Status</p><p className="text-sm text-muted-foreground">Updates when payments are approved/rejected</p></div>
-            <Switch defaultChecked />
+            <Switch
+              checked={notifPrefs?.payment_status ?? true}
+              onCheckedChange={v => updateNotifPrefs.mutate({ payment_status: v })}
+              disabled={updateNotifPrefs.isPending}
+            />
           </div>
         </CardContent>
       </Card>
