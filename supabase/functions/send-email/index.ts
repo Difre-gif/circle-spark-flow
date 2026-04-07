@@ -290,7 +290,45 @@ function buildInvoiceDue(data: {
   return { subject, html };
 }
 
-// ─── 5. payment-submitted ─────────────────────────────────────────────────────
+// ─── 5. invoice-overdue (tenant notification) ─────────────────────────────────
+function buildInvoiceOverdue(data: {
+  tenantName: string; orgName: string; invoiceNumber: string;
+  propertyUnit: string; period: string; dueDate: string;
+  amountDue: number; daysOverdue: number; payUrl?: string;
+}) {
+  const subject = `Overdue: Invoice ${data.invoiceNumber} — ${fmtAmount(data.amountDue)}`;
+  const html = buildEmail({
+    headerClass: "header-danger",
+    headerIcon: ICON.bell,
+    headerTitle: "Rent Payment Overdue",
+    headerSubtitle: `Invoice ${data.invoiceNumber} from ${data.orgName}`,
+    previewText: `Your rent payment of ${fmtAmount(data.amountDue)} is ${data.daysOverdue} day(s) overdue.`,
+    body: `
+      <p class="greeting">Hi ${data.tenantName},</p>
+      <p class="intro">Your rent invoice is now overdue. Please make your payment as soon as possible to avoid any further issues with your tenancy.</p>
+      <div class="alert alert-danger">
+        <div class="alert-title">Payment overdue by ${data.daysOverdue} day${data.daysOverdue !== 1 ? "s" : ""}</div>
+        Please submit your payment proof immediately to clear this balance.
+      </div>
+      <div class="amount-chip">${fmtAmount(data.amountDue)}</div>
+      <table class="details-table">
+        <tr><td>Invoice #</td><td>${data.invoiceNumber}</td></tr>
+        <tr><td>Property / Unit</td><td>${data.propertyUnit}</td></tr>
+        <tr><td>Billing Period</td><td>${fmtDate(data.period)}</td></tr>
+        <tr><td>Original Due Date</td><td><strong>${fmtDate(data.dueDate)}</strong></td></tr>
+        <tr><td>Amount Overdue</td><td><strong>${fmtAmount(data.amountDue)}</strong></td></tr>
+        <tr><td>Organisation</td><td>${data.orgName}</td></tr>
+      </table>
+      <div class="cta-wrap">
+        <a class="cta" href="${data.payUrl ?? "https://bizrent.rw/tenant/invoices"}">Submit Payment Now</a>
+      </div>
+      <p class="intro">If you have already made this payment, please submit your proof of payment through the BizRent portal so your landlord can verify it.</p>
+    `,
+  });
+  return { subject, html };
+}
+
+// ─── 6. payment-submitted ─────────────────────────────────────────────────────
 function buildPaymentSubmitted(data: {
   landlordName: string; tenantName: string; amount: number;
   propertyUnit: string; invoiceNumber: string; transactionId?: string;
@@ -455,6 +493,7 @@ function buildEmailByType(type: string, data: Record<string, unknown>): { subjec
     case "tenant-invitation": return buildTenantInvitation(data as any);
     case "staff-invitation":  return buildStaffInvitation(data as any);
     case "invoice-due":       return buildInvoiceDue(data as any);
+    case "invoice-overdue":   return buildInvoiceOverdue(data as any);
     case "payment-submitted": return buildPaymentSubmitted(data as any);
     case "payment-approved":  return buildPaymentApproved(data as any);
     case "payment-rejected":  return buildPaymentRejected(data as any);

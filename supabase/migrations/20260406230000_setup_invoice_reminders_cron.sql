@@ -55,11 +55,12 @@ begin
                 'type', 'invoice-due',
                 'data', jsonb_build_object(
                     'tenantName', invoice_record.tenant_name,
+                    'orgName', invoice_record.org_name,
                     'invoiceNumber', invoice_record.invoice_number,
-                    'dueDate', to_char(invoice_record.due_date, 'DD Month YYYY'),
+                    'dueDate', to_char(invoice_record.due_date, 'YYYY-MM-DD'),
                     'amountDue', invoice_record.amount_due,
                     'propertyUnit', invoice_record.property_name || ' — Unit ' || invoice_record.unit_number,
-                    'period', to_char(invoice_record.billing_period_start, 'DD Mon') || ' - ' || to_char(invoice_record.billing_period_end, 'DD Mon YYYY')
+                    'period', to_char(invoice_record.billing_period_start, 'YYYY-MM-DD')
                 )
             )
         );
@@ -99,14 +100,16 @@ begin
             ),
             body := jsonb_build_object(
                 'to', invoice_record.tenant_email,
-                'type', 'overdue-alert',
+                'type', 'invoice-overdue',
                 'data', jsonb_build_object(
                     'tenantName', invoice_record.tenant_name,
+                    'orgName', invoice_record.org_name,
                     'invoiceNumber', invoice_record.invoice_number,
-                    'dueDate', to_char(invoice_record.due_date, 'DD Month YYYY'),
+                    'dueDate', to_char(invoice_record.due_date, 'YYYY-MM-DD'),
                     'amountDue', invoice_record.amount_due,
+                    'daysOverdue', (current_date - invoice_record.due_date),
                     'propertyUnit', invoice_record.property_name || ' — Unit ' || invoice_record.unit_number,
-                    'period', to_char(invoice_record.billing_period_start, 'DD Mon') || ' - ' || to_char(invoice_record.billing_period_end, 'DD Mon YYYY')
+                    'period', to_char(invoice_record.billing_period_start, 'YYYY-MM-DD')
                 )
             )
         );
