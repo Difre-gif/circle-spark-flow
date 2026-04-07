@@ -52,7 +52,9 @@ export default function Register() {
 
     setLoading(true);
     try {
-      // 1. Create auth user with metadata (trigger creates public.users automatically)
+      // 1. Create auth user with metadata. 
+      // The Postgres trigger `handle_new_auth_user` automatically reads `organisation_name`
+      // and creates the organisation, owner role, and trial subscription atomically in the DB.
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
@@ -60,29 +62,14 @@ export default function Register() {
           data: {
             full_name: form.name,
             phone: form.phone || null,
+            organisation_name: form.organisation, // Passed to DB trigger
           },
         },
       });
       if (authError) throw new Error(authError.message);
       if (!authData.user) throw new Error('Registration failed. Please try again.');
 
-      // 2. Use the register_organisation() SECURITY DEFINER function
-      // This atomically creates org + OWNER role + TRIAL subscription
-      const slug = form.organisation.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const { error: orgError } = await supabase.rpc('register_organisation', {
-        p_name: form.organisation,
-        p_slug: slug || `org-${Date.now()}`,
-        p_email: form.email,
-        p_phone: form.phone || null,
-      });
-      if (orgError) {
-        // If org creation fails, sign out the user
-        await supabase.auth.signOut();
-        throw new Error(orgError.message);
-      }
-
-      // Fire-and-forget: welcome email to new landlord
-      supabase.functions.invoke('send-email', {
+      // Fire-and-forget: welcome email to new landlord      supabase.functions.invoke('send-email', {
         body: {
           to: form.email,
           type: 'welcome-landlord',
