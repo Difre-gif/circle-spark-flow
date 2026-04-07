@@ -31,14 +31,36 @@ export function useProperties() {
   return useQuery({
     queryKey: ['properties', orgId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('org_id', orgId!)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data;
+      // Fetch both properties and their occupancy stats
+      const [propsRes, statsRes] = await Promise.all([
+        supabase
+          .from('properties')
+          .select('*')
+          .eq('org_id', orgId!)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('unit_occupancy_summary')
+          .select('property_id, occupied_units, occupancy_rate_pct, total_units')
+          .eq('org_id', orgId!)
+      ]);
+
+      if (propsRes.error) throw propsRes.error;
+
+      const properties = propsRes.data || [];
+      const stats = statsRes.data || [];
+
+      // Merge stats into properties
+      return properties.map(p => {
+        const pStats = stats.find(s => s.property_id === p.id);
+        return {
+          ...p,
+          occupied_units: pStats?.occupied_units ?? 0,
+          // Fallback to table's total_units if view is missing it
+          total_units: pStats?.total_units ?? p.total_units ?? 0,
+          occupancy_rate_pct: pStats?.occupancy_rate_pct ?? 0
+        };
+      });
     },
     enabled: !!orgId,
   });

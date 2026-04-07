@@ -43,7 +43,11 @@ export default function Properties() {
     setDeleteTarget(null);
   };
 
-  const vacantUnits = (properties ?? []).reduce((acc, p) => acc + (p.total_units - p.occupied_units), 0);
+  const vacantUnits = (properties ?? []).reduce((acc, p) => {
+    const total = p.total_units || 0;
+    const occupied = p.occupied_units || 0;
+    return acc + Math.max(0, total - occupied);
+  }, 0);
 
   if (isLoading) {
     return (
@@ -79,7 +83,9 @@ export default function Properties() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {(properties ?? []).map(p => {
-          const occupancyRate = p.total_units > 0 ? Math.round((p.occupied_units / p.total_units) * 100) : 0;
+          const total = p.total_units || 0;
+          const occupied = p.occupied_units || 0;
+          const occupancyRate = total > 0 ? Math.round((occupied / total) * 100) : 0;
           return (
             <Card key={p.id} className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white group cursor-pointer hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all" onClick={() => navigate(`/landlord/properties/${p.id}`)}>
               <CardContent className="p-6">

@@ -225,8 +225,11 @@ function buildTenantInvitation(data: { orgName: string; inviterName: string; uni
 }
 
 // ─── 3. staff-invitation ──────────────────────────────────────────────────────
-function buildStaffInvitation(data: { orgName: string; inviterName: string; role: string }) {
+function buildStaffInvitation(data: { orgName: string; inviterName: string; role: string; invitationId?: string }) {
   const roleLabel = data.role === "MANAGER" ? "Property Manager" : data.role === "ACCOUNTANT" ? "Accountant" : data.role;
+  const acceptUrl = data.invitationId
+    ? `https://bizrent.rw/accept-invite?token=${data.invitationId}`
+    : `https://bizrent.rw/accept-invite`;
   const subject = `You've been invited to join ${data.orgName} as ${roleLabel}`;
   const html = buildEmail({
     headerClass: "header-default",
@@ -247,11 +250,12 @@ function buildStaffInvitation(data: { orgName: string; inviterName: string; role
       </table>
       <div class="alert alert-info">
         <div class="alert-title">Getting started</div>
-        Sign up with this email address and you will be automatically linked with the correct permissions.
+        Click the button below to accept the invitation and securely set up your account.
       </div>
       <div class="cta-wrap">
-        <a class="cta" href="https://bizrent.rw/register">Accept Invitation &amp; Sign Up</a>
+        <a class="cta" href="${acceptUrl}">Accept Invitation &amp; Join</a>
       </div>
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin-top:8px;">This link is personal to you and expires in 7 days.</p>
     `,
   });
   return { subject, html };
