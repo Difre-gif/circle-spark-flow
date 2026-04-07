@@ -236,9 +236,9 @@ export default function Units() {
                 <Trash2 className="h-6 w-6 text-red-600" />
               </div>
               <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Delete Unit {deleteTarget?.name}?</DialogTitle>
-              <p className="text-sm text-muted-foreground font-medium">
+              <DialogDescription className="text-sm text-muted-foreground font-medium">
                 This action cannot be undone. This will permanently delete the unit and remove any associated history.
-              </p>
+              </DialogDescription>
             </div>
             <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col sm:flex-row">
               <Button variant="outline" className="rounded-xl font-bold h-11 sm:flex-1" onClick={() => setDeleteTarget(null)}>
