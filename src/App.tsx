@@ -12,6 +12,7 @@ import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
+import AcceptInvite from "@/pages/auth/AcceptInvite";
 import ImpersonationBanner from "@/components/ImpersonationBanner";
 
 // Layouts
@@ -78,6 +79,7 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/accept-invite" element={<AcceptInvite />} />
 
       {/* Root redirect */}
       <Route path="/" element={

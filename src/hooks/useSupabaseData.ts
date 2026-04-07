@@ -216,11 +216,103 @@ export function useTenants() {
       if (error) throw error;
       return data;
     },
-    enabled: !!orgId,
-  });
-}
+      enabled: !!orgId,
+    });
+  }
 
-// ─── Invoices ───
+  export function useUpdateTenantProfile() {
+    const { orgId } = useAuth();
+    const qc = useQueryClient();
+    return useMutation({
+      mutationFn: async (input: { user_id: string; full_name: string; phone: string }) => {
+        const { error } = await supabase.rpc('update_tenant_profile', {
+          p_tenant_id: input.user_id,
+          p_org_id: orgId!,
+          p_name: input.full_name,
+          p_phone: input.phone || ''
+        });
+        if (error) throw error;
+      },
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: ['tenants'] });
+        toast.success('Tenant profile updated');
+      },
+      onError: (e: Error) => toast.error(e.message),
+    });
+  }
+
+  export function useRemoveTenant() {
+    const { orgId } = useAuth();
+    const qc = useQueryClient();
+    return useMutation({
+      mutationFn: async (tenantId: string) => {
+        const { error } = await supabase.rpc('remove_tenant', {
+          p_tenant_id: tenantId,
+          p_org_id: orgId!
+        });
+        if (error) throw error;
+      },
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: ['tenants'] });
+        toast.success('Tenant removed from workspace');
+      },
+      onError: (e: Error) => toast.error(e.message),
+    });
+  }
+
+  export function useDeleteInvitation() {
+    const qc = useQueryClient();
+    return useMutation({
+      mutationFn: async (invitationId: string) => {
+        const { error } = await supabase.from('invitations').delete().eq('id', invitationId);
+        if (error) throw error;
+      },
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: ['invitations'] });
+        toast.success('Invitation cancelled');
+      },
+      onError: (e: Error) => toast.error(e.message),
+    });
+  }
+
+  export function useResendInvitation() {
+    const { orgId, user } = useAuth();
+    return useMutation({
+      mutationFn: async (invitation: any) => {
+        const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
+        let unitInfo: string | undefined;
+        if (invitation.unit_id) {
+          const { data: unitRow } = await supabase.from('units').select('unit_number, property:properties!units_property_id_fkey(name)').eq('id', invitation.unit_id).single();
+          if (unitRow) {
+            const prop = (unitRow.property as any);
+            unitInfo = prop ? (prop.name + ' — Unit ' + unitRow.unit_number) : ('Unit ' + unitRow.unit_number);
+          }
+        }
+        const inviterName = user!.user_metadata?.full_name || user!.email || 'Management';
+        const type = invitation.role === 'TENANT' ? 'tenant-invitation' : 'staff-invitation';
+        
+        await supabase.functions.invoke('send-email', {
+          body: {
+            to: invitation.email,
+            type,
+            data: {
+              orgName: (org as any)?.name || 'BizRent',
+              inviterName,
+              role: invitation.role,
+              unitInfo,
+              invitationId: invitation.id,
+            },
+          },
+        });
+      },
+      onSuccess: () => {
+        toast.success('Invitation resent successfully');
+      },
+      onError: (e: Error) => toast.error(e.message),
+    });
+  }
+  
+  // ─── Invoices ───
 export function useInvoices(filters?: { tenantUserId?: string; status?: string }) {
   const { orgId, user } = useAuth();
   const isTenant = !orgId || filters?.tenantUserId;
@@ -814,7 +906,7 @@ export function useInviteTenant() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { email: string; unit_id?: string }) => {
-      const { error } = await supabase
+      const { data: invData, error } = await supabase
         .from('invitations')
         .insert({
           email: input.email.toLowerCase(),
@@ -823,7 +915,10 @@ export function useInviteTenant() {
           invited_by: user!.id,
           role: 'TENANT' as any,
           status: 'PENDING' as any,
-        });
+        })
+        .select('id')
+        .single();
+      
       if (error) {
         if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
         throw error;
@@ -854,6 +949,7 @@ export function useInviteTenant() {
                 orgName: (org as any)?.name || 'BizRent',
                 inviterName,
                 unitInfo,
+                invitationId: invData.id,
               },
             },
           });
@@ -862,7 +958,7 @@ export function useInviteTenant() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invitations'] });
-      toast.success('Invitation saved. The tenant will be linked automatically when they sign up.');
+      toast.success('Invitation sent. The tenant will receive a secure link to join.');
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -873,7 +969,7 @@ export function useInviteStaff() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { email: string; role: 'MANAGER' | 'ACCOUNTANT' }) => {
-      const { error } = await supabase
+      const { data: invData, error } = await supabase
         .from('invitations')
         .insert({
           email: input.email.toLowerCase(),
@@ -881,7 +977,10 @@ export function useInviteStaff() {
           invited_by: user!.id,
           role: input.role as any,
           status: 'PENDING' as any,
-        });
+        })
+        .select('id')
+        .single();
+      
       if (error) {
         if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
         throw error;
@@ -900,6 +999,7 @@ export function useInviteStaff() {
                 orgName: (org as any)?.name || 'BizRent',
                 inviterName,
                 role: input.role,
+                invitationId: invData.id,
               },
             },
           });
@@ -908,7 +1008,7 @@ export function useInviteStaff() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invitations'] });
-      toast.success('Staff invitation sent. They will be linked automatically when they sign up.');
+      toast.success('Staff invitation sent. They will receive a secure link to join.');
     },
     onError: (e: Error) => toast.error(e.message),
   });

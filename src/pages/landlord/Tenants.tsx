@@ -6,13 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTenants, useInvitations, formatDate } from '@/hooks/useSupabaseData';
-import { InviteTenantDialog } from '@/components/tenants/InviteTenantDialog';
+import { cn } from '@/lib/utils';
 
 export default function Tenants() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const { data: tenants, isLoading } = useTenants();
   const { data: invitations, isLoading: invLoading } = useInvitations();
   const [search, setSearch] = useState('');
+  const resendInvite = useResendInvitation();
+  const deleteInvite = useDeleteInvitation();
+  const removeTenant = useRemoveTenant();
+  const updateTenant = useUpdateTenantProfile();
+  
+  const [deleteTenantTarget, setDeleteTenantTarget] = useState<{ id: string; name: string } | null>(null);
+  const [editTenantTarget, setEditTenantTarget] = useState<{ id: string; name: string; phone: string } | null>(null);
 
   const filtered = (tenants ?? []).filter(t => {
     const user = t.user as any;
@@ -70,6 +77,7 @@ export default function Tenants() {
                       <th className="text-left px-8 py-4 whitespace-nowrap">Name</th>
                       <th className="text-left px-4 py-4">Contact Info</th>
                       <th className="text-left px-8 py-4">Joined Date</th>
+                      <th className="text-right px-8 py-4">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="[&_tr:nth-child(even)]:bg-muted/5">
@@ -92,13 +100,36 @@ export default function Tenants() {
                             </div>
                           </td>
                           <td className="px-8 py-5 text-muted-foreground text-xs font-bold">{formatDate(t.created_at)}</td>
+                          <td className="px-8 py-5 text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
+                                <DropdownMenuItem 
+                                  className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-navy transition-colors"
+                                  onClick={() => setEditTenantTarget({ id: user?.id, name: user?.full_name || '', phone: user?.phone || '' })}
+                                >
+                                  <Edit2 className="h-4 w-4" /> Edit Profile
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors"
+                                  onClick={() => setDeleteTenantTarget({ id: user?.id, name: user?.full_name })}
+                                >
+                                  <Trash2 className="h-4 w-4" /> Remove
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
                         </tr>
                       );
                     })}
                     {filtered.length === 0 && (
                       <tr>
-                        <td colSpan={3} className="py-20 text-center text-muted-foreground">
-                          <div className="flex flex-col items-center justify-center">
+                        <td colSpan={4} className="py-20 text-center text-muted-foreground">
+                          <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
                             <Activity className="h-10 w-10 mb-2 opacity-10" />
                             <p className="font-bold text-bizrent-navy">No active tenants found</p>
                             <p className="text-xs font-medium mt-1">Try adjusting your search criteria.</p>
@@ -153,15 +184,15 @@ export default function Tenants() {
                         <div className="absolute right-2 top-2 bottom-2 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-bizrent-blue/10 hover:text-bizrent-blue" onClick={() => console.log('Resend', inv.id)}>
-                                <RotateCw className="h-3 w-3" />
+                              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-bizrent-blue/10 hover:text-bizrent-blue" onClick={() => resendInvite.mutate(inv)}>
+                                <RotateCw className={cn("h-3 w-3", resendInvite.isPending && resendInvite.variables?.id === inv.id ? "animate-spin" : "")} />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent side="left"><p className="text-xs">Resend Invite</p></TooltipContent>
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-red-100 hover:text-red-600" onClick={() => console.log('Cancel', inv.id)}>
+                              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-red-100 hover:text-red-600" onClick={() => deleteInvite.mutate(inv.id)}>
                                 <Trash2 className="h-3 w-3" />
                               </Button>
                             </TooltipTrigger>
@@ -184,6 +215,86 @@ export default function Tenants() {
       </div>
 
       <InviteTenantDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+
+      <Dialog open={!!deleteTenantTarget} onOpenChange={open => { if (!open) setDeleteTenantTarget(null); }}>
+        <DialogContent className="sm:max-w-[420px] rounded-2xl p-6">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+              <Trash2 className="h-6 w-6 text-red-600" />
+            </div>
+            <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Remove Tenant?</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground font-medium">
+              Are you sure you want to remove <strong>{deleteTenantTarget?.name}</strong> from your workspace? They will no longer be able to submit payments or view invoices for your properties.
+            </DialogDescription>
+          </div>
+          <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col sm:flex-row">
+            <Button variant="outline" className="rounded-xl font-bold h-11 sm:flex-1" onClick={() => setDeleteTenantTarget(null)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              className="rounded-xl font-bold h-11 sm:flex-1 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
+              onClick={async () => {
+                if (deleteTenantTarget) {
+                  await removeTenant.mutateAsync(deleteTenantTarget.id);
+                  setDeleteTenantTarget(null);
+                }
+              }}
+              disabled={removeTenant.isPending}
+            >
+              {removeTenant.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {removeTenant.isPending ? 'Removing...' : 'Remove Tenant'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editTenantTarget} onOpenChange={open => { if (!open) setEditTenantTarget(null); }}>
+        <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-8">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-extrabold text-bizrent-navy">Edit Tenant Profile</DialogTitle>
+            <DialogDescription className="font-medium text-sm mt-1 text-muted-foreground">
+              Update the contact details for this tenant.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-bizrent-navy font-bold px-1">Full Name</Label>
+              <Input 
+                placeholder="John Doe" 
+                className="rounded-2xl h-12 border-border/60 focus-visible:ring-bizrent-blue/20"
+                value={editTenantTarget?.name || ''}
+                onChange={e => setEditTenantTarget(prev => prev ? { ...prev, name: e.target.value } : null)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-bizrent-navy font-bold px-1">Phone Number</Label>
+              <Input 
+                placeholder="+250 7XX XXX XXX" 
+                className="rounded-2xl h-12 border-border/60 focus-visible:ring-bizrent-blue/20"
+                value={editTenantTarget?.phone || ''}
+                onChange={e => setEditTenantTarget(prev => prev ? { ...prev, phone: e.target.value } : null)}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-3">
+            <Button variant="ghost" className="rounded-xl font-bold" onClick={() => setEditTenantTarget(null)}>Cancel</Button>
+            <Button 
+              className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-bold h-12 px-8 shadow-lg shadow-bizrent-navy/10"
+              onClick={async () => {
+                if (editTenantTarget) {
+                  await updateTenant.mutateAsync({ user_id: editTenantTarget.id, full_name: editTenantTarget.name, phone: editTenantTarget.phone });
+                  setEditTenantTarget(null);
+                }
+              }}
+              disabled={updateTenant.isPending || !editTenantTarget?.name.trim()}
+            >
+              {updateTenant.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {updateTenant.isPending ? 'Saving...' : 'Save Profile'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
