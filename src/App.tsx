@@ -52,7 +52,6 @@ import SystemVitals from "@/pages/super-admin/SystemVitals";
 import FraudDetection from "@/pages/super-admin/FraudDetection";
 import PropertyControl from "@/pages/super-admin/PropertyControl";
 import PendingApproval from "@/pages/auth/PendingApproval";
-import AcceptInvite from "@/pages/auth/AcceptInvite";
 
 // Tenant pages
 import TenantDashboard from "@/pages/tenant/Dashboard";
