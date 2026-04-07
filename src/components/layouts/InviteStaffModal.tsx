@@ -43,7 +43,7 @@ export function InviteStaffModal({ isOpen, onClose }: InviteStaffModalProps) {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email address</Label>
+            <Label htmlFor="email">Email address <span className="text-red-500">*</span></Label>
             <Input
               id="email"
               type="email"
@@ -54,7 +54,7 @@ export function InviteStaffModal({ isOpen, onClose }: InviteStaffModalProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="role">System Role</Label>
+            <Label htmlFor="role">System Role <span className="text-red-500">*</span></Label>
             <Select
               value={role}
               onValueChange={(val: any) => setRole(val)}

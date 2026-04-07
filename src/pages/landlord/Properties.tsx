@@ -107,11 +107,11 @@ export default function Properties() {
           </DialogHeader>
           <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label className="font-semibold text-bizrent-navy">Property Name</Label>
+              <Label className="font-semibold text-bizrent-navy">Property Name <span className="text-red-500">*</span></Label>
               <Input placeholder="e.g. Sunrise Apartments" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="focus-visible:ring-bizrent-blue/20" />
             </div>
             <div className="space-y-2">
-              <Label className="font-semibold text-bizrent-navy">Property Type</Label>
+              <Label className="font-semibold text-bizrent-navy">Property Type <span className="text-red-500">*</span></Label>
               <Select value={form.property_type} onValueChange={v => setForm(f => ({ ...f, property_type: v }))}>
                 <SelectTrigger className="focus:ring-bizrent-blue/20">
                   <SelectValue placeholder="Select property type" />
