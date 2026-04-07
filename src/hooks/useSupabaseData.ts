@@ -852,40 +852,6 @@ export function useInviteTenant() {
         if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
         throw error;
       }
-
-      const invitationId = inserted?.id;
-
-      // Fire-and-forget: tenant-invitation email
-      void (async () => {
-        try {
-          const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
-          let unitInfo: string | undefined;
-          if (input.unit_id) {
-            const { data: unitRow } = await supabase
-              .from('units')
-              .select('unit_number, property:properties!units_property_id_fkey(name)')
-              .eq('id', input.unit_id)
-              .single();
-            if (unitRow) {
-              const prop = (unitRow.property as any);
-              unitInfo = prop ? (prop.name + ' — Unit ' + unitRow.unit_number) : ('Unit ' + unitRow.unit_number);
-            }
-          }
-          const inviterName = user!.user_metadata?.full_name || user!.email || 'Management';
-          await supabase.functions.invoke('send-email', {
-            body: {
-              to: input.email.toLowerCase(),
-              type: 'tenant-invitation',
-              data: {
-                orgName: (org as any)?.name || 'BizRent',
-                inviterName,
-                unitInfo,
-                invitationId,
-              },
-            },
-          });
-        } catch { /* ignore email errors */ }
-      })();
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invitations'] });
@@ -915,28 +881,6 @@ export function useInviteStaff() {
         if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
         throw error;
       }
-
-      const invitationId = inserted?.id;
-
-      // Fire-and-forget: staff-invitation email
-      void (async () => {
-        try {
-          const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
-          const inviterName = user!.user_metadata?.full_name || user!.email || 'Management';
-          await supabase.functions.invoke('send-email', {
-            body: {
-              to: input.email.toLowerCase(),
-              type: 'staff-invitation',
-              data: {
-                orgName: (org as any)?.name || 'BizRent',
-                inviterName,
-                role: input.role,
-                invitationId,
-              },
-            },
-          });
-        } catch { /* ignore email errors */ }
-      })();
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invitations'] });
