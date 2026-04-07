@@ -905,6 +905,7 @@ export function useInviteStaff() {
                 orgName: (org as any)?.name || 'BizRent',
                 inviterName,
                 role: input.role,
+                invitationId: invData.id,
               },
             },
           });
@@ -1401,27 +1402,48 @@ export function useUpdateTenantDetails() {
   });
 }
 
-export function useRemoveTenant() {
-  const { orgId } = useAuth();
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (tenantUserId: string) => {
-      const { error } = await supabase.rpc('remove_tenant_from_org', {
-        p_tenant_user_id: tenantUserId,
-        p_org_id: orgId!,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['tenants'] });
-      qc.invalidateQueries({ queryKey: ['tenancies'] });
-      qc.invalidateQueries({ queryKey: ['units'] });
-      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
-      toast.success('Tenant removed from organisation');
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-}
+  export function useRemoveTenant() {
+    const { orgId } = useAuth();
+    const qc = useQueryClient();
+    return useMutation({
+      mutationFn: async (tenantUserId: string) => {
+        const { error } = await supabase.rpc('remove_tenant_from_org', {
+          p_tenant_user_id: tenantUserId,
+          p_org_id: orgId!,
+        });
+        if (error) throw error;
+      },
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: ['tenants'] });
+        qc.invalidateQueries({ queryKey: ['tenancies'] });
+        qc.invalidateQueries({ queryKey: ['units'] });
+        qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
+        toast.success('Tenant removed from organisation');
+      },
+      onError: (e: Error) => toast.error(e.message),
+    });
+  }
+
+  export function useUpdateTenantProfile() {
+    const { orgId } = useAuth();
+    const qc = useQueryClient();
+    return useMutation({
+      mutationFn: async (input: { user_id: string; full_name: string; phone: string }) => {
+        const { error } = await supabase.rpc('update_tenant_profile', {
+          p_tenant_id: input.user_id,
+          p_org_id: orgId!,
+          p_name: input.full_name,
+          p_phone: input.phone || ''
+        });
+        if (error) throw error;
+      },
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: ['tenants'] });
+        toast.success('Tenant profile updated');
+      },
+      onError: (e: Error) => toast.error(e.message),
+    });
+  }
 
 export function useCancelInvitation() {
   const qc = useQueryClient();
