@@ -69,7 +69,8 @@ export default function Register() {
       if (authError) throw new Error(authError.message);
       if (!authData.user) throw new Error('Registration failed. Please try again.');
 
-      // Fire-and-forget: welcome email to new landlord      supabase.functions.invoke('send-email', {
+      // Fire-and-forget: welcome email to new landlord
+      supabase.functions.invoke('send-email', {
         body: {
           to: form.email,
           type: 'welcome-landlord',
