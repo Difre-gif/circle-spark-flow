@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { useOrganisation, useUpdateOrganisation, useSubscription, formatRWF } fr
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Check, Zap, Shield, Crown } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Settings() {
   const { data: org, isLoading: orgLoading } = useOrganisation();
@@ -18,6 +19,31 @@ export default function Settings() {
   const updateOrg = useUpdateOrganisation();
   const [form, setForm] = useState<{ name: string; email: string; phone: string } | null>(null);
   const [pricingOpen, setPricingOpen] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
+  const [pwErrors, setPwErrors] = useState<Partial<Record<string, string>>>({});
+  const [pwLoading, setPwLoading] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNext, setShowNext] = useState(false);
+
+  const handleChangePassword = async () => {
+    const errs: Partial<Record<string, string>> = {};
+    if (!pwForm.current) errs.current = 'Current password is required.';
+    if (!pwForm.next) errs.next = 'New password is required.';
+    else if (pwForm.next.length < 8) errs.next = 'Password must be at least 8 characters.';
+    if (pwForm.next !== pwForm.confirm) errs.confirm = 'Passwords do not match.';
+    setPwErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    setPwLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) { toast.error('Could not verify session.'); setPwLoading(false); return; }
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email: user.email, password: pwForm.current });
+    if (signInErr) { setPwErrors({ current: 'Current password is incorrect.' }); setPwLoading(false); return; }
+    const { error: updateErr } = await supabase.auth.updateUser({ password: pwForm.next });
+    setPwLoading(false);
+    if (updateErr) { toast.error(updateErr.message); return; }
+    toast.success('Password updated successfully.');
+    setPwForm({ current: '', next: '', confirm: '' });
+  };
 
   if (orgLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
 
@@ -126,6 +152,41 @@ export default function Settings() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Change Password */}
+      <Card className="border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden">
+        <CardHeader className="bg-muted/20 border-b border-border/40 pb-4 pt-6 px-6">
+          <CardTitle className="text-lg font-bold text-bizrent-navy">Change Password</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-6 px-6">
+          <div className="space-y-1">
+            <Label className="font-semibold text-bizrent-navy">Current Password <span className="text-red-500">*</span></Label>
+            <div className="relative">
+              <Input type={showCurrent ? 'text' : 'password'} placeholder="••••••••" value={pwForm.current} onChange={e => { setPwForm(f => ({ ...f, current: e.target.value })); setPwErrors(fe => ({ ...fe, current: undefined })); }} className="pr-10 focus-visible:ring-bizrent-blue/20 rounded-xl" />
+              <button type="button" onClick={() => setShowCurrent(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>{showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
+            </div>
+            {pwErrors.current && <p className="text-xs text-red-500">{pwErrors.current}</p>}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label className="font-semibold text-bizrent-navy">New Password <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <Input type={showNext ? 'text' : 'password'} placeholder="Min. 8 characters" value={pwForm.next} onChange={e => { setPwForm(f => ({ ...f, next: e.target.value })); setPwErrors(fe => ({ ...fe, next: undefined })); }} className="pr-10 focus-visible:ring-bizrent-blue/20 rounded-xl" />
+                <button type="button" onClick={() => setShowNext(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>{showNext ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
+              </div>
+              {pwErrors.next && <p className="text-xs text-red-500">{pwErrors.next}</p>}
+            </div>
+            <div className="space-y-1">
+              <Label className="font-semibold text-bizrent-navy">Confirm New Password <span className="text-red-500">*</span></Label>
+              <Input type="password" placeholder="••••••••" value={pwForm.confirm} onChange={e => { setPwForm(f => ({ ...f, confirm: e.target.value })); setPwErrors(fe => ({ ...fe, confirm: undefined })); }} className="focus-visible:ring-bizrent-blue/20 rounded-xl" />
+              {pwErrors.confirm && <p className="text-xs text-red-500">{pwErrors.confirm}</p>}
+            </div>
+          </div>
+          <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleChangePassword} disabled={pwLoading}>
+            {pwLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Updating...</> : 'Update Password'}
+          </Button>
+        </CardContent>
+      </Card>
 
       <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
         <DialogContent className="sm:max-w-4xl rounded-3xl max-h-[90vh] overflow-y-auto">

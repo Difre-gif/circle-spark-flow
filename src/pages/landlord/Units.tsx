@@ -1,21 +1,23 @@
 import { useState } from 'react';
-import { Plus, Loader2, Home, Search } from 'lucide-react';
+import { Plus, Loader2, Home, Search, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUnits, useProperties, useCreateUnit, formatRWF } from '@/hooks/useSupabaseData';
+import { useUnits, useProperties, useCreateUnit, useDeleteUnit, formatRWF } from '@/hooks/useSupabaseData';
 
 export default function Units() {
   const { data: units, isLoading } = useUnits();
   const { data: properties } = useProperties();
   const createUnit = useCreateUnit();
+  const deleteUnit = useDeleteUnit();
   const [search, setSearch] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [form, setForm] = useState({ property_id: '', unit_number: '', unit_type: '', monthly_rent: 0 });
 
   const filtered = (units ?? []).filter(u =>
@@ -28,6 +30,12 @@ export default function Units() {
     await createUnit.mutateAsync(form);
     setDialogOpen(false);
     setForm({ property_id: '', unit_number: '', unit_type: '', monthly_rent: 0 });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    await deleteUnit.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
@@ -66,6 +74,7 @@ export default function Units() {
                   <th className="text-left px-6 py-4">Type</th>
                   <th className="text-left px-6 py-4">Monthly Rent</th>
                   <th className="text-center px-6 py-4">Status</th>
+                  <th className="text-center px-6 py-4">Actions</th>
                 </tr>
               </thead>
               <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
@@ -83,11 +92,16 @@ export default function Units() {
                     <td className="px-6 py-4 text-muted-foreground capitalize">{u.unit_type.toLowerCase()}</td>
                     <td className="px-6 py-4 font-semibold text-bizrent-slate font-tabular-nums">{formatRWF(u.monthly_rent)}</td>
                     <td className="px-6 py-4 text-center"><StatusBadge status={u.status} /></td>
+                    <td className="px-6 py-4 text-center">
+                      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-red-600 hover:bg-red-50 h-8 w-8 rounded-lg" title="Delete unit" onClick={() => setDeleteTarget({ id: u.id, name: u.unit_number })}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-16 text-center text-muted-foreground">
+                    <td colSpan={6} className="py-16 text-center text-muted-foreground">
                       <div className="flex flex-col items-center justify-center">
                         <Home className="h-8 w-8 mb-2 opacity-20" />
                         <p className="font-medium text-bizrent-navy">No units found</p>
@@ -152,6 +166,25 @@ export default function Units() {
             <Button className="bg-bizrent-blue hover:bg-bizrent-navy rounded-xl font-semibold" onClick={handleCreate} disabled={createUnit.isPending}>
               {createUnit.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {createUnit.isPending ? 'Saving...' : 'Save Unit'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={open => { if (!open) setDeleteTarget(null); }}>
+        <DialogContent className="sm:max-w-[420px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-bizrent-navy">Delete Unit</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 mt-2">
+            <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button variant="destructive" className="rounded-xl font-semibold" onClick={handleDeleteConfirm} disabled={deleteUnit.isPending}>
+              {deleteUnit.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {deleteUnit.isPending ? 'Deleting...' : 'Delete Unit'}
             </Button>
           </DialogFooter>
         </DialogContent>

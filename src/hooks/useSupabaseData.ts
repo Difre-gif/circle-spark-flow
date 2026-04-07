@@ -138,6 +138,23 @@ export function useCreateUnit() {
   });
 }
 
+export function useDeleteUnit() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (unitId: string) => {
+      const { error } = await supabase.from('units').delete().eq('id', unitId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['units'] });
+      qc.invalidateQueries({ queryKey: ['properties'] });
+      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      toast.success('Unit deleted');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
 // ─── Tenancies ───
 export function useTenancies() {
   const { orgId } = useAuth();

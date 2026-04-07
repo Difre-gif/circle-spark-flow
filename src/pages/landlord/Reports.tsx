@@ -1,12 +1,30 @@
-import { Loader2, Download } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Loader2, Download, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOccupancySummary, useOverdueAgingReport, useCollectionSummary, formatRWF } from '@/hooks/useSupabaseData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+// Generate last 12 months as filter options
+function getMonthOptions() {
+  const opts = [{ value: 'all', label: 'All Time' }];
+  for (let i = 0; i < 12; i++) {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() - i);
+    opts.push({
+      value: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+      label: d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+    });
+  }
+  return opts;
+}
+
 export default function Reports() {
+  const [monthFilter, setMonthFilter] = useState('all');
   const { data: occupancy, isLoading: occLoading } = useOccupancySummary();
   const { data: aging, isLoading: agingLoading } = useOverdueAgingReport();
   const { data: collection, isLoading: colLoading } = useCollectionSummary();
@@ -28,18 +46,37 @@ export default function Reports() {
     return Object.entries(bucketMap).map(([bucket, data]) => ({ bucket, ...data }));
   })();
 
-  // Collection chart data
-  const collectionData = (collection ?? []).map(c => ({
-    month: new Date(c.period ?? '').toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }),
-    collected: Number(c.total_amount_paid ?? 0),
-    outstanding: Number(c.total_outstanding ?? 0),
-  }));
+  // Collection chart data — filtered by selected month
+  const collectionData = (collection ?? [])
+    .filter(c => monthFilter === 'all' || (c.period ?? '').startsWith(monthFilter))
+    .map(c => ({
+      month: new Date(c.period ?? '').toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }),
+      collected: Number(c.total_amount_paid ?? 0),
+      outstanding: Number(c.total_outstanding ?? 0),
+    }));
+
+  const monthOptions = getMonthOptions();
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div><h1 className="text-2xl font-bold">Reports</h1><p className="text-muted-foreground">Financial and occupancy analytics</p></div>
-        <Button variant="outline"><Download className="mr-2 h-4 w-4" /> Export</Button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Select value={monthFilter} onValueChange={setMonthFilter}>
+              <SelectTrigger className="w-[180px] h-9 rounded-xl text-sm">
+                <SelectValue placeholder="Filter by month" />
+              </SelectTrigger>
+              <SelectContent>
+                {monthOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button variant="outline" onClick={() => window.print()}>
+            <Download className="mr-2 h-4 w-4" /> Export
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="collections">
