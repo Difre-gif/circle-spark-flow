@@ -1,9 +1,10 @@
-import { ArrowRightLeft, Send, Wallet, Activity, Download, Loader2, Search, Home } from 'lucide-react';
+import { ArrowRightLeft, Send, Wallet, Activity, Download, Search, Home, Copy, Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDashboardStats, usePayments, useOccupancySummary, useOrganisation, formatRWF, formatDate, useInvoices } from '@/hooks/useSupabaseData';
+import { useAuth } from '@/contexts/AuthContext';
+import { useDashboardStats, usePayments, useOccupancySummary, useOrganisation, formatRWF, formatDate, useInvoices, useInvitations } from '@/hooks/useSupabaseData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -12,12 +13,15 @@ import { toast } from 'sonner';
 
 export default function LandlordDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [reminderOpen, setReminderOpen] = useState(false);
+  const [showMomo, setShowMomo] = useState(false);
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: recentPayments, isLoading: paymentsLoading } = usePayments();
   const { data: occupancy, isLoading: occLoading } = useOccupancySummary();
   const { data: org } = useOrganisation();
   const { data: overdueInvoices } = useInvoices({ status: 'OVERDUE' });
+  const { data: invitations } = useInvitations();
 
   // Granular loading per widget instead of a global blocker
   // const isLoading = statsLoading || paymentsLoading || occLoading;
@@ -31,17 +35,37 @@ export default function LandlordDashboard() {
     { month: 'Jun', collected: 320, outstanding: 80 },
   ];
 
+  const getDynamicInsight = () => {
+    if (statsLoading || occLoading) return "Loading your insights...";
+    const vacantUnits = stats?.vacantUnits ?? 0;
+    const invCount = (invitations ?? []).length;
+    
+    if (vacantUnits > 0) {
+      // Assuming average rent is 150,000 for calculation if we don't have exact numbers
+      const estLoss = vacantUnits * 150000;
+      return <span className="flex items-center gap-1.5"><Activity className="h-4 w-4 text-bizrent-red" /> You have <strong className="text-bizrent-navy">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong> losing approx {formatRWF(estLoss)}/month. <span className="text-bizrent-blue cursor-pointer hover:underline" onClick={() => navigate('/landlord/units')}>List them now &rarr;</span></span>;
+    }
+    if (invCount > 0) {
+      return <span className="flex items-center gap-1.5"><Send className="h-4 w-4 text-[#ffcc00]" /> {invCount} tenant{invCount > 1 ? 's' : ''} invited, awaiting sign-up. <span className="text-bizrent-blue cursor-pointer hover:underline" onClick={() => navigate('/landlord/tenants')}>Review invites &rarr;</span></span>;
+    }
+    return `Managing ${org?.name || 'your workspace'}.`;
+  };
+
+  const firstName = user?.name?.split(' ')[0] || 'there';
+
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
-          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest flex items-center gap-1.5 mb-1">
-            <Home className="h-3.5 w-3.5" /> Home / Overview
+          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+            <Home className="h-3.5 w-3.5" /> <span className="text-bizrent-blue">Home / Overview</span>
           </p>
-          <h1 className="page-title">
-            {org ? `Good morning, ${org.name}` : <Skeleton className="h-8 w-64 inline-block" />}
+          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">
+            {org ? `Good morning, ${firstName}` : <Skeleton className="h-8 w-64 inline-block" />}
           </h1>
-          <p className="page-description">Stay on top of your properties, monitor payments, and track status.</p>
+          <p className="page-description font-medium text-muted-foreground mt-2 flex items-center gap-1">
+            {org ? getDynamicInsight() : <Skeleton className="h-4 w-96 inline-block" />}
+          </p>
         </div>
       </div>
 
@@ -68,14 +92,26 @@ export default function LandlordDashboard() {
                 </h2>
               )}
               
-              <p className="text-xs font-bold text-bizrent-red mt-3 bg-bizrent-red/10 inline-block px-2.5 py-1 rounded-md">
-                Requires Attention
-              </p>
+              {!statsLoading && (stats?.outstanding ?? 0) > 0 ? (
+                <p className="text-xs font-bold text-bizrent-red mt-3 bg-bizrent-red/10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-bizrent-red opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-bizrent-red"></span>
+                  </span>
+                  Requires Attention
+                </p>
+              ) : !statsLoading ? (
+                <p className="text-xs font-bold text-bizrent-emerald mt-3 bg-bizrent-emerald/10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
+                   All Clear
+                </p>
+              ) : null}
               
               <div className="flex flex-col gap-3 mt-8">
                 <Button 
-                  className="w-full rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-sm"
+                  className="w-full rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-sm disabled:opacity-50"
                   onClick={() => setReminderOpen(true)}
+                  disabled={!overdueInvoices || overdueInvoices.length === 0}
+                  title={(!overdueInvoices || overdueInvoices.length === 0) ? "No tenants with outstanding balances" : undefined}
                 >
                   <Send className="mr-2 h-4 w-4" /> Send Reminders
                 </Button>
@@ -116,8 +152,17 @@ export default function LandlordDashboard() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-sm text-bizrent-navy font-tabular-nums">{prop.occupancy_rate_pct}%</p>
-                          <p className="text-[10px] font-bold text-bizrent-emerald uppercase">Active</p>
+                          {prop.total_units === 0 ? (
+                            <>
+                              <p className="font-bold text-sm text-bizrent-slate">—</p>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase cursor-pointer hover:text-bizrent-blue hover:underline" onClick={() => navigate('/landlord/units')}>Add units &rarr;</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="font-bold text-sm text-bizrent-navy font-tabular-nums">{prop.occupancy_rate_pct}%</p>
+                              <p className="text-[10px] font-bold text-bizrent-emerald uppercase">Active</p>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -144,11 +189,27 @@ export default function LandlordDashboard() {
                 </div>
                 <div className="flex justify-between items-center mb-6">
                   <p className="text-xs font-bold opacity-80 uppercase tracking-widest">MTN Mobile Money</p>
-                  <Activity className="h-5 w-5 opacity-80" />
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 opacity-80" />
+                    <span className="bg-black/10 rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase">🔒 Secure</span>
+                  </div>
                 </div>
                 <p className="text-sm font-semibold opacity-90 mb-1">Merchant Code</p>
                 {org ? (
-                  <p className="text-3xl font-mono font-bold tracking-widest">{org.momo_merchant_number || '000000'}</p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-3xl font-mono font-bold tracking-widest">{showMomo ? (org.momo_merchant_number || '000000') : '••••••'}</p>
+                    <div className="flex items-center gap-1 opacity-80">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-black/10 rounded-full" onClick={() => setShowMomo(!showMomo)}>
+                        {showMomo ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-black/10 rounded-full" onClick={() => {
+                        navigator.clipboard.writeText(org.momo_merchant_number || '000000');
+                        toast.success('Merchant code copied to clipboard');
+                      }}>
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   <Skeleton className="h-10 w-32 bg-bizrent-navy/20" />
                 )}
@@ -170,16 +231,30 @@ export default function LandlordDashboard() {
             {/* 4 Colored Stats Grid */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-4">
               {/* Highlight Stat (Amber) */}
-              <div className="bg-[#ffcc00] rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy">
+              <div className="bg-[#ffcc00] rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                  <Wallet className="w-16 h-16" />
+                </div>
                 <p className="text-xs font-bold opacity-80 mb-2 uppercase tracking-wide">Pending Payments</p>
                 {statsLoading ? (
                   <Skeleton className="h-8 w-12 bg-bizrent-navy/20" />
                 ) : (
                   <h3 className="text-3xl font-extrabold font-tabular-nums">{stats?.pendingPayments ?? 0}</h3>
                 )}
-                <p className="text-[10px] font-bold mt-3 bg-bizrent-navy/10 self-start px-2.5 py-1 rounded-md uppercase">
-                  Requires Review
-                </p>
+                
+                {(!statsLoading && (stats?.pendingPayments ?? 0) > 0) ? (
+                  <p className="text-[10px] font-bold mt-3 bg-bizrent-navy text-white self-start px-2.5 py-1 rounded-md uppercase flex items-center gap-1.5 shadow-md">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                    </span>
+                    Review Now
+                  </p>
+                ) : !statsLoading ? (
+                  <p className="text-[10px] font-bold mt-3 bg-bizrent-navy/10 self-start px-2.5 py-1 rounded-md uppercase">
+                    Caught up
+                  </p>
+                ) : null}
               </div>
               
               {/* White Stat 1 */}
@@ -190,9 +265,19 @@ export default function LandlordDashboard() {
                 ) : (
                   <h3 className="text-3xl font-extrabold text-bizrent-navy font-tabular-nums">{stats?.collectionRate ?? 0}%</h3>
                 )}
-                <p className="text-[10px] font-bold mt-3 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2.5 py-1 rounded-md uppercase">
-                  ↑ This month
-                </p>
+                {!statsLoading && (stats?.collectionRate ?? 0) === 0 ? (
+                  <p className="text-[10px] font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
+                    Needs Action
+                  </p>
+                ) : !statsLoading && (stats?.collectionRate ?? 0) < 60 ? (
+                  <p className="text-[10px] font-bold mt-3 text-bizrent-amber flex items-center bg-bizrent-amber/10 self-start px-2.5 py-1 rounded-md uppercase">
+                    Below Target
+                  </p>
+                ) : !statsLoading ? (
+                  <p className="text-[10px] font-bold mt-3 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2.5 py-1 rounded-md uppercase">
+                    On Track
+                  </p>
+                ) : null}
               </div>
 
               {/* White Stat 2 */}
@@ -231,7 +316,7 @@ export default function LandlordDashboard() {
               <CardContent className="px-6 pt-6 pb-2">
                 <div className="flex justify-end gap-4 mb-4 text-xs font-bold">
                   <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-blue"></span> Collected</div>
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-slate"></span> Outstanding</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Outstanding</div>
                 </div>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -241,7 +326,7 @@ export default function LandlordDashboard() {
                       <YAxis hide />
                       <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                       <Bar dataKey="collected" stackId="a" fill="hsl(222 72% 48%)" radius={[0, 0, 4, 4]} />
-                      <Bar dataKey="outstanding" stackId="a" fill="hsl(222 47% 11%)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="outstanding" stackId="a" fill="hsl(38 92% 50%)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Bell, Search, LogOut, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,24 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function TopBar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { data: notifications } = useNotifications();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const unreadCount = (notifications ?? []).filter(n => !n.is_read).length;
 
@@ -27,7 +41,16 @@ export function TopBar() {
     <header className="sticky top-0 z-20 flex h-20 items-center justify-between px-4 md:px-8 bg-white/80 backdrop-blur-md border-b border-border/40">
       {/* Left: Sidebar Toggle & Mobile Logo */}
       <div className="flex items-center gap-3">
-        <SidebarTrigger className="h-10 w-10 rounded-xl bg-white border border-border/60 shadow-sm text-bizrent-navy hover:bg-slate-50 transition-all active:scale-95" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="inline-block">
+              <SidebarTrigger className="h-10 w-10 rounded-xl bg-white border border-border/60 shadow-sm text-bizrent-navy hover:bg-slate-50 transition-all active:scale-95" />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>Toggle Sidebar (Cmd+B)</p>
+          </TooltipContent>
+        </Tooltip>
         <div className="md:hidden flex items-center gap-3">
           <BizRentLogo variant="icon" size="sm" className="text-bizrent-navy" />
         </div>
@@ -45,9 +68,13 @@ export function TopBar() {
         <div className="relative hidden md:block w-72 group">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-bizrent-navy" />
           <Input 
+            ref={searchInputRef}
             placeholder="Search properties, tenants..." 
-            className="pl-11 h-11 rounded-full bg-muted/30 border-transparent shadow-sm focus-visible:ring-bizrent-navy/20 focus-visible:bg-white transition-all text-sm font-medium" 
+            className="pl-11 pr-16 h-11 rounded-full bg-muted/30 border-transparent shadow-sm focus-visible:ring-bizrent-navy/20 focus-visible:bg-white transition-all text-sm font-medium" 
           />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none opacity-50 font-bold text-[10px] tracking-widest uppercase">
+            <kbd className="font-sans">⌘</kbd>K
+          </div>
         </div>
 
         {/* Mobile Actions (Hidden on Desktop because Sidebar handles this) */}

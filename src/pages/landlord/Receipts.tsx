@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Download, Search, FileCheck, Filter } from 'lucide-react';
+import { Loader2, Download, Search, FileCheck, Filter, CalendarIcon, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,13 +8,24 @@ import { StatusBadge } from '@/components/StatusBadge';
 
 export default function Receipts() {
   const [search, setSearch] = useState('');
+  const [dateRange, setDateRange] = useState<Date | undefined>(undefined);
   const { data: receipts, isLoading } = useReceipts();
 
-  const filtered = (receipts ?? []).filter(r => 
-    r.receipt_number.toLowerCase().includes(search.toLowerCase()) ||
-    ((r.tenant as any)?.full_name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-    ((r.invoice as any)?.invoice_number ?? '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = (receipts ?? []).filter(r => {
+    const matchesSearch = r.receipt_number.toLowerCase().includes(search.toLowerCase()) ||
+                          ((r.tenant as any)?.full_name ?? '').toLowerCase().includes(search.toLowerCase()) ||
+                          ((r.invoice as any)?.invoice_number ?? '').toLowerCase().includes(search.toLowerCase());
+    
+    let matchesDate = true;
+    if (dateRange) {
+      const rDate = new Date(r.generated_at);
+      matchesDate = rDate.getFullYear() === dateRange.getFullYear() &&
+                    rDate.getMonth() === dateRange.getMonth() &&
+                    rDate.getDate() === dateRange.getDate();
+    }
+    
+    return matchesSearch && matchesDate;
+  });
 
   if (isLoading) return (
     <div className="flex items-center justify-center min-h-[60vh]">
@@ -26,17 +37,55 @@ export default function Receipts() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest mb-1">Collections / Receipts</p>
+          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Collections</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-bizrent-blue">Receipts</span>
+          </p>
           <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">Receipts</h1>
           <p className="page-description font-medium text-muted-foreground">View and download {receipts?.length ?? 0} generated payment receipts</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="rounded-xl border-border/60 font-semibold h-11">
-            <Filter className="mr-2 h-4 w-4" /> Filter
-          </Button>
-          <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-semibold h-11 px-6 shadow-sm transition-all hover:scale-[1.02]">
-            <Download className="mr-2 h-4 w-4" /> Export All
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className={cn("rounded-xl border-border/60 font-semibold h-11", dateRange && "bg-muted text-bizrent-navy")}>
+                <CalendarIcon className="mr-2 h-4 w-4" /> 
+                {dateRange ? format(dateRange, "MMM d, yyyy") : "Pick a date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={dateRange}
+                onSelect={setDateRange}
+                initialFocus
+              />
+              {dateRange && (
+                <div className="p-3 border-t border-border/50">
+                  <Button variant="ghost" className="w-full text-xs h-8" onClick={() => setDateRange(undefined)}>Clear Filter</Button>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-semibold h-11 px-6 shadow-sm transition-all hover:scale-[1.02]">
+                <Download className="mr-2 h-4 w-4" /> Export All
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px] rounded-xl shadow-lg border-border/40">
+              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 transition-colors">
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 transition-colors">
+                Export as PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 transition-colors">
+                Export as Excel
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

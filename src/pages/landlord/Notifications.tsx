@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Bell, CreditCard, FileText, Users, Settings, Filter, CheckCheck } from 'lucide-react';
+import { Loader2, Bell, CreditCard, FileText, Users, Settings, Filter, CheckCheck, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -42,7 +42,11 @@ export default function Notifications() {
     <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest mb-1">System / Updates</p>
+          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">System</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-bizrent-blue">Updates</span>
+          </p>
           <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">Notifications</h1>
           <p className="page-description font-medium text-muted-foreground">You have {unreadCount} unread alerts requiring your attention</p>
         </div>

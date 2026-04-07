@@ -1,4 +1,4 @@
-import { Loader2, Download } from 'lucide-react';
+import { Loader2, Download, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -35,21 +35,58 @@ export default function Reports() {
     outstanding: Number(c.total_outstanding ?? 0),
   }));
 
+  const kpis = {
+    totalCollected: collectionData.reduce((acc, curr) => acc + curr.collected, 0),
+    totalOutstanding: collectionData.reduce((acc, curr) => acc + curr.outstanding, 0),
+    avgOccupancy: occupancy && occupancy.length > 0 
+      ? Math.round(occupancy.reduce((acc, curr) => acc + (curr.occupancy_rate_pct ?? 0), 0) / occupancy.length) 
+      : 0
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">Reports</h1><p className="text-muted-foreground">Financial and occupancy analytics</p></div>
-        <Button variant="outline"><Download className="mr-2 h-4 w-4" /> Export</Button>
+      <div className="page-header flex items-center justify-between">
+        <div>
+          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Analytics</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-bizrent-blue">Reports</span>
+          </p>
+          <h1 className="page-title text-2xl font-bold">Reports</h1>
+          <p className="page-description text-muted-foreground mt-1">Financial and occupancy analytics</p>
+        </div>
+        <Button variant="outline" className="rounded-xl font-semibold"><Download className="mr-2 h-4 w-4" /> Export</Button>
       </div>
 
-      <Tabs defaultValue="collections">
-        <TabsList>
-          <TabsTrigger value="collections">Collections</TabsTrigger>
-          <TabsTrigger value="aging">Aging Report</TabsTrigger>
-          <TabsTrigger value="occupancy">Occupancy</TabsTrigger>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-6">
+        <StatCard title="Total Collected (6mo)" value={formatRWF(kpis.totalCollected)} icon={BarChart2} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
+        <StatCard title="Total Outstanding" value={formatRWF(kpis.totalOutstanding)} icon={Activity} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
+        <StatCard title="Avg Portfolio Occupancy" value={`${kpis.avgOccupancy}%`} icon={Home} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
+      </div>
+
+      <Tabs defaultValue="collections" className="space-y-6">
+        <TabsList className="bg-transparent border-b border-border/40 w-full justify-start h-auto p-0 rounded-none overflow-x-auto flex-nowrap">
+          <TabsTrigger 
+            value="collections" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy transition-all"
+          >
+            Collections
+          </TabsTrigger>
+          <TabsTrigger 
+            value="aging" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy transition-all"
+          >
+            Aging Report
+          </TabsTrigger>
+          <TabsTrigger 
+            value="occupancy" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy transition-all"
+          >
+            Occupancy
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="collections" className="space-y-4 mt-4">
+        <TabsContent value="collections" className="space-y-4 mt-0 animate-in fade-in slide-in-from-bottom-2">
           <Card>
             <CardHeader><CardTitle>Monthly Collections vs Outstanding</CardTitle></CardHeader>
             <CardContent>
@@ -65,13 +102,27 @@ export default function Reports() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-center py-12 text-muted-foreground">No collection data yet</p>
+                <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in duration-500">
+                  <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
+                    <BarChart2 className="h-8 w-8 text-muted-foreground/50" />
+                  </div>
+                  <p className="font-bold text-bizrent-navy text-lg">No collection data yet</p>
+                  <p className="text-sm mt-2 text-muted-foreground font-medium max-w-sm mb-6">
+                    Your collection data will appear here once tenants start making payments against their invoices.
+                  </p>
+                  <Button 
+                    className="rounded-xl font-bold px-6 bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-lg shadow-bizrent-navy/10"
+                    onClick={() => window.location.href = '/landlord/tenants'}
+                  >
+                    Invite your first tenant
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="aging" className="space-y-4 mt-4">
+        <TabsContent value="aging" className="space-y-4 mt-0 animate-in fade-in slide-in-from-bottom-2">
           <Card>
             <CardHeader><CardTitle>Aging Buckets</CardTitle></CardHeader>
             <CardContent className="p-0">
@@ -99,7 +150,7 @@ export default function Reports() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="occupancy" className="space-y-4 mt-4">
+        <TabsContent value="occupancy" className="space-y-4 mt-0 animate-in fade-in slide-in-from-bottom-2">
           <Card>
             <CardHeader><CardTitle>Property Occupancy</CardTitle></CardHeader>
             <CardContent className="p-0">

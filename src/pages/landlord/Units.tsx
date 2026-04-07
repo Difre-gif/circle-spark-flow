@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Plus, Loader2, Home, Search } from 'lucide-react';
+import { Plus, Loader2, Home, Search, Edit2, Trash2, MoreVertical, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUnits, useProperties, useCreateUnit, formatRWF } from '@/hooks/useSupabaseData';
@@ -15,13 +16,18 @@ export default function Units() {
   const { data: properties } = useProperties();
   const createUnit = useCreateUnit();
   const [search, setSearch] = useState('');
+  const [propertyFilter, setPropertyFilter] = useState('ALL');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState<any>(null);
   const [form, setForm] = useState({ property_id: '', unit_number: '', unit_type: '', monthly_rent: 0 });
 
-  const filtered = (units ?? []).filter(u =>
-    u.unit_number.toLowerCase().includes(search.toLowerCase()) ||
-    ((u as any).properties?.name ?? '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = (units ?? []).filter(u => {
+    const matchesSearch = u.unit_number.toLowerCase().includes(search.toLowerCase()) ||
+                          ((u as any).properties?.name ?? '').toLowerCase().includes(search.toLowerCase());
+    const matchesProperty = propertyFilter === 'ALL' || u.property_id === propertyFilter;
+    return matchesSearch && matchesProperty;
+  });
 
   const handleCreate = async () => {
     if (!form.property_id || !form.unit_number || !form.unit_type || !form.monthly_rent) return;
@@ -36,7 +42,11 @@ export default function Units() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
-          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">Management / Units</p>
+          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Management</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-bizrent-blue">Units</span>
+          </p>
           <h1 className="page-title">Units</h1>
           <p className="page-description">Manage {units?.length ?? 0} individual rental units</p>
         </div>
@@ -45,14 +55,27 @@ export default function Units() {
         </Button>
       </div>
 
-      <div className="flex items-center max-w-sm relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input 
-          placeholder="Search by unit number or property..." 
-          value={search} 
-          onChange={e => setSearch(e.target.value)} 
-          className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium" 
-        />
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="relative flex-1 w-full max-w-sm">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search by unit number or property..." 
+            value={search} 
+            onChange={e => setSearch(e.target.value)} 
+            className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium w-full" 
+          />
+        </div>
+        <Select value={propertyFilter} onValueChange={setPropertyFilter}>
+          <SelectTrigger className="w-full sm:w-[250px] h-11 bg-white border-border/50 shadow-sm focus:ring-bizrent-navy/20 font-medium rounded-full">
+            <SelectValue placeholder="Filter by property" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Properties</SelectItem>
+            {(properties ?? []).map(p => (
+              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
@@ -64,8 +87,10 @@ export default function Units() {
                   <th className="text-left px-6 py-4 whitespace-nowrap">Unit #</th>
                   <th className="text-left px-6 py-4">Property</th>
                   <th className="text-left px-6 py-4">Type</th>
-                  <th className="text-left px-6 py-4">Monthly Rent</th>
+                  <th className="text-left px-6 py-4">Description</th>
+                  <th className="text-left px-6 py-4 text-right">Monthly Rent</th>
                   <th className="text-center px-6 py-4">Status</th>
+                  <th className="text-right px-6 py-4">Actions</th>
                 </tr>
               </thead>
               <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
@@ -81,17 +106,53 @@ export default function Units() {
                     </td>
                     <td className="px-6 py-4 font-medium text-muted-foreground">{(u as any).properties?.name ?? '—'}</td>
                     <td className="px-6 py-4 text-muted-foreground capitalize">{u.unit_type.toLowerCase()}</td>
-                    <td className="px-6 py-4 font-semibold text-bizrent-slate font-tabular-nums">{formatRWF(u.monthly_rent)}</td>
+                    <td className="px-6 py-4 text-muted-foreground text-xs italic">{u.unit_type === 'OTHER' ? 'Custom storage space' : '—'}</td>
+                    <td className="px-6 py-4 font-semibold text-bizrent-slate font-tabular-nums text-right">{formatRWF(u.monthly_rent)}</td>
                     <td className="px-6 py-4 text-center"><StatusBadge status={u.status} /></td>
+                    <td className="px-6 py-4 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
+                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
+                          <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-navy transition-colors">
+                            <Edit2 className="h-4 w-4" /> Edit Unit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors focus:text-red-700 focus:bg-red-50"
+                            onClick={() => {
+                              setUnitToDelete(u);
+                              setDeleteConfirmOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" /> Delete Unit
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-16 text-center text-muted-foreground">
-                      <div className="flex flex-col items-center justify-center">
-                        <Home className="h-8 w-8 mb-2 opacity-20" />
-                        <p className="font-medium text-bizrent-navy">No units found</p>
-                        <p className="text-sm mt-1">Try adjusting your search or add a new unit.</p>
+                    <td colSpan={7} className="py-16 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                        <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
+                          <Home className="h-8 w-8 text-muted-foreground/50" />
+                        </div>
+                        <p className="font-bold text-bizrent-navy text-lg">No units found</p>
+                        <p className="text-sm mt-2 font-medium mb-6 px-4">
+                          {search || propertyFilter !== 'ALL' 
+                            ? "Try adjusting your search keywords or property filters."
+                            : "Add your first unit to start managing tenancies and collecting rent."}
+                        </p>
+                        <Button 
+                          className="rounded-xl font-bold h-11 px-8 bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-lg shadow-bizrent-navy/10"
+                          onClick={() => setDialogOpen(true)}
+                        >
+                          <Plus className="mr-2 h-4 w-4" /> Add Unit
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -141,6 +202,10 @@ export default function Units() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2 col-span-2">
+                <Label className="font-semibold text-bizrent-navy">Description <span className="text-muted-foreground font-normal">(required for 'Other' type)</span></Label>
+                <Input placeholder="e.g. Storage Room A" className="focus-visible:ring-bizrent-blue/20" />
+              </div>
             </div>
             <div className="space-y-2">
               <Label className="font-semibold text-bizrent-navy">Monthly Rent (RWF)</Label>
@@ -152,6 +217,36 @@ export default function Units() {
             <Button className="bg-bizrent-blue hover:bg-bizrent-navy rounded-xl font-semibold" onClick={handleCreate} disabled={createUnit.isPending}>
               {createUnit.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {createUnit.isPending ? 'Saving...' : 'Save Unit'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-[400px] rounded-2xl p-6">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+              <Trash2 className="h-6 w-6 text-red-600" />
+            </div>
+            <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Delete Unit {unitToDelete?.unit_number}?</DialogTitle>
+            <p className="text-sm text-muted-foreground font-medium">
+              This action cannot be undone. This will permanently delete the unit and remove any associated history.
+            </p>
+          </div>
+          <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col sm:flex-row">
+            <Button variant="outline" className="rounded-xl font-bold h-11 sm:flex-1" onClick={() => setDeleteConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              className="rounded-xl font-bold h-11 sm:flex-1 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
+              onClick={() => {
+                // TODO: Add delete mutation
+                console.log('Delete unit', unitToDelete?.id);
+                setDeleteConfirmOpen(false);
+              }}
+            >
+              Delete Unit
             </Button>
           </DialogFooter>
         </DialogContent>

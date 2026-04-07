@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Loader2, Search, UserPlus, Mail, Clock, Send, Activity } from 'lucide-react';
+import { Loader2, Search, UserPlus, Mail, Clock, Send, Activity, Trash2, RotateCw, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,9 +26,17 @@ export default function Tenants() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest mb-1">Management / Tenants</p>
+          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Management</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-bizrent-blue">Tenants Directory</span>
+          </p>
           <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">Tenants Directory</h1>
-          <p className="page-description font-medium text-muted-foreground">Manage and monitor your {tenants?.length ?? 0} active tenants</p>
+          <p className="page-description font-medium text-muted-foreground">
+            {tenants?.length === 0 
+              ? "No tenants yet — add someone to your workspace"
+              : `Manage your ${tenants?.length} active tenant${tenants?.length === 1 ? '' : 's'}`}
+          </p>
         </div>
         <Button 
           onClick={() => setInviteOpen(true)}
@@ -125,14 +134,39 @@ export default function Tenants() {
                 ) : (
                   <>
                     {(invitations ?? []).map(inv => (
-                      <div key={inv.id} className="p-4 rounded-2xl border border-border/50 bg-muted/30 space-y-2 group hover:border-[#ffcc00]/50 transition-all">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[13px] font-bold text-bizrent-navy truncate max-w-[180px]">{inv.email}</span>
+                      <div key={inv.id} className="p-4 rounded-2xl border border-border/50 bg-muted/30 space-y-2 group hover:border-[#ffcc00]/50 transition-all relative">
+                        <div className="flex justify-between items-start pr-12">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-[13px] font-bold text-bizrent-navy truncate max-w-[140px] cursor-help">{inv.email}</span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{inv.email}</p>
+                            </TooltipContent>
+                          </Tooltip>
                           <span className="text-[9px] font-extrabold bg-[#ffcc00]/20 text-[#8a6e00] px-2 py-0.5 rounded-full uppercase tracking-tighter">Sent</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
                           <Mail className="h-3 w-3" />
                           Invited {formatDate(inv.created_at)}
+                        </div>
+                        <div className="absolute right-2 top-2 bottom-2 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-bizrent-blue/10 hover:text-bizrent-blue" onClick={() => console.log('Resend', inv.id)}>
+                                <RotateCw className="h-3 w-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left"><p className="text-xs">Resend Invite</p></TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-red-100 hover:text-red-600" onClick={() => console.log('Cancel', inv.id)}>
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left"><p className="text-xs">Cancel Invite</p></TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                     ))}

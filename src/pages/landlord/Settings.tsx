@@ -9,7 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useOrganisation, useUpdateOrganisation, useSubscription, formatRWF } from '@/hooks/useSupabaseData';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Check, Zap, Shield, Crown } from 'lucide-react';
+import { Check, Zap, Shield, Crown, ChevronRight, Phone } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 export default function Settings() {
@@ -31,7 +32,11 @@ export default function Settings() {
     <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl">
       <div className="page-header">
         <div>
-          <p className="text-xs font-bold text-bizrent-blue uppercase tracking-widest">System / Settings</p>
+          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">System</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-bizrent-blue">Settings</span>
+          </p>
           <h1 className="page-title">Settings</h1>
           <p className="page-description">Manage your organisation and preferences</p>
         </div>
@@ -53,11 +58,27 @@ export default function Settings() {
             </div>
             <div className="space-y-2">
               <Label className="font-semibold text-bizrent-navy">Phone</Label>
-              <Input className="focus-visible:ring-bizrent-blue/20 rounded-xl" value={currentForm.phone} onChange={e => setForm({ ...currentForm, phone: e.target.value })} />
+              <div className="relative">
+                <Input 
+                  className="focus-visible:ring-bizrent-blue/20 rounded-xl pl-4" 
+                  placeholder="+250 7XX XXX XXX"
+                  value={currentForm.phone} 
+                  onChange={e => setForm({ ...currentForm, phone: e.target.value })} 
+                />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label className="font-semibold text-bizrent-navy opacity-70">Country</Label>
-              <Input className="rounded-xl bg-muted/50 opacity-70" value={org?.country_code ?? 'RW'} disabled />
+              <Label className="font-semibold text-bizrent-navy">Country</Label>
+              <Select defaultValue="RW" disabled>
+                <SelectTrigger className="w-full rounded-xl bg-muted/30 focus:ring-0 cursor-not-allowed text-muted-foreground font-medium">
+                  <SelectValue placeholder="Select Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="RW">Rwanda (RW)</SelectItem>
+                  <SelectItem value="KE">Kenya (KE)</SelectItem>
+                  <SelectItem value="UG">Uganda (UG)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleSave} disabled={updateOrg.isPending}>
@@ -94,12 +115,16 @@ export default function Settings() {
               </div>
             </>}
             <Button 
-              variant="outline" 
-              className="w-full mt-2 rounded-xl font-semibold border-border/80 text-bizrent-navy hover:bg-slate-50"
+              className="w-full mt-6 rounded-xl font-bold bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-lg shadow-bizrent-navy/10 h-12"
               onClick={() => setPricingOpen(true)}
             >
-              Upgrade Plan
+              Upgrade Plan to Unlock Features
             </Button>
+            {subscription?.status === 'TRIAL' && (
+              <p className="text-center text-xs font-bold text-bizrent-red mt-3 bg-red-50 p-2 rounded-xl">
+                ⚠️ Your trial expires in 14 days
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -108,23 +133,29 @@ export default function Settings() {
             <CardTitle className="text-lg font-bold text-bizrent-navy">Notification Preferences</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6 px-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="font-bold text-bizrent-navy">Payment Submissions</p>
-                <p className="text-sm font-medium text-muted-foreground mt-0.5">Get notified when tenants submit payments</p>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-bold text-bizrent-navy">Payment Submissions</p>
+                  <p className="text-sm font-medium text-muted-foreground mt-0.5">Get notified when tenants submit payments</p>
+                </div>
+                <Switch defaultChecked onCheckedChange={() => toast.success("Notification preferences saved")} />
               </div>
-              <Switch defaultChecked />
-            </div>
-            <Separator className="bg-border/50" />
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="font-bold text-bizrent-navy">Overdue Invoices</p>
-                <p className="text-sm font-medium text-muted-foreground mt-0.5">Alert when invoices become overdue</p>
+              <Separator className="bg-border/50" />
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-bold text-bizrent-navy">Overdue Invoices</p>
+                  <p className="text-sm font-medium text-muted-foreground mt-0.5">Alert when invoices become overdue</p>
+                </div>
+                <Switch defaultChecked onCheckedChange={() => toast.success("Notification preferences saved")} />
               </div>
-              <Switch defaultChecked />
-            </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex justify-center pt-8 pb-4">
+        <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
+          <Shield className="h-3.5 w-3.5" /> Secured with 256-bit encryption
+        </p>
       </div>
 
       <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>

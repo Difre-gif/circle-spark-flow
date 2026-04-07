@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrganisation, useCreateOrganisation } from '@/hooks/useSupabaseData';
@@ -147,8 +148,18 @@ export function LandlordSidebar() {
       <SidebarContent className="px-2">
         <SidebarMenu className="gap-1 mt-2">
           {navigationItems.map((item) => {
+            // Updated logic to ensure top-level match doesn't falsely trigger for sub-routes if it's the exact Dashboard route
             const isActive = location.pathname === item.url || (item.url !== '/landlord' && location.pathname.startsWith(item.url));
-            return (
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
+    const parts = name.split(' ').filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+  };
+
+  return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton 
                   asChild 
@@ -164,7 +175,18 @@ export function LandlordSidebar() {
                     {!isCollapsed && <span className="text-[13px] font-bold tracking-tight">{item.title}</span>}
                     
                     {!isCollapsed && item.highlight && (
-                      <span className="ml-auto bg-[#ffcc00] text-bizrent-navy text-[8px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-[#ffcc00]/50">MoMo</span>
+                      <div className="ml-auto flex items-center">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="bg-[#ffcc00] text-bizrent-navy text-[8px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-[#ffcc00]/50 cursor-help">
+                              MoMo
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="right">
+                            <p>Payments via MTN Mobile Money</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     )}
                     
                     {isActive && (
@@ -180,28 +202,37 @@ export function LandlordSidebar() {
 
       {/* 3. Footer: User Anchor */}
       <SidebarFooter className="p-4 border-t border-border/40 bg-slate-50/30">
-        <div className={cn("flex items-center gap-3 mb-4", isCollapsed && "justify-center mb-0")}>
-          <div className="h-10 w-10 rounded-2xl bg-bizrent-navy text-white flex items-center justify-center font-bold shrink-0 shadow-lg shadow-bizrent-navy/10 relative group cursor-pointer transition-transform hover:scale-105 active:scale-95">
-            {user?.name?.charAt(0) || 'U'}
-            <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-green-500 border-[3px] border-white rounded-full transition-transform group-hover:scale-110" />
-          </div>
-          {!isCollapsed && (
-            <div className="flex-1 overflow-hidden">
-              <p className="text-[13px] font-bold text-bizrent-navy truncate leading-tight">{user?.name}</p>
-              <p className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">{user?.email}</p>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className={cn("flex items-center gap-3 w-full cursor-pointer hover:bg-black/5 p-2 rounded-xl transition-colors", isCollapsed && "justify-center p-0")}>
+              <div className="h-10 w-10 rounded-2xl bg-bizrent-navy text-white flex items-center justify-center font-bold shrink-0 shadow-lg shadow-bizrent-navy/10 relative group transition-transform hover:scale-105 active:scale-95">
+                {getInitials(user?.name)}
+                <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-green-500 border-[3px] border-white rounded-full transition-transform group-hover:scale-110" />
+              </div>
+              {!isCollapsed && (
+                <div className="flex-1 overflow-hidden">
+                  <p className="text-[13px] font-bold text-bizrent-navy truncate leading-tight">{user?.name}</p>
+                  <p className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">{user?.email}</p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        
-        {!isCollapsed && (
-          <Button 
-            variant="ghost" 
-            className="w-full text-[11px] font-extrabold text-muted-foreground/70 hover:text-bizrent-red hover:bg-bizrent-red/5 transition-all h-9 rounded-xl uppercase tracking-wider" 
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2 h-3.5 w-3.5" strokeWidth={2.5} /> Log out
-          </Button>
-        )}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[212px] rounded-2xl shadow-xl border-border/40 p-1.5" align="start" sideOffset={12}>
+            <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">My Account</DropdownMenuLabel>
+            <DropdownMenuItem className="font-bold text-bizrent-navy py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5" onClick={() => navigate('/landlord/settings')}>
+              <div className="h-6 w-6 rounded flex items-center justify-center bg-bizrent-navy/10 text-bizrent-navy"><Settings className="h-3.5 w-3.5" /></div>
+              <span>Profile Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="my-1.5 opacity-50" />
+            <DropdownMenuItem 
+              className="text-bizrent-red font-semibold py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-red-50 focus:text-bizrent-red flex items-center gap-2.5"
+              onClick={handleLogout}
+            >
+              <div className="h-6 w-6 rounded flex items-center justify-center bg-red-100 text-bizrent-red"><LogOut className="h-3.5 w-3.5" /></div>
+              <span>Log Out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   );
