@@ -150,16 +150,8 @@ export function LandlordSidebar() {
           {navigationItems.map((item) => {
             // Updated logic to ensure top-level match doesn't falsely trigger for sub-routes if it's the exact Dashboard route
             const isActive = location.pathname === item.url || (item.url !== '/landlord' && location.pathname.startsWith(item.url));
-  const getInitials = (name?: string) => {
-    if (!name) return 'U';
-    const parts = name.split(' ').filter(Boolean);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-  };
-
-  return (
+            
+            return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton 
                   asChild 
