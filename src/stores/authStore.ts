@@ -74,56 +74,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         .select('id, full_name, email, phone')
         .eq('id', userId)
         .single();
-
+        
       if (!userData) return;
 
       const isSuperAdmin = userData.email === 'fredricknjorogekariuki@gmail.com';
 
-      // Fetch ALL active roles with org details to prioritize intelligently
-      const { data: allRoles } = await supabase
+      // Use limit(1) to prevent PGRST116 when a user belongs to multiple organizations temporarily
+      const { data: roleDataArr } = await supabase
         .from('user_organisation_roles')
-        .select('org_id, role, org:organisations(id, name, subscription_status, currency_code, timezone)')
+        .select('org_id, role')
         .eq('user_id', userId)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .limit(1);
 
-      const roles = allRoles || [];
-      let selectedRole = roles.length > 0 ? roles[0] : null;
-
-      if (roles.length > 1) {
-        // 1. Try to respect the last used org from localStorage
-        const savedOrgId = localStorage.getItem('bizrent_last_org');
-        if (savedOrgId) {
-          const match = roles.find(r => r.org_id === savedOrgId);
-          if (match) selectedRole = match;
-        }
-
-        // 2. If no saved org or it wasn't found, try to pick one that is NOT pending approval
-        if (!savedOrgId || !roles.find(r => r.org_id === savedOrgId)) {
-          const activeOrg = roles.find(r => {
-            const status = (r.org as any)?.subscription_status;
-            return status !== 'PENDING_APPROVAL';
-          });
-          if (activeOrg) selectedRole = activeOrg;
-        }
-      }
+      const roleData = roleDataArr?.[0];
 
       let isPendingApproval = false;
       let orgCurrency = 'RWF';
       let orgTimezone = 'Africa/Kigali';
 
-      if (selectedRole?.org_id) {
-        const orgData = selectedRole.org as any;
-        isPendingApproval = orgData?.subscription_status === 'PENDING_APPROVAL';
+      if (roleData?.org_id) {
+        const { data: orgData } = await supabase
+          .from('organisations')
+          .select('subscription_status, currency_code, timezone')
+          .eq('id', roleData.org_id)
+          .single();
+        isPendingApproval = orgData?.subscription_status === ('PENDING_APPROVAL' as any);
         if (orgData?.currency_code) orgCurrency = orgData.currency_code;
         if (orgData?.timezone) orgTimezone = orgData.timezone;
-
-        // Save preference for next reload
-        localStorage.setItem('bizrent_last_org', selectedRole.org_id);
       }
 
       const role: UserRole = isSuperAdmin 
         ? 'super-admin' 
-        : (selectedRole?.role === 'TENANT' ? 'tenant' : 'landlord');
+        : (roleData?.role === 'TENANT' ? 'tenant' : 'landlord');
 
       const userObj: User = {
         id: userData.id,
@@ -131,10 +114,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         email: userData.email,
         phone: userData.phone || '',
         role,
-        organisationId: selectedRole?.org_id || undefined,
+        organisationId: roleData?.org_id || undefined,
       };
 
-      const userOrgs = roles.map(r => ({
+      const { data: allRoles } = await supabase
+        .from('user_organisation_roles')
+        .select('org_id, role, org:organisations(id, name)')
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+      const userOrgs = (allRoles || []).map(r => ({
         id: (r.org as any)?.id,
         name: (r.org as any)?.name,
         role: r.role
@@ -142,8 +131,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({
         user: userObj,
-        orgId: selectedRole?.org_id || null,
-        orgRole: selectedRole?.role || null,
+        orgId: roleData?.org_id || null,
+        orgRole: roleData?.role || null,
         userOrgs,
         orgCurrency,
         orgTimezone,
@@ -151,7 +140,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isPendingApproval,
         isAuthenticated: !!get().session,
       });
-    } catch (err) {      console.error('Error fetching user profile:', err);
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
     }
   },
 

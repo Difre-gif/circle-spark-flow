@@ -118,11 +118,6 @@ export default function AcceptInvite() {
     });
     if (error) throw error;
     
-    // Save the accepted org ID so authStore prioritizes it
-    if (invitation?.org_id) {
-      localStorage.setItem('bizrent_last_org', invitation.org_id);
-    }
-
     // Reload the profile so the auth store picks up the new org + role
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {

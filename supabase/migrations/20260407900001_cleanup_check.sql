@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.check_user_auth_status(text);
