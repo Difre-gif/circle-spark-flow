@@ -1,25 +1,26 @@
 import { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Loader2, Home, Search, Edit2, Trash2, MoreVertical, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUnits, useProperties, useCreateUnit, formatRWF } from '@/hooks/useSupabaseData';
+import { useUnits, useProperties, useCreateUnit, useDeleteUnit, formatRWF } from '@/hooks/useSupabaseData';
 
 export default function Units() {
   const { data: units, isLoading } = useUnits();
   const { data: properties } = useProperties();
   const createUnit = useCreateUnit();
+  const deleteUnit = useDeleteUnit();
   const [search, setSearch] = useState('');
   const [propertyFilter, setPropertyFilter] = useState('ALL');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [unitToDelete, setUnitToDelete] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [form, setForm] = useState({ property_id: '', unit_number: '', unit_type: '', monthly_rent: 0 });
 
   const filtered = (units ?? []).filter(u => {
@@ -34,6 +35,12 @@ export default function Units() {
     await createUnit.mutateAsync(form);
     setDialogOpen(false);
     setForm({ property_id: '', unit_number: '', unit_type: '', monthly_rent: 0 });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    await deleteUnit.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
@@ -123,14 +130,14 @@ export default function Units() {
                           <DropdownMenuItem 
                             className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors focus:text-red-700 focus:bg-red-50"
                             onClick={() => {
-                              setUnitToDelete(u);
-                              setDeleteConfirmOpen(true);
+                              setDeleteTarget({ id: u.id, name: u.unit_number });
                             }}
                           >
                             <Trash2 className="h-4 w-4" /> Delete Unit
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                    </td>
                     </td>
                   </tr>
                 ))}
@@ -222,31 +229,34 @@ export default function Units() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-[400px] rounded-2xl p-6">
-          <div className="flex flex-col items-center justify-center text-center space-y-4">
-            <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-              <Trash2 className="h-6 w-6 text-red-600" />
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={!!deleteTarget} onOpenChange={open => { if (!open) setDeleteTarget(null); }}>
+          <DialogContent className="sm:max-w-[420px] rounded-2xl p-6">
+            <div className="flex flex-col items-center justify-center text-center space-y-4">
+              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+              <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Delete Unit {deleteTarget?.name}?</DialogTitle>
+              <p className="text-sm text-muted-foreground font-medium">
+                This action cannot be undone. This will permanently delete the unit and remove any associated history.
+              </p>
             </div>
-            <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Delete Unit {unitToDelete?.unit_number}?</DialogTitle>
-            <p className="text-sm text-muted-foreground font-medium">
-              This action cannot be undone. This will permanently delete the unit and remove any associated history.
-            </p>
-          </div>
-          <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col sm:flex-row">
-            <Button variant="outline" className="rounded-xl font-bold h-11 sm:flex-1" onClick={() => setDeleteConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button 
-              variant="destructive" 
-              className="rounded-xl font-bold h-11 sm:flex-1 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
-              onClick={() => {
-                // TODO: Add delete mutation
-                console.log('Delete unit', unitToDelete?.id);
-                setDeleteConfirmOpen(false);
-              }}
-            >
-              Delete Unit
+            <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col sm:flex-row">
+              <Button variant="outline" className="rounded-xl font-bold h-11 sm:flex-1" onClick={() => setDeleteTarget(null)}>
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                className="rounded-xl font-bold h-11 sm:flex-1 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
+                onClick={handleDeleteConfirm}
+                disabled={deleteUnit.isPending}
+              >
+                {deleteUnit.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {deleteUnit.isPending ? 'Deleting...' : 'Delete Unit'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
             </Button>
           </DialogFooter>
         </DialogContent>

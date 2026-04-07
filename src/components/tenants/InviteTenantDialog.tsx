@@ -68,7 +68,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-[13px] font-bold text-bizrent-navy ml-1">Email Address</Label>
+            <Label htmlFor="email" className="text-[13px] font-bold text-bizrent-navy ml-1">Email Address <span className="text-red-500">*</span></Label>
             <Input
               id="email"
               type="email"
