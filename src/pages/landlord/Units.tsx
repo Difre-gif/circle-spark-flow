@@ -138,7 +138,6 @@ export default function Units() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
-                    </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
@@ -254,13 +253,9 @@ export default function Units() {
                 {deleteUnit.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {deleteUnit.isPending ? 'Deleting...' : 'Delete Unit'}
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+      </div>
+    );
+  }
