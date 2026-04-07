@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import { Loader2, Download, ChevronRight } from 'lucide-react';
-=======
 import { useState, useMemo } from 'react';
-import { Loader2, Download, Calendar } from 'lucide-react';
->>>>>>> 0181a39890c6e36b8cf27d8b66f3dcd7853253cb
+import { Loader2, Download, Calendar, ChevronRight, BarChart2, Activity, Home, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -71,8 +67,7 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
-<<<<<<< HEAD
-      <div className="page-header flex items-center justify-between">
+      <div className="page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Analytics</span>
@@ -82,10 +77,6 @@ export default function Reports() {
           <h1 className="page-title text-2xl font-bold">Reports</h1>
           <p className="page-description text-muted-foreground mt-1">Financial and occupancy analytics</p>
         </div>
-        <Button variant="outline" className="rounded-xl font-semibold"><Download className="mr-2 h-4 w-4" /> Export</Button>
-=======
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div><h1 className="text-2xl font-bold">Reports</h1><p className="text-muted-foreground">Financial and occupancy analytics</p></div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -98,11 +89,10 @@ export default function Reports() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" onClick={() => window.print()}>
+          <Button variant="outline" className="rounded-xl font-semibold" onClick={() => window.print()}>
             <Download className="mr-2 h-4 w-4" /> Export
           </Button>
         </div>
->>>>>>> 0181a39890c6e36b8cf27d8b66f3dcd7853253cb
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-6">
