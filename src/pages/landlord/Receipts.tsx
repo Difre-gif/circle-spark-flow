@@ -5,6 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useReceipts, formatRWF, formatDate } from '@/hooks/useSupabaseData';
 import { StatusBadge } from '@/components/StatusBadge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 export default function Receipts() {
   const [search, setSearch] = useState('');
