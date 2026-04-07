@@ -900,7 +900,7 @@ export function useInviteStaff() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { email: string; role: 'MANAGER' | 'ACCOUNTANT' }) => {
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('invitations')
         .insert({
           email: input.email.toLowerCase(),
@@ -908,11 +908,15 @@ export function useInviteStaff() {
           invited_by: user!.id,
           role: input.role as any,
           status: 'PENDING' as any,
-        });
+        })
+        .select('id')
+        .single();
       if (error) {
         if (error.code === '23505') throw new Error('This user has already been invited to your organisation.');
         throw error;
       }
+
+      const invitationId = inserted?.id;
 
       // Fire-and-forget: staff-invitation email
       void (async () => {
@@ -927,7 +931,7 @@ export function useInviteStaff() {
                 orgName: (org as any)?.name || 'BizRent',
                 inviterName,
                 role: input.role,
-                invitationId: invData.id,
+                invitationId,
               },
             },
           });
