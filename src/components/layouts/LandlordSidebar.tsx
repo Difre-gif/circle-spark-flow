@@ -104,10 +104,34 @@ export function LandlordSidebar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[212px] rounded-2xl shadow-xl border-border/40 p-1.5" align="start" sideOffset={12}>
             <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">Organizations</DropdownMenuLabel>
-            <DropdownMenuItem className="font-bold text-bizrent-navy py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5">
-              <div className="h-6 w-6 rounded flex items-center justify-center bg-bizrent-blue/10 text-bizrent-blue"><Building2 className="h-3.5 w-3.5" /></div>
-              <span className="truncate">{org?.name}</span>
-            </DropdownMenuItem>
+            
+            {userOrgs.map((o) => (
+              <DropdownMenuItem 
+                key={o.id}
+                className={cn(
+                  "py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5 mb-1",
+                  o.id === orgId ? "font-bold text-bizrent-navy bg-slate-50/50" : "font-medium text-muted-foreground"
+                )}
+                onClick={() => {
+                  if (o.id !== orgId) {
+                    switchOrg(o.id);
+                    navigate('/landlord');
+                  }
+                }}
+              >
+                <div className={cn(
+                  "h-6 w-6 rounded flex items-center justify-center",
+                  o.id === orgId ? "bg-bizrent-blue/10 text-bizrent-blue" : "bg-muted text-muted-foreground"
+                )}>
+                  <Building2 className="h-3.5 w-3.5" />
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="truncate text-xs">{o.name}</span>
+                  {o.role !== 'OWNER' && <span className="text-[8px] uppercase tracking-widest opacity-60 font-extrabold">{o.role}</span>}
+                </div>
+              </DropdownMenuItem>
+            ))}
+
             <DropdownMenuSeparator className="my-1.5 opacity-50" />
             <DropdownMenuItem 
               className="text-muted-foreground font-semibold py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5"

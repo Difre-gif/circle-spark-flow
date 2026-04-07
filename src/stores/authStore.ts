@@ -57,6 +57,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     session: null,
     orgId: null,
     orgRole: null,
+    userOrgs: [],
     orgCurrency: 'RWF',
     orgTimezone: 'Africa/Kigali',
     isAuthenticated: false,
@@ -78,13 +79,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const isSuperAdmin = userData.email === 'fredricknjorogekariuki@gmail.com';
 
-      // Use maybeSingle to prevent PGRST116 when no role exists yet (e.g. fresh user)
-      const { data: roleData } = await supabase
+      // Use limit(1) to prevent PGRST116 when a user belongs to multiple organizations temporarily
+      const { data: roleDataArr } = await supabase
         .from('user_organisation_roles')
         .select('org_id, role')
         .eq('user_id', userId)
         .eq('is_active', true)
-        .maybeSingle();
+        .limit(1);
+
+      const roleData = roleDataArr?.[0];
 
       let isPendingApproval = false;
       let orgCurrency = 'RWF';
@@ -114,10 +117,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         organisationId: roleData?.org_id || undefined,
       };
 
+      const { data: allRoles } = await supabase
+        .from('user_organisation_roles')
+        .select('org_id, role, org:organisations(id, name)')
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+      const userOrgs = (allRoles || []).map(r => ({
+        id: (r.org as any)?.id,
+        name: (r.org as any)?.name,
+        role: r.role
+      })).filter(o => o.id && o.name);
+
       set({
         user: userObj,
         orgId: roleData?.org_id || null,
         orgRole: roleData?.role || null,
+        userOrgs,
         orgCurrency,
         orgTimezone,
         isSuperAdmin,
@@ -141,6 +157,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   switchRole: () => {
     // No-op for now based on previous context 
+  },
+
+  switchOrg: async (targetOrgId) => {
+    const orgInfo = get().userOrgs.find(o => o.id === targetOrgId);
+    if (!orgInfo) return;
+    
+    // Optionally fetch currency/timezone for the new org here, 
+    // or just let hooks re-fire. We'll at least set the orgId.
+    set({
+      orgId: targetOrgId,
+      orgRole: orgInfo.role,
+    });
   },
 
   impersonate: (orgId) => {
