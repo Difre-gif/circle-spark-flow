@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, isSuperAdmin, isPendingApproval, orgRole, user } = useAuth();
+  const { isAuthenticated, isLoading, isSuperAdmin, orgRole, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -25,11 +25,6 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   // Super Admin bypasses standard role checks
   if (isSuperAdmin) {
     return <>{children}</>;
-  }
-
-  // New signups must be approved unless they are the Super Admin
-  if (isPendingApproval) {
-    return <Navigate to="/pending-approval" replace />;
   }
 
   if (allowedRoles && orgRole && !allowedRoles.includes(orgRole)) {

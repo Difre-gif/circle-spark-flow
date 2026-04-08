@@ -15,7 +15,6 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   isSuperAdmin: boolean;
-  isPendingApproval: boolean;
   impersonatedOrgId: string | null;
   impersonatedUser: User | null;
   
@@ -47,7 +46,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   isLoading: true,
   isSuperAdmin: false,
-  isPendingApproval: false,
   impersonatedOrgId: null,
   impersonatedUser: null,
 
@@ -67,7 +65,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       orgTimezone: 'Africa/Kigali',
       isAuthenticated: false,
       isSuperAdmin: false,
-      isPendingApproval: false,
       impersonatedOrgId: null,
       impersonatedUser: null,
     });
@@ -110,17 +107,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Inject the context into the Supabase client so subsequent queries respect the selected org RLS
       setSupabaseOrgId(currentOrgId || null);
 
-      let isPendingApproval = false;
       let orgCurrency = 'RWF';
       let orgTimezone = 'Africa/Kigali';
 
       if (currentOrgId) {
         const { data: orgData } = await supabase
           .from('organisations')
-          .select('subscription_status, currency_code, timezone')
+          .select('currency_code, timezone')
           .eq('id', currentOrgId)
           .single();
-        isPendingApproval = orgData?.subscription_status === ('PENDING_APPROVAL' as any);
         if (orgData?.currency_code) orgCurrency = orgData.currency_code;
         if (orgData?.timezone) orgTimezone = orgData.timezone;
       }
@@ -146,7 +141,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         orgCurrency,
         orgTimezone,
         isSuperAdmin,
-        isPendingApproval,
         isAuthenticated: !!get().session,
       });
     } catch (err) {

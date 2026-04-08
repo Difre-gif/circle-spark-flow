@@ -924,13 +924,8 @@ export function usePendingOrganisations() {
   return useQuery({
     queryKey: ['pending-organisations'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('organisations')
-        .select('*')
-        .eq('subscription_status', 'PENDING_APPROVAL')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data;
+      // PENDING_APPROVAL is deprecated. Return empty array to prevent breakages.
+      return [];
     },
     enabled: !!isSuperAdmin,
   });

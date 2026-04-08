@@ -116,8 +116,6 @@ export default function SuperAdminOrganizations() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'PENDING_APPROVAL':
-        return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1"><Clock size={12}/> Pending</Badge>;
       case 'TRIAL':
         return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Trial</Badge>;
       case 'ACTIVE':
@@ -250,7 +248,6 @@ export default function SuperAdminOrganizations() {
                 </SelectTrigger>
                 <SelectContent className="rounded-xl p-2 border-slate-100">
                   <SelectItem value="ALL" className="rounded-lg font-bold">All Statuses</SelectItem>
-                  <SelectItem value="PENDING_APPROVAL" className="rounded-lg font-bold">Pending</SelectItem>
                   <SelectItem value="TRIAL" className="rounded-lg font-bold">In Trial</SelectItem>
                   <SelectItem value="ACTIVE" className="rounded-lg font-bold">Active</SelectItem>
                   <SelectItem value="INACTIVE" className="rounded-lg font-bold">Inactive</SelectItem>

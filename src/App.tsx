@@ -93,9 +93,6 @@ function AppRoutes() {
           : <Navigate to="/login" replace />
       } />
 
-      {/* Special states */}
-      <Route path="/pending-approval" element={<PendingApproval />} />
-
       {/* Super Admin portal */}
       <Route path="/super-admin" element={
         <ProtectedRoute>
