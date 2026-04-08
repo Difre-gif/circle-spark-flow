@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useDashboardStats, usePayments, useOccupancySummary, useOrganisation, formatRWF, formatDate, useInvoices, useInvitations } from '@/hooks/useSupabaseData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
@@ -22,18 +22,42 @@ export default function LandlordDashboard() {
   const { data: org } = useOrganisation();
   const { data: overdueInvoices } = useInvoices({ status: 'OVERDUE' });
   const { data: invitations } = useInvitations();
+  const { data: allInvoices } = useInvoices();
 
   // Granular loading per widget instead of a global blocker
   // const isLoading = statsLoading || paymentsLoading || occLoading;
 
-  const mockChartData = [
-    { month: 'Jan', collected: 200, outstanding: 150 },
-    { month: 'Feb', collected: 250, outstanding: 120 },
-    { month: 'Mar', collected: 220, outstanding: 180 },
-    { month: 'Apr', collected: 300, outstanding: 100 },
-    { month: 'May', collected: 280, outstanding: 140 },
-    { month: 'Jun', collected: 320, outstanding: 80 },
-  ];
+  const chartData = useMemo(() => {
+    if (!allInvoices) return [];
+
+    const dataMap = new Map();
+    const months = [];
+    const now = new Date();
+    
+    // Generate last 6 months list (chronological order)
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthLabel = d.toLocaleString('en-US', { month: 'short' });
+      months.push({ label: monthLabel, monthNum: d.getMonth(), year: d.getFullYear() });
+      dataMap.set(monthLabel, { month: monthLabel, collected: 0, outstanding: 0 });
+    }
+
+    allInvoices.forEach(inv => {
+      const invDate = new Date(inv.due_date || inv.created_at);
+      const mLabel = invDate.toLocaleString('en-US', { month: 'short' });
+      
+      if (dataMap.has(mLabel)) {
+        const entry = dataMap.get(mLabel);
+        const collected = inv.amount_paid || 0;
+        const outstanding = inv.balance ?? Math.max(0, (inv.amount_due || 0) - collected);
+        
+        entry.collected += collected;
+        entry.outstanding += outstanding;
+      }
+    });
+
+    return Array.from(dataMap.values());
+  }, [allInvoices]);
 
   const getDynamicInsight = () => {
     if (statsLoading || occLoading) return "Loading your insights...";
@@ -351,7 +375,7 @@ export default function LandlordDashboard() {
                 </div>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={mockChartData} barSize={16}>
+                    <BarChart data={chartData} barSize={16}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} dy={10} />
                       <YAxis hide />
