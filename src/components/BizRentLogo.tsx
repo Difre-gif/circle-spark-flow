@@ -8,8 +8,8 @@ interface BizRentLogoProps {
 }
 
 export function BizRentLogo({ className, size = 'md', theme = 'auto' }: BizRentLogoProps) {
-  // We'll map the sizes to heights that fit the wordmark well
-  const sizes = { sm: 'h-6', md: 'h-8', lg: 'h-12' };
+  // We'll map the sizes to heights that fit the wordmark well. Increased slightly because the image is a tight crop.
+  const sizes = { sm: 'h-8', md: 'h-10', lg: 'h-14' };
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
