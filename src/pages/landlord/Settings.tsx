@@ -22,7 +22,12 @@ export default function Settings() {
   const updateNotifPrefs = useUpdateNotificationPrefs();
   
   const [form, setForm] = useState<{ name: string; email: string; phone: string } | null>(null);
-  const [settingsForm, setSettingsForm] = useState<{ default_due_day: number; grace_period_days: number } | null>(null);
+  const [settingsForm, setSettingsForm] = useState<{ 
+    default_due_day: number; 
+    grace_period_days: number;
+    days_before_due: string;
+    days_after_due: string;
+  } | null>(null);
   
   const [pricingOpen, setPricingOpen] = useState(false);
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
@@ -38,6 +43,8 @@ export default function Settings() {
       setSettingsForm({
         default_due_day: dbSettings?.billing?.default_due_day || 1,
         grace_period_days: dbSettings?.billing?.grace_period_days || 3,
+        days_before_due: (dbSettings?.reminders?.days_before_due || [3]).join(', '),
+        days_after_due: (dbSettings?.reminders?.days_after_due || [1, 5, 10]).join(', ')
       });
     }
   }, [org, settingsForm]);
@@ -73,7 +80,10 @@ export default function Settings() {
   const handleSaveSettings = () => {
     if (!settingsForm) return;
     
-    // Merge new billing settings with existing JSONB
+    // Parse the comma-separated strings back into arrays of numbers
+    const parseNumberArray = (str: string) => 
+      str.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+
     const currentSettings = (org?.settings as any) || {};
     const newSettings = {
       ...currentSettings,
@@ -81,6 +91,11 @@ export default function Settings() {
         ...currentSettings.billing,
         default_due_day: settingsForm.default_due_day,
         grace_period_days: settingsForm.grace_period_days
+      },
+      reminders: {
+        ...currentSettings.reminders,
+        days_before_due: parseNumberArray(settingsForm.days_before_due),
+        days_after_due: parseNumberArray(settingsForm.days_after_due)
       }
     };
     
@@ -159,6 +174,7 @@ export default function Settings() {
         </CardHeader>
         <CardContent className="space-y-8 pt-6 px-6">
           {settingsForm && (
+            <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -203,19 +219,50 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-          )}
+            
+            <Separator className="bg-border/50" />
 
-          <div className="bg-slate-50 border border-border/50 rounded-2xl p-5 flex items-start gap-4">
-            <div className="h-10 w-10 rounded-full bg-bizrent-blue/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <BellRing className="h-5 w-5 text-bizrent-blue" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="font-bold text-bizrent-navy flex items-center gap-2">
+                    <BellRing className="h-4 w-4 text-bizrent-blue" />
+                    Pre-Due Reminders
+                  </Label>
+                  <Input 
+                    type="text" 
+                    className="w-full rounded-xl font-bold focus-visible:ring-bizrent-blue/20" 
+                    placeholder="e.g. 7, 3, 1"
+                    value={settingsForm.days_before_due}
+                    onChange={e => setSettingsForm({ ...settingsForm, days_before_due: e.target.value })}
+                  />
+                  <p className="text-[11px] text-muted-foreground font-medium mt-1 leading-relaxed">
+                    Comma-separated list of days <strong className="text-bizrent-navy">before</strong> the due date to send automated email reminders to tenants.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="font-bold text-bizrent-navy flex items-center gap-2">
+                    <BellRing className="h-4 w-4 text-red-500" />
+                    Overdue Escalation Messages
+                  </Label>
+                  <Input 
+                    type="text" 
+                    className="w-full rounded-xl font-bold focus-visible:ring-red-500/20 border-red-200" 
+                    placeholder="e.g. 1, 5, 10"
+                    value={settingsForm.days_after_due}
+                    onChange={e => setSettingsForm({ ...settingsForm, days_after_due: e.target.value })}
+                  />
+                  <p className="text-[11px] text-muted-foreground font-medium mt-1 leading-relaxed">
+                    Comma-separated list of days <strong className="text-red-600">after</strong> the due date to send escalating overdue notices.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 className="font-bold text-bizrent-navy text-sm">Automated Reminders</h4>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed font-medium">
-                The system will automatically email tenants <strong className="text-bizrent-navy">3 days before</strong> their rent is due, and every <strong className="text-bizrent-navy">7 days</strong> once their invoice crosses the grace period into OVERDUE status.
-              </p>
-            </div>
-          </div>
+            </>
+          )}
 
           <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleSaveSettings} disabled={updateOrg.isPending}>
             {updateOrg.isPending ? 'Saving...' : 'Save Policy'}
