@@ -84,14 +84,7 @@ const BASE_CSS = `
 `;
 
 // ─── Logo SVG ────────────────────────────────────────────────────────────────
-const LOGO_SVG = `<svg width="120" height="36" viewBox="0 0 120 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="8" fill="#1e3a5f"/>
-  <path d="M16 8 L26 15 L26 28 L6 28 L6 15 Z" fill="#ffffff" opacity="0.9"/>
-  <path d="M10 22 L10 28 L14 28 L14 22 Z M18 22 L18 28 L22 28 L22 22 Z" fill="#1e3a5f"/>
-  <path d="M14 22 L18 22 L18 26 L14 26 Z" fill="#1e3a5f"/>
-  <path d="M16 6 L28 14" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
-  <text x="38" y="22" font-family="Inter,sans-serif" font-size="15" font-weight="700" fill="#ffffff">BizRent</text>
-</svg>`;
+const LOGO_SVG = `<img src="https://bizrent.rw/logo-dark.png" alt="BizRent" width="120" style="border-radius: 8px; display: block; margin: 0 auto;" />`;
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 const ICON = {
