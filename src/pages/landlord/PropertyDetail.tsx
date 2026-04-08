@@ -4,10 +4,40 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useProperty, useUnits, formatRWF, usePropertyManagers, useTeamMembers, useAssignManager, useRemoveManager } from '@/hooks/useSupabaseData';
+import { useProperty, useUnits, formatRWF, usePropertyManagers, useTeamMembers, useAssignManager, useRemoveManager, useUpdateUnit } from '@/hooks/useSupabaseData';
 import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+
+function InlineRentEdit({ unit, updateUnit }: { unit: any, updateUnit: any }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [rent, setRent] = useState(unit.monthly_rent || 0);
+
+  const handleSave = async () => {
+    await updateUnit.mutateAsync({ id: unit.id, monthly_rent: rent });
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-2">
+        <Input type="number" className="w-24 h-8 text-xs font-bold font-mono" value={rent || ''} onChange={e => setRent(Number(e.target.value))} autoFocus />
+        <Button size="sm" className="h-8 bg-bizrent-emerald hover:bg-emerald-600 text-white font-semibold rounded-lg px-3" onClick={handleSave} disabled={updateUnit.isPending}>
+          {updateUnit.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Save'}
+        </Button>
+        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground rounded-lg" onClick={() => { setIsEditing(false); setRent(unit.monthly_rent); }}>✕</Button>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="flex items-center gap-2 group cursor-pointer hover:bg-slate-50 p-1.5 -ml-1.5 rounded-lg transition-colors w-fit" onClick={() => setIsEditing(true)}>
+      <span className="font-bold text-bizrent-slate font-tabular-nums">{formatRWF(unit.monthly_rent)}</span>
+      <Edit2 className="h-3.5 w-3.5 text-bizrent-blue opacity-0 group-hover:opacity-100 transition-opacity" />
+    </div>
+  );
+}
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -23,6 +53,7 @@ export default function PropertyDetail() {
   const assignManager = useAssignManager();
   const removeManager = useRemoveManager();
   const [selectedMgr, setSelectedMgr] = useState<string>('');
+  const updateUnit = useUpdateUnit();
 
   if (propLoading || unitsLoading || mgrLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-bizrent-navy" /></div>;
   if (!property) return <div className="text-center py-12 text-muted-foreground">Property not found</div>;
@@ -105,7 +136,9 @@ export default function PropertyDetail() {
                         {u.floor && <div className="text-[10px] font-semibold text-muted-foreground">Floor {u.floor}</div>}
                       </TableCell>
                       <TableCell className="font-medium text-muted-foreground text-xs">{u.unit_type}</TableCell>
-                      <TableCell className="font-bold text-bizrent-slate">{formatRWF(u.monthly_rent)}</TableCell>
+                      <TableCell>
+                        <InlineRentEdit unit={u} updateUnit={updateUnit} />
+                      </TableCell>
                       <TableCell className="px-8 py-4 text-right"><StatusBadge status={u.status} /></TableCell>
                     </TableRow>
                   ))}
