@@ -1,5 +1,7 @@
 -- Missing Super Admin RPCs for Dashboard
 
+DROP FUNCTION IF EXISTS public.get_global_admin_metrics();
+
 CREATE OR REPLACE FUNCTION public.get_global_admin_metrics()
 RETURNS json
 LANGUAGE plpgsql
