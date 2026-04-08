@@ -342,9 +342,9 @@ export default function Settings() {
         <DialogContent className="sm:max-w-4xl rounded-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="text-center pb-6">
             <DialogTitle className="text-3xl font-extrabold text-bizrent-navy">Upgrade Your Business</DialogTitle>
-            <DialogDescription className="text-md font-medium">
+            <DialogDesc className="text-md font-medium">
               Choose the perfect tier for your expanding property portfolio.
-            </DialogDescription>
+            </DialogDesc>
           </DialogHeader>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
