@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, setSupabaseOrgId } from '@/integrations/supabase/client';
 import type { Session } from '@supabase/supabase-js';
 import type { User, UserRole } from '@/types';
 
@@ -9,6 +9,7 @@ export interface AuthState {
   session: Session | null;
   orgId: string | null;
   orgRole: string | null;
+  userOrgs: any[];
   orgCurrency: string;
   orgTimezone: string;
   isAuthenticated: boolean;
@@ -22,6 +23,7 @@ export interface AuthState {
   login: (email: string, password: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   switchRole: (role: UserRole) => void;
+  switchOrg: (orgId: string) => void;
   impersonate: (orgId: string) => void;
   impersonateUser: (targetUser: User) => void;
   stopImpersonating: () => void;
@@ -39,6 +41,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   orgId: null,
   orgRole: null,
+  userOrgs: [],
   orgCurrency: 'RWF',
   orgTimezone: 'Africa/Kigali',
   isAuthenticated: false,
@@ -52,20 +55,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setUser: (user) => set({ user, isAuthenticated: !!get().session && !!user }),
   setIsLoading: (isLoading) => set({ isLoading }),
   
-  clearAuth: () => set({
-    user: null,
-    session: null,
-    orgId: null,
-    orgRole: null,
-    userOrgs: [],
-    orgCurrency: 'RWF',
-    orgTimezone: 'Africa/Kigali',
-    isAuthenticated: false,
-    isSuperAdmin: false,
-    isPendingApproval: false,
-    impersonatedOrgId: null,
-    impersonatedUser: null,
-  }),
+  clearAuth: () => {
+    setSupabaseOrgId(null);
+    set({
+      user: null,
+      session: null,
+      orgId: null,
+      orgRole: null,
+      userOrgs: [],
+      orgCurrency: 'RWF',
+      orgTimezone: 'Africa/Kigali',
+      isAuthenticated: false,
+      isSuperAdmin: false,
+      isPendingApproval: false,
+      impersonatedOrgId: null,
+      impersonatedUser: null,
+    });
+  },
 
   fetchUserProfile: async (userId: string) => {
     try {
@@ -79,44 +85,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const isSuperAdmin = userData.email === 'fredricknjorogekariuki@gmail.com';
 
-      // Use limit(1) to prevent PGRST116 when a user belongs to multiple organizations temporarily
-      const { data: roleDataArr } = await supabase
-        .from('user_organisation_roles')
-        .select('org_id, role')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .limit(1);
-
-      const roleData = roleDataArr?.[0];
-
-      let isPendingApproval = false;
-      let orgCurrency = 'RWF';
-      let orgTimezone = 'Africa/Kigali';
-
-      if (roleData?.org_id) {
-        const { data: orgData } = await supabase
-          .from('organisations')
-          .select('subscription_status, currency_code, timezone')
-          .eq('id', roleData.org_id)
-          .single();
-        isPendingApproval = orgData?.subscription_status === ('PENDING_APPROVAL' as any);
-        if (orgData?.currency_code) orgCurrency = orgData.currency_code;
-        if (orgData?.timezone) orgTimezone = orgData.timezone;
-      }
-
-      const role: UserRole = isSuperAdmin 
-        ? 'super-admin' 
-        : (roleData?.role === 'TENANT' ? 'tenant' : 'landlord');
-
-      const userObj: User = {
-        id: userData.id,
-        name: userData.full_name,
-        email: userData.email,
-        phone: userData.phone || '',
-        role,
-        organisationId: roleData?.org_id || undefined,
-      };
-
+      // Fetch all active roles for the user to support multiple orgs/roles
       const { data: allRoles } = await supabase
         .from('user_organisation_roles')
         .select('org_id, role, org:organisations(id, name)')
@@ -129,10 +98,50 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         role: r.role
       })).filter(o => o.id && o.name);
 
+      // Determine the active org: use currently selected orgId if valid, otherwise fallback to the first active org
+      let currentOrgId = get().orgId;
+      let activeRoleData = userOrgs.find(o => o.id === currentOrgId);
+      
+      if (!activeRoleData && userOrgs.length > 0) {
+        activeRoleData = userOrgs[0];
+        currentOrgId = activeRoleData.id;
+      }
+
+      // Inject the context into the Supabase client so subsequent queries respect the selected org RLS
+      setSupabaseOrgId(currentOrgId || null);
+
+      let isPendingApproval = false;
+      let orgCurrency = 'RWF';
+      let orgTimezone = 'Africa/Kigali';
+
+      if (currentOrgId) {
+        const { data: orgData } = await supabase
+          .from('organisations')
+          .select('subscription_status, currency_code, timezone')
+          .eq('id', currentOrgId)
+          .single();
+        isPendingApproval = orgData?.subscription_status === ('PENDING_APPROVAL' as any);
+        if (orgData?.currency_code) orgCurrency = orgData.currency_code;
+        if (orgData?.timezone) orgTimezone = orgData.timezone;
+      }
+
+      // Role is derived from the *active* organization context, NOT overridden by isSuperAdmin
+      const activeRole = activeRoleData?.role || null;
+      const parsedRole: UserRole = activeRole === 'TENANT' ? 'tenant' : 'landlord';
+
+      const userObj: User = {
+        id: userData.id,
+        name: userData.full_name,
+        email: userData.email,
+        phone: userData.phone || '',
+        role: parsedRole,
+        organisationId: currentOrgId || undefined,
+      };
+
       set({
         user: userObj,
-        orgId: roleData?.org_id || null,
-        orgRole: roleData?.role || null,
+        orgId: currentOrgId || null,
+        orgRole: activeRole,
         userOrgs,
         orgCurrency,
         orgTimezone,
@@ -163,12 +172,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const orgInfo = get().userOrgs.find(o => o.id === targetOrgId);
     if (!orgInfo) return;
     
-    // Optionally fetch currency/timezone for the new org here, 
-    // or just let hooks re-fire. We'll at least set the orgId.
-    set({
-      orgId: targetOrgId,
-      orgRole: orgInfo.role,
+    // Inject new context into the Supabase client
+    setSupabaseOrgId(targetOrgId);
+    
+    // Update the local state & user object so the router responds correctly
+    set(state => {
+      const parsedRole = orgInfo.role === 'TENANT' ? 'tenant' : 'landlord';
+      return {
+        orgId: targetOrgId,
+        orgRole: orgInfo.role,
+        user: state.user ? { ...state.user, role: parsedRole, organisationId: targetOrgId } : null,
+      };
     });
+    
+    // We optionally fetch the profile again to get fresh orgCurrency/timezone
+    await get().fetchUserProfile(get().user!.id);
   },
 
   impersonate: (orgId) => {

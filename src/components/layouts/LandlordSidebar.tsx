@@ -244,6 +244,17 @@ export function LandlordSidebar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[212px] rounded-2xl shadow-xl border-border/40 p-1.5" align="start" sideOffset={12}>
             <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">My Account</DropdownMenuLabel>
+            
+            {isSuperAdmin && (
+              <>
+                <DropdownMenuItem className="font-bold text-indigo-700 py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-indigo-50 flex items-center gap-2.5" onClick={() => navigate('/super-admin')}>
+                  <div className="h-6 w-6 rounded flex items-center justify-center bg-indigo-100 text-indigo-700"><Shield className="h-3.5 w-3.5" /></div>
+                  <span>Super Admin Portal</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="my-1.5 opacity-50" />
+              </>
+            )}
+
             <DropdownMenuItem className="font-bold text-bizrent-navy py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5" onClick={() => navigate('/landlord/settings')}>
               <div className="h-6 w-6 rounded flex items-center justify-center bg-bizrent-navy/10 text-bizrent-navy"><Settings className="h-3.5 w-3.5" /></div>
               <span>Profile Settings</span>

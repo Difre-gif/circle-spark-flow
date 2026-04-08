@@ -2,7 +2,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { BizRentLogo } from '@/components/BizRentLogo';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Home, FileText, CreditCard, Receipt, User, LogOut } from 'lucide-react';
+import { Home, FileText, CreditCard, Receipt, User, LogOut, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -14,7 +14,7 @@ const navItems = [
 ];
 
 export function TenantLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -29,6 +29,12 @@ export function TenantLayout() {
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-card px-4">
         <BizRentLogo variant="full" size="sm" className="text-primary" />
         <div className="flex items-center gap-2">
+          {isSuperAdmin && (
+            <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 hidden sm:flex" onClick={() => navigate('/super-admin')}>
+              <Shield className="h-4 w-4 mr-1" />
+              Admin
+            </Button>
+          )}
           <span className="text-sm text-muted-foreground hidden sm:block">{user?.name}</span>
           <Button variant="ghost" size="icon" onClick={async () => { await logout(); navigate('/login'); }}>
             <LogOut className="h-4 w-4" />

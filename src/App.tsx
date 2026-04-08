@@ -89,9 +89,7 @@ function AppRoutes() {
       {/* Root redirect */}
       <Route path="/" element={
         isAuthenticated
-          ? (user?.role === 'super-admin' 
-              ? <Navigate to="/super-admin" replace />
-              : <Navigate to={user?.role === 'tenant' ? '/tenant' : '/landlord'} replace />)
+          ? <Navigate to={user?.role === 'tenant' ? '/tenant' : '/landlord'} replace />
           : <Navigate to="/login" replace />
       } />
 

@@ -5,6 +5,22 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://ippbpimivjuabjijuwvv.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwcGJwaW1pdmp1YWJqaWp1d3Z2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMzMyMzIsImV4cCI6MjA5MDcwOTIzMn0.Bc8-WpWtiGSVqnMFMUu-rcE7yYVHGrXcl6Ce5ndMc2A";
 
+let currentOrgId: string | null = null;
+
+// Exported function to allow the authStore to update the active org ID globally
+export const setSupabaseOrgId = (orgId: string | null) => {
+  currentOrgId = orgId;
+};
+
+// Intercept all requests to add the active context header for PostgREST
+const customFetch = (input: RequestInfo | URL, init?: RequestInit) => {
+  const headers = new Headers(init?.headers);
+  if (currentOrgId) {
+    headers.set('x-org-id', currentOrgId);
+  }
+  return fetch(input, { ...init, headers });
+};
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -13,5 +29,8 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
+  },
+  global: {
+    fetch: customFetch,
   }
 });

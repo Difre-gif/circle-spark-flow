@@ -3,9 +3,24 @@ import { BizRentLogo } from "@/components/BizRentLogo";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { Clock, Mail } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function PendingApproval() {
-  const { logout, user } = useAuth();
+  const { logout, user, isAuthenticated, isPendingApproval } = useAuth();
+  const navigate = useNavigate();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isPendingApproval) {
+    return <Navigate to="/" replace />;
+  }
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
@@ -45,7 +60,7 @@ export default function PendingApproval() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-3">
-          <Button variant="outline" className="w-full text-slate-600" onClick={() => logout()}>
+          <Button variant="outline" className="w-full text-slate-600" onClick={handleLogout}>
             Sign out and check later
           </Button>
           <p className="text-xs text-center text-slate-400">
