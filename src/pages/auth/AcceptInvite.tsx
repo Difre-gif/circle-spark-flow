@@ -71,7 +71,16 @@ export default function AcceptInvite() {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        if (session.user.email?.toLowerCase() === invitation.email.toLowerCase()) {
+        // Verify the session isn't a phantom session by fetching the user from the server
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error || !user) {
+          // Phantom session (user deleted on backend but token exists locally)
+          await supabase.auth.signOut();
+          return;
+        }
+
+        if (user.email?.toLowerCase() === invitation.email.toLowerCase()) {
           setAlreadySignedIn(true);
         } else {
           // Signed in as someone else, sign them out so they can sign in/up as the invitee
