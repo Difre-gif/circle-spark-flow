@@ -370,12 +370,16 @@ export function useApprovePayment() {
         try {
           const { data: pm } = await supabase
             .from('payments')
-            .select('transaction_id, tenant:users!payments_tenant_user_id_fkey(email, full_name), invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
+            .select('transaction_id, tenant:users!payments_tenant_user_id_fkey(email, full_name, notification_prefs), invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
             .eq('id', paymentId)
             .single();
           const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
           const tenant = (pm?.tenant as any);
-          if (tenant?.email && pm) {
+          
+          // Check notification preference
+          const shouldSend = tenant?.notification_prefs?.payment_status !== false;
+
+          if (tenant?.email && pm && shouldSend) {
             const inv = (pm.invoice as any);
             const unit = inv?.unit;
             await supabase.functions.invoke('send-email', {
@@ -442,12 +446,16 @@ export function useRejectPayment() {
         try {
           const { data: pm } = await supabase
             .from('payments')
-            .select('amount, transaction_id, tenant:users!payments_tenant_user_id_fkey(email, full_name), invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
+            .select('amount, transaction_id, tenant:users!payments_tenant_user_id_fkey(email, full_name, notification_prefs), invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
             .eq('id', paymentId)
             .single();
           const { data: org } = await supabase.from('organisations').select('name').eq('id', orgId!).single();
           const tenant = (pm?.tenant as any);
-          if (tenant?.email && pm) {
+          
+          // Check notification preference
+          const shouldSend = tenant?.notification_prefs?.payment_status !== false;
+
+          if (tenant?.email && pm && shouldSend) {
             const inv = (pm.invoice as any);
             const unit = inv?.unit;
             await supabase.functions.invoke('send-email', {
