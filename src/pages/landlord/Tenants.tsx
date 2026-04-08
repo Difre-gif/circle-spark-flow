@@ -26,7 +26,16 @@ export default function Tenants() {
   const createTenancy = useCreateTenancy();
   
   const [deleteTenantTarget, setDeleteTenantTarget] = useState<{ id: string; name: string } | null>(null);
-  const [editTenantTarget, setEditTenantTarget] = useState<{ id: string; name: string; phone: string; unit_id?: string; rent?: number } | null>(null);
+  const [editTenantTarget, setEditTenantTarget] = useState<{ 
+    id: string; 
+    name: string; 
+    phone: string; 
+    unit_id?: string; 
+    rent?: number;
+    billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
+    period_anchor_day?: number;
+    security_deposit_total?: number;
+  } | null>(null);
 
   const availableUnits = (units ?? []).filter(u => u.status === 'VACANT');
 
@@ -321,15 +330,69 @@ export default function Tenants() {
                 </div>
 
                 {editTenantTarget?.unit_id && (
-                  <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-300">
-                    <Label className="text-xs font-bold text-slate-500 ml-1">Agreed Monthly Rent (RWF)</Label>
-                    <Input 
-                      type="number"
-                      placeholder="Agreed rent" 
-                      className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
-                      value={editTenantTarget?.rent || ''}
-                      onChange={e => setEditTenantTarget(prev => prev ? { ...prev, rent: Number(e.target.value) } : null)}
-                    />
+                  <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-slate-500 ml-1">Agreed Monthly Rent (RWF)</Label>
+                      <Input 
+                        type="number"
+                        placeholder="Agreed rent" 
+                        className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
+                        value={editTenantTarget?.rent || ''}
+                        onChange={e => setEditTenantTarget(prev => prev ? { ...prev, rent: Number(e.target.value) } : null)}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-500 ml-1">Security Deposit</Label>
+                        <Input 
+                          type="number"
+                          placeholder="e.g. 50000" 
+                          className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
+                          value={editTenantTarget?.security_deposit_total || ''}
+                          onChange={e => setEditTenantTarget(prev => prev ? { ...prev, security_deposit_total: Number(e.target.value) } : null)}
+                        />
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-500 ml-1">Billing Freq.</Label>
+                        <Select 
+                          value={editTenantTarget?.billing_frequency || 'MONTHLY'} 
+                          onValueChange={val => setEditTenantTarget(prev => prev ? { ...prev, billing_frequency: val as any } : null)}
+                        >
+                          <SelectTrigger className="h-11 rounded-xl bg-white border-border/60 font-bold">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl">
+                            <SelectItem value="WEEKLY" className="font-bold">Weekly</SelectItem>
+                            <SelectItem value="MONTHLY" className="font-bold">Monthly</SelectItem>
+                            <SelectItem value="QUARTERLY" className="font-bold">Quarterly</SelectItem>
+                            <SelectItem value="ANNUAL" className="font-bold">Annual</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-slate-500 ml-1 flex items-center justify-between">
+                        <span>Period Anchor Day</span>
+                        <span className="text-[9px] uppercase tracking-widest text-bizrent-blue bg-bizrent-blue/10 px-2 py-0.5 rounded-full">Override</span>
+                      </Label>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-medium text-slate-400">Day</span>
+                        <Input 
+                          type="number"
+                          min="1"
+                          max="31"
+                          placeholder="1" 
+                          className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold w-20 text-center"
+                          value={editTenantTarget?.period_anchor_day || ''}
+                          onChange={e => setEditTenantTarget(prev => prev ? { ...prev, period_anchor_day: Number(e.target.value) } : null)}
+                        />
+                        <span className="text-xs font-medium text-slate-400">of the month</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 leading-tight ml-1 mt-1">Leave blank to use the organisation's default billing day.</p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -355,7 +418,10 @@ export default function Tenants() {
                       unit_id: editTenantTarget.unit_id,
                       agreed_rent: editTenantTarget.rent,
                       start_date: new Date().toISOString().split('T')[0],
-                      deposit_amount: 0 // Default for this fast-link UI
+                      deposit_amount: editTenantTarget.security_deposit_total || 0,
+                      security_deposit_total: editTenantTarget.security_deposit_total,
+                      billing_frequency: editTenantTarget.billing_frequency || 'MONTHLY',
+                      period_anchor_day: editTenantTarget.period_anchor_day,
                     });
                   }
                   
