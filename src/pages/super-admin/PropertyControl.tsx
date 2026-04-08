@@ -43,7 +43,7 @@ function useGlobalProperties() {
       const { data, error } = await supabase
         .from('properties')
         .select(`
-          id, name, address, property_type, is_active, created_at,
+          id, name, address_line1, property_type, is_active, created_at,
           organisation:organisations(id, name),
           units(id)
         `)
