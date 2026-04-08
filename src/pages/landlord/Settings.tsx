@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Loader2, Eye, EyeOff, CalendarClock, BellRing } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useOrganisation, useUpdateOrganisation, useSubscription, formatRWF, useNotificationPrefs, useUpdateNotificationPrefs } from '@/hooks/useSupabaseData';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription as DialogDesc } from '@/components/ui/dialog';
 import { Check, Zap, Shield, Crown, ChevronRight, Phone } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
@@ -20,13 +20,27 @@ export default function Settings() {
   const updateOrg = useUpdateOrganisation();
   const { data: notifPrefs } = useNotificationPrefs();
   const updateNotifPrefs = useUpdateNotificationPrefs();
+  
   const [form, setForm] = useState<{ name: string; email: string; phone: string } | null>(null);
+  const [settingsForm, setSettingsForm] = useState<{ default_due_day: number; grace_period_days: number } | null>(null);
+  
   const [pricingOpen, setPricingOpen] = useState(false);
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
   const [pwErrors, setPwErrors] = useState<Partial<Record<string, string>>>({});
   const [pwLoading, setPwLoading] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNext, setShowNext] = useState(false);
+
+  // Initialize settings form when org loads
+  useEffect(() => {
+    if (org && !settingsForm) {
+      const dbSettings = org.settings as any;
+      setSettingsForm({
+        default_due_day: dbSettings?.billing?.default_due_day || 1,
+        grace_period_days: dbSettings?.billing?.grace_period_days || 3,
+      });
+    }
+  }, [org, settingsForm]);
 
   const handleChangePassword = async () => {
     const errs: Partial<Record<string, string>> = {};
@@ -54,6 +68,24 @@ export default function Settings() {
 
   const handleSave = () => {
     updateOrg.mutate(currentForm);
+  };
+  
+  const handleSaveSettings = () => {
+    if (!settingsForm) return;
+    
+    // Merge new billing settings with existing JSONB
+    const currentSettings = (org?.settings as any) || {};
+    const newSettings = {
+      ...currentSettings,
+      billing: {
+        ...currentSettings.billing,
+        default_due_day: settingsForm.default_due_day,
+        grace_period_days: settingsForm.grace_period_days
+      }
+    };
+    
+    updateOrg.mutate({ settings: newSettings } as any);
+    toast.success("Billing policies updated successfully.");
   };
 
   return (
@@ -111,6 +143,82 @@ export default function Settings() {
           </div>
           <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleSave} disabled={updateOrg.isPending}>
             {updateOrg.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden">
+        <CardHeader className="bg-muted/20 border-b border-border/40 pb-4 pt-6 px-6">
+          <CardTitle className="text-lg font-bold text-bizrent-navy flex items-center gap-2">
+            <CalendarClock className="h-5 w-5 text-bizrent-blue" />
+            Billing & Reminder Policy
+          </CardTitle>
+          <CardDescription className="text-muted-foreground font-medium mt-1">
+            Configure how the system handles automated invoicing, grace periods, and overdue escalation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8 pt-6 px-6">
+          {settingsForm && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="font-bold text-bizrent-navy">Default Billing Day</Label>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-muted-foreground">Day</span>
+                    <Input 
+                      type="number" 
+                      min="1" 
+                      max="28" 
+                      className="w-20 rounded-xl font-bold text-center focus-visible:ring-bizrent-blue/20" 
+                      value={settingsForm.default_due_day}
+                      onChange={e => setSettingsForm({ ...settingsForm, default_due_day: Number(e.target.value) })}
+                    />
+                    <span className="text-sm font-medium text-muted-foreground">of the month</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-medium mt-1 leading-relaxed">
+                    Invoices will automatically generate 7 days before this date. <br/>(e.g., if set to 5th, invoices generate on the 28th).
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="font-bold text-bizrent-navy flex items-center gap-2">
+                    Grace Period <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full uppercase tracking-widest font-extrabold">Important</span>
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <Input 
+                      type="number" 
+                      min="0" 
+                      max="30" 
+                      className="w-20 rounded-xl font-bold text-center focus-visible:ring-bizrent-blue/20" 
+                      value={settingsForm.grace_period_days}
+                      onChange={e => setSettingsForm({ ...settingsForm, grace_period_days: Number(e.target.value) })}
+                    />
+                    <span className="text-sm font-medium text-muted-foreground">days after due date</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-medium mt-1 leading-relaxed">
+                    Payments are considered <span className="text-amber-600 font-bold">LATE</span> immediately after the due date, but will only escalate to <span className="text-red-600 font-bold">OVERDUE</span> status (triggering staff action) after this grace period ends.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-slate-50 border border-border/50 rounded-2xl p-5 flex items-start gap-4">
+            <div className="h-10 w-10 rounded-full bg-bizrent-blue/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <BellRing className="h-5 w-5 text-bizrent-blue" />
+            </div>
+            <div>
+              <h4 className="font-bold text-bizrent-navy text-sm">Automated Reminders</h4>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed font-medium">
+                The system will automatically email tenants <strong className="text-bizrent-navy">3 days before</strong> their rent is due, and every <strong className="text-bizrent-navy">7 days</strong> once their invoice crosses the grace period into OVERDUE status.
+              </p>
+            </div>
+          </div>
+
+          <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleSaveSettings} disabled={updateOrg.isPending}>
+            {updateOrg.isPending ? 'Saving...' : 'Save Policy'}
           </Button>
         </CardContent>
       </Card>
