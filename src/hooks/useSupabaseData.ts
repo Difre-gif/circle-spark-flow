@@ -199,7 +199,18 @@ export function useCreateTenancy() {
   const { orgId, user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { tenant_user_id: string; unit_id: string; start_date: string; agreed_rent: number; deposit_amount: number; end_date?: string }) => {
+    mutationFn: async (input: { 
+      tenant_user_id: string; 
+      unit_id: string; 
+      start_date: string; 
+      agreed_rent: number; 
+      deposit_amount?: number; 
+      end_date?: string;
+      billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
+      period_anchor_day?: number;
+      security_deposit_total?: number;
+      advance_payment_months?: number;
+    }) => {
       const { data, error } = await supabase
         .from('tenancies')
         .insert({ ...input, org_id: orgId!, created_by: user!.id, status: 'ACTIVE' as any })
@@ -731,6 +742,61 @@ export function useTeamMembers() {
       return data;
     },
     enabled: !!orgId,
+  });
+}
+
+// ─── Property Managers ───
+export function usePropertyManagers(propertyId: string | undefined) {
+  return useQuery({
+    queryKey: ['property-managers', propertyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('property_managers')
+        .select('*, user:users!property_managers_user_id_fkey(full_name, email)')
+        .eq('property_id', propertyId!);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!propertyId,
+  });
+}
+
+export function useAssignManager() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { property_id: string; user_id: string }) => {
+      const { error } = await supabase
+        .from('property_managers')
+        .insert(input);
+      if (error) {
+        if (error.code === '23505') throw new Error('This manager is already assigned to this property.');
+        throw error;
+      }
+    },
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['property-managers', variables.property_id] });
+      toast.success('Manager assigned successfully');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useRemoveManager() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { property_id: string; user_id: string }) => {
+      const { error } = await supabase
+        .from('property_managers')
+        .delete()
+        .eq('property_id', input.property_id)
+        .eq('user_id', input.user_id);
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['property-managers', variables.property_id] });
+      toast.success('Manager removed');
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
