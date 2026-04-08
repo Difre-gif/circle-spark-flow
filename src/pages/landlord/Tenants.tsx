@@ -8,22 +8,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useTenants, useInvitations, formatDate, useResendInvitation, useCancelInvitation, useUpdateTenantProfile, useRemoveTenant } from '@/hooks/useSupabaseData';
+import { useTenants, useInvitations, formatDate, useResendInvitation, useCancelInvitation, useUpdateTenantProfile, useRemoveTenant, useUnits, useCreateTenancy } from '@/hooks/useSupabaseData';
 import { InviteTenantDialog } from '@/components/tenants/InviteTenantDialog';
 import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function Tenants() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const { data: tenants, isLoading } = useTenants();
   const { data: invitations, isLoading: invLoading } = useInvitations();
+  const { data: units } = useUnits();
   const [search, setSearch] = useState('');
   const resendInvite = useResendInvitation();
   const cancelInvite = useCancelInvitation();
   const removeTenant = useRemoveTenant();
   const updateTenant = useUpdateTenantProfile();
+  const createTenancy = useCreateTenancy();
   
   const [deleteTenantTarget, setDeleteTenantTarget] = useState<{ id: string; name: string } | null>(null);
-  const [editTenantTarget, setEditTenantTarget] = useState<{ id: string; name: string; phone: string } | null>(null);
+  const [editTenantTarget, setEditTenantTarget] = useState<{ id: string; name: string; phone: string; unit_id?: string; rent?: number } | null>(null);
+
+  const availableUnits = (units ?? []).filter(u => u.status === 'VACANT');
 
   const filtered = (tenants ?? []).filter(t => {
     const user = t.user as any;
@@ -261,24 +266,73 @@ export default function Tenants() {
               Update the contact details for this tenant.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-6 space-y-4">
+          <div className="py-6 space-y-5">
             <div className="space-y-2">
-              <Label className="text-bizrent-navy font-bold px-1">Full Name</Label>
-              <Input 
-                placeholder="John Doe" 
-                className="rounded-2xl h-12 border-border/60 focus-visible:ring-bizrent-blue/20"
-                value={editTenantTarget?.name || ''}
-                onChange={e => setEditTenantTarget(prev => prev ? { ...prev, name: e.target.value } : null)}
-              />
+              <Label className="text-bizrent-navy font-bold px-1 text-xs uppercase tracking-widest opacity-70">Personal Info</Label>
+              <div className="space-y-4 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-500 ml-1">Full Name</Label>
+                  <Input 
+                    placeholder="John Doe" 
+                    className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20"
+                    value={editTenantTarget?.name || ''}
+                    onChange={e => setEditTenantTarget(prev => prev ? { ...prev, name: e.target.value } : null)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-500 ml-1">Phone Number</Label>
+                  <Input 
+                    placeholder="+250 7XX XXX XXX" 
+                    className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20"
+                    value={editTenantTarget?.phone || ''}
+                    onChange={e => setEditTenantTarget(prev => prev ? { ...prev, phone: e.target.value } : null)}
+                  />
+                </div>
+              </div>
             </div>
+
             <div className="space-y-2">
-              <Label className="text-bizrent-navy font-bold px-1">Phone Number</Label>
-              <Input 
-                placeholder="+250 7XX XXX XXX" 
-                className="rounded-2xl h-12 border-border/60 focus-visible:ring-bizrent-blue/20"
-                value={editTenantTarget?.phone || ''}
-                onChange={e => setEditTenantTarget(prev => prev ? { ...prev, phone: e.target.value } : null)}
-              />
+              <Label className="text-bizrent-navy font-bold px-1 text-xs uppercase tracking-widest opacity-70">Unit Assignment</Label>
+              <div className="p-4 bg-blue-50/30 rounded-2xl border border-blue-100/50 space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-500 ml-1">Move into Unit</Label>
+                  <Select 
+                    value={editTenantTarget?.unit_id || "none"} 
+                    onValueChange={val => {
+                      const unit = units?.find(u => u.id === val);
+                      setEditTenantTarget(prev => prev ? { ...prev, unit_id: val === "none" ? undefined : val, rent: unit?.monthly_rent } : null);
+                    }}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl bg-white border-border/60">
+                      <SelectValue placeholder="Select a vacant unit" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="none" className="text-slate-400 font-medium">No unit assigned</SelectItem>
+                      {availableUnits.map(u => (
+                        <SelectItem key={u.id} value={u.id} className="font-bold">
+                          {u.properties?.name} — {u.unit_number} ({u.unit_type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] font-semibold text-slate-400 mt-1 ml-1">
+                    Only vacant units are shown here.
+                  </p>
+                </div>
+
+                {editTenantTarget?.unit_id && (
+                  <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-300">
+                    <Label className="text-xs font-bold text-slate-500 ml-1">Agreed Monthly Rent (RWF)</Label>
+                    <Input 
+                      type="number"
+                      placeholder="Agreed rent" 
+                      className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
+                      value={editTenantTarget?.rent || ''}
+                      onChange={e => setEditTenantTarget(prev => prev ? { ...prev, rent: Number(e.target.value) } : null)}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-3">
@@ -287,14 +341,31 @@ export default function Tenants() {
               className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-bold h-12 px-8 shadow-lg shadow-bizrent-navy/10"
               onClick={async () => {
                 if (editTenantTarget) {
-                  await updateTenant.mutateAsync({ user_id: editTenantTarget.id, full_name: editTenantTarget.name, phone: editTenantTarget.phone });
+                  // 1. Update basic profile
+                  await updateTenant.mutateAsync({ 
+                    user_id: editTenantTarget.id, 
+                    full_name: editTenantTarget.name, 
+                    phone: editTenantTarget.phone 
+                  });
+                  
+                  // 2. If a unit was selected, create a tenancy
+                  if (editTenantTarget.unit_id && editTenantTarget.rent) {
+                    await createTenancy.mutateAsync({
+                      tenant_user_id: editTenantTarget.id,
+                      unit_id: editTenantTarget.unit_id,
+                      agreed_rent: editTenantTarget.rent,
+                      start_date: new Date().toISOString().split('T')[0],
+                      deposit_amount: 0 // Default for this fast-link UI
+                    });
+                  }
+                  
                   setEditTenantTarget(null);
                 }
               }}
-              disabled={updateTenant.isPending || !editTenantTarget?.name.trim()}
+              disabled={updateTenant.isPending || createTenancy.isPending || !editTenantTarget?.name.trim()}
             >
-              {updateTenant.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {updateTenant.isPending ? 'Saving...' : 'Save Profile'}
+              {(updateTenant.isPending || createTenancy.isPending) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {(updateTenant.isPending || createTenancy.isPending) ? 'Updating...' : 'Save Profile'}
             </Button>
           </DialogFooter>
         </DialogContent>
