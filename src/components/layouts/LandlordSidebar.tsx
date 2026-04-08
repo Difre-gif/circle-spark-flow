@@ -41,7 +41,7 @@ const navigationItems = [
 ];
 
 export function LandlordSidebar() {
-  const { user, logout, userOrgs, switchOrg, orgId } = useAuth();
+  const { user, logout, userOrgs, switchOrg, orgId, isSuperAdmin } = useAuth();
   const { data: org } = useOrganisation();
   const navigate = useNavigate();
   const location = useLocation();
