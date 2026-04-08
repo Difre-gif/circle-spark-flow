@@ -1387,24 +1387,14 @@ export type Database = {
         | "SUBSCRIPTION_EXPIRING"
       payment_method_enum: "MOMO" | "BANK_TRANSFER" | "MPESA"
       payment_status_enum: "PENDING" | "APPROVED" | "REJECTED" | "AUTO_APPROVED"
-      property_type_enum:
-        | "APARTMENT"
-        | "COMMERCIAL"
-        | "OFFICE"
-        | "KIOSK"
-        | "MIXED_USE"
+      property_type_enum: "RESIDENTIAL" | "COMMERCIAL" | "MIXED"
       subscription_status_enum: "TRIAL" | "ACTIVE" | "LAPSED" | "CANCELLED"
       subscription_tier_enum: "STARTER" | "GROWTH" | "PRO"
       tenancy_status_enum: "ACTIVE" | "TERMINATED" | "EXPIRED"
       unit_status_enum: "VACANT" | "OCCUPIED" | "MAINTENANCE"
-      unit_type_enum:
-        | "STUDIO"
-        | "1BED"
-        | "2BED"
-        | "3BED"
-        | "KIOSK"
-        | "OFFICE"
-        | "OTHER"
+      unit_type_enum: "ROOM" | "APARTMENT" | "SHOP" | "OFFICE" | "LAND"
+      billing_frequency_enum: "WEEKLY" | "MONTHLY" | "BIMONTHLY" | "QUARTERLY" | "SEMI_ANNUAL" | "ANNUAL"
+      lease_type_enum: "FIXED" | "ROLLING"
       user_role_enum:
         | "OWNER"
         | "MANAGER"
@@ -1551,26 +1541,14 @@ export const Constants = {
       ],
       payment_method_enum: ["MOMO", "BANK_TRANSFER", "MPESA"],
       payment_status_enum: ["PENDING", "APPROVED", "REJECTED", "AUTO_APPROVED"],
-      property_type_enum: [
-        "APARTMENT",
-        "COMMERCIAL",
-        "OFFICE",
-        "KIOSK",
-        "MIXED_USE",
-      ],
+      property_type_enum: ["RESIDENTIAL", "COMMERCIAL", "MIXED"],
       subscription_status_enum: ["TRIAL", "ACTIVE", "LAPSED", "CANCELLED"],
       subscription_tier_enum: ["STARTER", "GROWTH", "PRO"],
       tenancy_status_enum: ["ACTIVE", "TERMINATED", "EXPIRED"],
       unit_status_enum: ["VACANT", "OCCUPIED", "MAINTENANCE"],
-      unit_type_enum: [
-        "STUDIO",
-        "1BED",
-        "2BED",
-        "3BED",
-        "KIOSK",
-        "OFFICE",
-        "OTHER",
-      ],
+      unit_type_enum: ["ROOM", "APARTMENT", "SHOP", "OFFICE", "LAND"],
+      billing_frequency_enum: ["WEEKLY", "MONTHLY", "BIMONTHLY", "QUARTERLY", "SEMI_ANNUAL", "ANNUAL"],
+      lease_type_enum: ["FIXED", "ROLLING"],
       user_role_enum: [
         "OWNER",
         "MANAGER",
