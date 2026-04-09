@@ -1322,6 +1322,7 @@ export interface NotificationPrefs {
   overdue_invoices: boolean;
   invoice_reminders: boolean;
   payment_status: boolean;
+  communication_channel?: 'email' | 'sms' | 'both';
 }
 
 const DEFAULT_PREFS: NotificationPrefs = {
@@ -1329,6 +1330,7 @@ const DEFAULT_PREFS: NotificationPrefs = {
   overdue_invoices: true,
   invoice_reminders: true,
   payment_status: true,
+  communication_channel: 'email',
 };
 
 export function useNotificationPrefs() {
