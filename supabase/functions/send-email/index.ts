@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
-const AF_USERNAME = Deno.env.get("AFRICASTALKING_USERNAME") || "sandbox";
-const AF_API_KEY = Deno.env.get("AFRICASTALKING_API_KEY");
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -505,60 +503,6 @@ function buildEmailByType(type: string, data: Record<string, unknown>): { subjec
   }
 }
 
-// ─── SMS Builder ─────────────────────────────────────────────────────────────
-function extractPhoneFromProxyEmail(email: string): string | null {
-  const match = email.match(/^(\+?\d+)@tenants\.bizrent\.rw$/);
-  if (match) return match[1];
-  return null;
-}
-
-function formatPhoneNumber(phone: string): string | null {
-  if (!phone) return null;
-  // Remove all non-numeric characters except +
-  let cleaned = phone.replace(/[^\d+]/g, '');
-  
-  if (cleaned.startsWith('+')) {
-    return cleaned; // Already formatted
-  }
-  
-  // Handling Rwanda (250) and Kenya (254) numbers
-  if (cleaned.startsWith('250') || cleaned.startsWith('254')) {
-    return '+' + cleaned;
-  }
-  
-  if (cleaned.startsWith('0')) {
-    // We try to guess the country based on length. Rwandan 078.. is 10 digits. Kenyan 07.. is 10 digits.
-    // If the system doesn't have explicit country, we'll default to +250 for now based on Phase 1 Rwanda.
-    // But realistically the client app should pass the country code. We'll prepend +250.
-    return '+250' + cleaned.substring(1);
-  }
-  
-  return '+' + cleaned;
-}
-
-function buildSmsByType(type: string, data: Record<string, any>): string | null {
-  const fmtAmt = (n: number) => `RWF ${Number(n).toLocaleString("en-US")}`;
-  const fmtDate = (iso: string) => {
-    try { return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }
-    catch { return iso; }
-  };
-  
-  switch (type) {
-    case "tenant-invitation":
-      return `Muraho! ${data.inviterName} from ${data.orgName} has invited you to manage your rent on BizRent. Login at bizrent.rw to get started.`;
-    case "invoice-due":
-      return `BizRent: Your rent invoice ${data.invoiceNumber} for ${fmtAmt(data.amountDue)} is due on ${fmtDate(data.dueDate)}. Please pay via MoMo and submit proof on bizrent.rw.`;
-    case "invoice-overdue":
-      return `BizRent: URGENT. Your rent invoice ${data.invoiceNumber} for ${fmtAmt(data.amountDue)} is overdue by ${data.daysOverdue} days. Please pay immediately.`;
-    case "payment-approved":
-      return `BizRent: Your payment of ${fmtAmt(data.amount)} for invoice ${data.invoiceNumber} has been APPROVED by ${data.approvedBy}. Thank you!`;
-    case "payment-rejected":
-      return `BizRent: Your payment of ${fmtAmt(data.amount)} for invoice ${data.invoiceNumber} was REJECTED. Reason: ${data.rejectionReason}. Please resubmit proof.`;
-    default:
-      return null;
-  }
-}
-
 // ─── Request handler ──────────────────────────────────────────────────────────
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -566,15 +510,11 @@ serve(async (req) => {
   }
 
   try {
-    const payload = await req.json() as {
+    const { to, type, data } = await req.json() as {
       to: string;
       type: string;
       data: Record<string, unknown>;
-      phone?: string;
-      channelPref?: "email" | "sms" | "both";
     };
-    
-    const { to, type, data, phone, channelPref = "email" } = payload;
 
     if (!to || !type || !data) {
       return new Response(JSON.stringify({ error: "Missing required fields: to, type, data" }), {
@@ -585,97 +525,33 @@ serve(async (req) => {
 
     const { subject, html } = buildEmailByType(type, data);
 
-    const isProxyEmail = extractPhoneFromProxyEmail(to) !== null;
-    const targetPhone = formatPhoneNumber(phone || extractPhoneFromProxyEmail(to) || "");
-    
-    // Logic for sending
-    // 1. If it's a proxy email, we MUST send SMS and CANNOT send email.
-    // 2. Otherwise, check user preferences.
-    const shouldSendSms = targetPhone && (isProxyEmail || channelPref === "sms" || channelPref === "both");
-    const shouldSendEmail = !isProxyEmail && (channelPref === "email" || channelPref === "both");
-    
-    const results: Record<string, any> = {};
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: resolveSender(type),
+        to: [to],
+        subject,
+        html,
+      }),
+    });
 
-    // ─── SMS Routing ───
-    if (shouldSendSms) {
-      console.log(`[send-email] Routing to SMS: ${targetPhone}. Proxy: ${isProxyEmail}, Pref: ${channelPref}`);
-      const smsBody = buildSmsByType(type, data);
-      
-      if (smsBody && AF_API_KEY) {
-        let afUrl = "https://api.africastalking.com/version1/messaging/bulk";
-        if (AF_USERNAME === "sandbox") {
-          // Fallback to standard sandbox URL if bulk isn't supported yet
-          afUrl = "https://api.sandbox.africastalking.com/version1/messaging";
-        }
-
-        const afPayload: any = {
-          username: AF_USERNAME,
-          message: smsBody,
-          to: targetPhone // using 'to' for standard API, 'phoneNumbers' for bulk
-        };
-
-        if (AF_USERNAME !== "sandbox") {
-          afPayload.phoneNumbers = [targetPhone];
-          delete afPayload.to;
-        }
-
-        const afRes = await fetch(afUrl, {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "apiKey": AF_API_KEY,
-          },
-          body: new URLSearchParams(afPayload).toString(),
-        });
-
-        if (!afRes.ok) {
-          const err = await afRes.text();
-          console.error(`[send-email] Africa's Talking SMS error ${afRes.status}: ${err}`);
-          results.sms = { status: "error", error: err };
-        } else {
-          const afData = await afRes.json();
-          console.log(`[send-email] Sent SMS to ${targetPhone}:`, JSON.stringify(afData));
-          results.sms = { status: "success", data: afData };
-        }
-      } else if (!AF_API_KEY) {
-        console.warn("[send-email] AFRICASTALKING_API_KEY not set. SMS skipped.");
-        results.sms = { status: "skipped", reason: "missing_api_key" };
-      }
-    }
-
-    // ─── Real Email Routing via Resend ───
-    if (shouldSendEmail) {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: resolveSender(type),
-          to: [to],
-          subject,
-          html,
-        }),
+    if (!res.ok) {
+      const err = await res.text();
+      console.error(`[send-email] Resend error ${res.status}: ${err}`);
+      return new Response(JSON.stringify({ error: err }), {
+        status: res.status,
+        headers: { ...CORS, "Content-Type": "application/json" },
       });
-
-      if (!res.ok) {
-        const err = await res.text();
-        console.error(`[send-email] Resend error ${res.status}: ${err}`);
-        results.email = { status: "error", error: err };
-      } else {
-        const result = await res.json();
-        console.log(`[send-email] Sent '${type}' to ${to} → id:${result.id}`);
-        results.email = { status: "success", id: result.id };
-      }
     }
 
-    if (!shouldSendSms && !shouldSendEmail) {
-       console.log(`[send-email] Nothing sent for ${to}. Proxy: ${isProxyEmail}, Pref: ${channelPref}`);
-    }
+    const result = await res.json();
+    console.log(`[send-email] Sent '${type}' to ${to} → id:${result.id}`);
 
-    return new Response(JSON.stringify({ results }), {
+    return new Response(JSON.stringify({ id: result.id }), {
       status: 200,
       headers: { ...CORS, "Content-Type": "application/json" },
     });

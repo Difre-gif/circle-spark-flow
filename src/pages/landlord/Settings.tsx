@@ -316,31 +316,8 @@ export default function Settings() {
             <CardTitle className="text-lg font-bold text-bizrent-navy">Notification Preferences</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6 px-6">
-              <div className="space-y-3">
+              <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="font-bold text-bizrent-navy">Default Communication Channel</p>
-                  <p className="text-sm font-medium text-muted-foreground mt-0.5">Choose how you prefer to receive notifications</p>
-                </div>
-                <Select 
-                  value={notifPrefs?.communication_channel || 'email'} 
-                  onValueChange={(val: 'email' | 'sms' | 'both') => {
-                    updateNotifPrefs.mutate({ communication_channel: val });
-                    toast.success("Communication channel updated");
-                  }}
-                  disabled={updateNotifPrefs.isPending}
-                >
-                  <SelectTrigger className="w-full md:w-[250px] font-medium text-bizrent-navy focus:ring-bizrent-blue">
-                    <SelectValue placeholder="Select channel" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="sms">SMS</SelectItem>
-                    <SelectItem value="both">Both Email & SMS</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Separator className="bg-border/50" />
-              <div className="flex items-center justify-between gap-4">                <div>
                   <p className="font-bold text-bizrent-navy">Payment Submissions</p>
                   <p className="text-sm font-medium text-muted-foreground mt-0.5">Get notified when tenants submit payments</p>
                 </div>

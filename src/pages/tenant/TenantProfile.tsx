@@ -6,54 +6,21 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useNotificationPrefs, useUpdateNotificationPrefs, useUpdateTenantDetails } from '@/hooks/useSupabaseData';
+import { useNotificationPrefs, useUpdateNotificationPrefs } from '@/hooks/useSupabaseData';
 
 export default function TenantProfile() {
   const { user } = useAuth();
   const { data: notifPrefs } = useNotificationPrefs();
   const updateNotifPrefs = useUpdateNotificationPrefs();
-  const updateDetails = useUpdateTenantDetails();
-  
-  const [profileForm, setProfileForm] = useState({ 
-    full_name: user?.name ?? '', 
-    email: user?.email ?? '', 
-    phone: user?.phone ?? '' 
-  });
-  
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
   const [pwErrors, setPwErrors] = useState<Partial<Record<string, string>>>({});
   const [pwLoading, setPwLoading] = useState(false);
-  const [profileLoading, setProfileLoading] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNext, setShowNext] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
-  const handleUpdateProfile = async () => {
-    setProfileLoading(true);
-    try {
-      if (profileForm.email !== user?.email) {
-        const { error } = await supabase.auth.updateUser({ email: profileForm.email });
-        if (error) throw new Error("Email update failed: " + error.message);
-        toast.success("Check your new email address to confirm the change.");
-      }
-      
-      await updateDetails.mutateAsync({ 
-        userId: user!.id, 
-        full_name: profileForm.full_name, 
-        phone: profileForm.phone 
-      });
-      
-      toast.success("Profile details updated.");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update profile.");
-    } finally {
-      setProfileLoading(false);
-    }
-  };
 
   const handleChangePassword = async () => {
     const errs: Partial<Record<string, string>> = {};
@@ -87,10 +54,10 @@ export default function TenantProfile() {
       <Card>
         <CardHeader><CardTitle>Personal Information</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2"><Label>Full Name</Label><Input value={profileForm.full_name} onChange={e => setProfileForm(f => ({ ...f, full_name: e.target.value }))} /></div>
-          <div className="space-y-2"><Label>Email</Label><Input value={profileForm.email} onChange={e => setProfileForm(f => ({ ...f, email: e.target.value }))} /></div>
-          <div className="space-y-2"><Label>Phone</Label><Input value={profileForm.phone} onChange={e => setProfileForm(f => ({ ...f, phone: e.target.value }))} /></div>
-          <Button onClick={handleUpdateProfile} disabled={profileLoading}>{profileLoading ? 'Saving...' : 'Save Changes'}</Button>
+          <div className="space-y-2"><Label>Full Name</Label><Input defaultValue={user?.name ?? ''} /></div>
+          <div className="space-y-2"><Label>Email</Label><Input defaultValue={user?.email ?? ''} /></div>
+          <div className="space-y-2"><Label>Phone</Label><Input defaultValue={user?.phone ?? ''} /></div>
+          <Button>Save Changes</Button>
         </CardContent>
       </Card>
 
@@ -134,26 +101,8 @@ export default function TenantProfile() {
       <Card>
         <CardHeader><CardTitle>Notification Preferences</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2 pb-2">
-            <Label>Default Communication Channel</Label>
-            <Select 
-              value={notifPrefs?.communication_channel || 'email'} 
-              onValueChange={(val: 'email' | 'sms' | 'both') => updateNotifPrefs.mutate({ communication_channel: val })}
-              disabled={updateNotifPrefs.isPending}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select channel" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="sms">SMS</SelectItem>
-                <SelectItem value="both">Both Email & SMS</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">We will use your proxy email or provided phone number for SMS.</p>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">            <div><p className="font-medium">Invoice Reminders</p><p className="text-sm text-muted-foreground">Get reminded before due dates</p></div>
+          <div className="flex items-center justify-between">
+            <div><p className="font-medium">Invoice Reminders</p><p className="text-sm text-muted-foreground">Get reminded before due dates</p></div>
             <Switch
               checked={notifPrefs?.invoice_reminders ?? true}
               onCheckedChange={v => updateNotifPrefs.mutate({ invoice_reminders: v })}
