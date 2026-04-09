@@ -512,6 +512,30 @@ function extractPhoneFromProxyEmail(email: string): string | null {
   return null;
 }
 
+function formatPhoneNumber(phone: string): string | null {
+  if (!phone) return null;
+  // Remove all non-numeric characters except +
+  let cleaned = phone.replace(/[^\d+]/g, '');
+  
+  if (cleaned.startsWith('+')) {
+    return cleaned; // Already formatted
+  }
+  
+  // Handling Rwanda (250) and Kenya (254) numbers
+  if (cleaned.startsWith('250') || cleaned.startsWith('254')) {
+    return '+' + cleaned;
+  }
+  
+  if (cleaned.startsWith('0')) {
+    // We try to guess the country based on length. Rwandan 078.. is 10 digits. Kenyan 07.. is 10 digits.
+    // If the system doesn't have explicit country, we'll default to +250 for now based on Phase 1 Rwanda.
+    // But realistically the client app should pass the country code. We'll prepend +250.
+    return '+250' + cleaned.substring(1);
+  }
+  
+  return '+' + cleaned;
+}
+
 function buildSmsByType(type: string, data: Record<string, any>): string | null {
   const fmtAmt = (n: number) => `RWF ${Number(n).toLocaleString("en-US")}`;
   const fmtDate = (iso: string) => {
@@ -542,11 +566,15 @@ serve(async (req) => {
   }
 
   try {
-    const { to, type, data } = await req.json() as {
+    const payload = await req.json() as {
       to: string;
       type: string;
       data: Record<string, unknown>;
+      phone?: string;
+      channelPref?: "email" | "sms" | "both";
     };
+    
+    const { to, type, data, phone, channelPref = "email" } = payload;
 
     if (!to || !type || !data) {
       return new Response(JSON.stringify({ error: "Missing required fields: to, type, data" }), {
@@ -557,82 +585,97 @@ serve(async (req) => {
 
     const { subject, html } = buildEmailByType(type, data);
 
-    // ─── SMS Routing for Proxy Emails ───
-    const proxyPhone = extractPhoneFromProxyEmail(to);
-    if (proxyPhone) {
-      console.log(`[send-email] Proxy email detected: ${to}. Routing to SMS.`);
+    const isProxyEmail = extractPhoneFromProxyEmail(to) !== null;
+    const targetPhone = formatPhoneNumber(phone || extractPhoneFromProxyEmail(to) || "");
+    
+    // Logic for sending
+    // 1. If it's a proxy email, we MUST send SMS and CANNOT send email.
+    // 2. Otherwise, check user preferences.
+    const shouldSendSms = targetPhone && (isProxyEmail || channelPref === "sms" || channelPref === "both");
+    const shouldSendEmail = !isProxyEmail && (channelPref === "email" || channelPref === "both");
+    
+    const results: Record<string, any> = {};
+
+    // ─── SMS Routing ───
+    if (shouldSendSms) {
+      console.log(`[send-email] Routing to SMS: ${targetPhone}. Proxy: ${isProxyEmail}, Pref: ${channelPref}`);
       const smsBody = buildSmsByType(type, data);
       
       if (smsBody && AF_API_KEY) {
-        // Format phone: if starts with 0, replace with +250
-        let phoneNum = proxyPhone;
-        if (phoneNum.startsWith("0")) phoneNum = "+250" + phoneNum.substring(1);
-        else if (!phoneNum.startsWith("+")) phoneNum = "+" + phoneNum;
+        let afUrl = "https://api.africastalking.com/version1/messaging/bulk";
+        if (AF_USERNAME === "sandbox") {
+          // Fallback to standard sandbox URL if bulk isn't supported yet
+          afUrl = "https://api.sandbox.africastalking.com/version1/messaging";
+        }
 
-        const afUrl = AF_USERNAME === "sandbox" 
-          ? "https://api.sandbox.africastalking.com/version1/messaging/bulk"
-          : "https://api.africastalking.com/version1/messaging/bulk";
-          
+        const afPayload: any = {
+          username: AF_USERNAME,
+          message: smsBody,
+          to: targetPhone // using 'to' for standard API, 'phoneNumbers' for bulk
+        };
+
+        if (AF_USERNAME !== "sandbox") {
+          afPayload.phoneNumbers = [targetPhone];
+          delete afPayload.to;
+        }
+
         const afRes = await fetch(afUrl, {
           method: "POST",
           headers: {
             "Accept": "application/json",
-            "Content-Type": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
             "apiKey": AF_API_KEY,
           },
-          body: JSON.stringify({
-            username: AF_USERNAME,
-            message: smsBody,
-            phoneNumbers: [phoneNum]
-          }),
+          body: new URLSearchParams(afPayload).toString(),
         });
 
         if (!afRes.ok) {
           const err = await afRes.text();
           console.error(`[send-email] Africa's Talking SMS error ${afRes.status}: ${err}`);
+          results.sms = { status: "error", error: err };
         } else {
           const afData = await afRes.json();
-          console.log(`[send-email] Sent SMS to ${phoneNum}:`, JSON.stringify(afData));
+          console.log(`[send-email] Sent SMS to ${targetPhone}:`, JSON.stringify(afData));
+          results.sms = { status: "success", data: afData };
         }
       } else if (!AF_API_KEY) {
         console.warn("[send-email] AFRICASTALKING_API_KEY not set. SMS skipped.");
+        results.sms = { status: "skipped", reason: "missing_api_key" };
       }
-
-      // Short-circuit: DO NOT send a real email to a proxy address to protect Resend reputation
-      return new Response(JSON.stringify({ id: "sms-routed", sms: true }), {
-        status: 200,
-        headers: { ...CORS, "Content-Type": "application/json" },
-      });
     }
 
     // ─── Real Email Routing via Resend ───
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: resolveSender(type),
-        to: [to],
-        subject,
-        html,
-      }),
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      console.error(`[send-email] Resend error ${res.status}: ${err}`);
-      return new Response(JSON.stringify({ error: err }), {
-        status: res.status,
-        headers: { ...CORS, "Content-Type": "application/json" },
+    if (shouldSendEmail) {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: resolveSender(type),
+          to: [to],
+          subject,
+          html,
+        }),
       });
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error(`[send-email] Resend error ${res.status}: ${err}`);
+        results.email = { status: "error", error: err };
+      } else {
+        const result = await res.json();
+        console.log(`[send-email] Sent '${type}' to ${to} → id:${result.id}`);
+        results.email = { status: "success", id: result.id };
+      }
     }
 
-    const result = await res.json();
-    console.log(`[send-email] Sent '${type}' to ${to} → id:${result.id}`);
+    if (!shouldSendSms && !shouldSendEmail) {
+       console.log(`[send-email] Nothing sent for ${to}. Proxy: ${isProxyEmail}, Pref: ${channelPref}`);
+    }
 
-    return new Response(JSON.stringify({ id: result.id }), {
+    return new Response(JSON.stringify({ results }), {
       status: 200,
       headers: { ...CORS, "Content-Type": "application/json" },
     });
