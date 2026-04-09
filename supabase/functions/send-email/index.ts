@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
+const AF_USERNAME = Deno.env.get("AFRICASTALKING_USERNAME") || "sandbox";
+const AF_API_KEY = Deno.env.get("AFRICASTALKING_API_KEY");
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -503,6 +505,36 @@ function buildEmailByType(type: string, data: Record<string, unknown>): { subjec
   }
 }
 
+// ─── SMS Builder ─────────────────────────────────────────────────────────────
+function extractPhoneFromProxyEmail(email: string): string | null {
+  const match = email.match(/^(\+?\d+)@tenants\.bizrent\.rw$/);
+  if (match) return match[1];
+  return null;
+}
+
+function buildSmsByType(type: string, data: Record<string, any>): string | null {
+  const fmtAmt = (n: number) => `RWF ${Number(n).toLocaleString("en-US")}`;
+  const fmtDate = (iso: string) => {
+    try { return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }
+    catch { return iso; }
+  };
+  
+  switch (type) {
+    case "tenant-invitation":
+      return `Muraho! ${data.inviterName} from ${data.orgName} has invited you to manage your rent on BizRent. Login at bizrent.rw to get started.`;
+    case "invoice-due":
+      return `BizRent: Your rent invoice ${data.invoiceNumber} for ${fmtAmt(data.amountDue)} is due on ${fmtDate(data.dueDate)}. Please pay via MoMo and submit proof on bizrent.rw.`;
+    case "invoice-overdue":
+      return `BizRent: URGENT. Your rent invoice ${data.invoiceNumber} for ${fmtAmt(data.amountDue)} is overdue by ${data.daysOverdue} days. Please pay immediately.`;
+    case "payment-approved":
+      return `BizRent: Your payment of ${fmtAmt(data.amount)} for invoice ${data.invoiceNumber} has been APPROVED by ${data.approvedBy}. Thank you!`;
+    case "payment-rejected":
+      return `BizRent: Your payment of ${fmtAmt(data.amount)} for invoice ${data.invoiceNumber} was REJECTED. Reason: ${data.rejectionReason}. Please resubmit proof.`;
+    default:
+      return null;
+  }
+}
+
 // ─── Request handler ──────────────────────────────────────────────────────────
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -525,6 +557,55 @@ serve(async (req) => {
 
     const { subject, html } = buildEmailByType(type, data);
 
+    // ─── SMS Routing for Proxy Emails ───
+    const proxyPhone = extractPhoneFromProxyEmail(to);
+    if (proxyPhone) {
+      console.log(`[send-email] Proxy email detected: ${to}. Routing to SMS.`);
+      const smsBody = buildSmsByType(type, data);
+      
+      if (smsBody && AF_API_KEY) {
+        // Format phone: if starts with 0, replace with +250
+        let phoneNum = proxyPhone;
+        if (phoneNum.startsWith("0")) phoneNum = "+250" + phoneNum.substring(1);
+        else if (!phoneNum.startsWith("+")) phoneNum = "+" + phoneNum;
+
+        const afUrl = AF_USERNAME === "sandbox" 
+          ? "https://api.sandbox.africastalking.com/version1/messaging/bulk"
+          : "https://api.africastalking.com/version1/messaging/bulk";
+          
+        const afRes = await fetch(afUrl, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "apiKey": AF_API_KEY,
+          },
+          body: JSON.stringify({
+            username: AF_USERNAME,
+            message: smsBody,
+            phoneNumbers: [phoneNum]
+          }),
+        });
+
+        if (!afRes.ok) {
+          const err = await afRes.text();
+          console.error(`[send-email] Africa's Talking SMS error ${afRes.status}: ${err}`);
+        } else {
+          const afData = await afRes.json();
+          console.log(`[send-email] Sent SMS to ${phoneNum}:`, JSON.stringify(afData));
+        }
+      } else if (!AF_API_KEY) {
+        console.warn("[send-email] AFRICASTALKING_API_KEY not set. SMS skipped.");
+      }
+
+      // Short-circuit: DO NOT send a real email to a proxy address to protect Resend reputation
+      return new Response(JSON.stringify({ id: "sms-routed", sms: true }), {
+        status: 200,
+        headers: { ...CORS, "Content-Type": "application/json" },
+      });
+    }
+
+    // ─── Real Email Routing via Resend ───
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
