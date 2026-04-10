@@ -27,7 +27,7 @@ export function TenantLayout() {
     <div className="min-h-screen flex flex-col">
       {/* Top header */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-card px-4">
-        <BizRentLogo variant="full" size="sm" className="text-primary" />
+        <BizRentLogo variant="full" size="sm" className="text-bizrent-navy" />
         <div className="flex items-center gap-2">
           {isSuperAdmin && (
             <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 hidden sm:flex" onClick={() => navigate('/super-admin')}>
@@ -55,7 +55,7 @@ export function TenantLayout() {
             onClick={() => navigate(item.url)}
             className={cn(
               'flex flex-col items-center gap-1 rounded-md px-3 py-1.5 text-xs transition-colors',
-              isActive(item.url) ? 'text-primary font-semibold' : 'text-muted-foreground'
+              isActive(item.url) ? 'text-bizrent-navy font-bold' : 'text-muted-foreground'
             )}
           >
             <item.icon className="h-5 w-5" />
