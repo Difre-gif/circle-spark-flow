@@ -63,9 +63,9 @@ export default function SuperAdminSettings() {
       <div className="grid gap-8 lg:grid-cols-3">
         {tiers?.map((tier) => (
           <Card key={tier.id} className={`border-none shadow-md overflow-hidden flex flex-col ${editingId === tier.id ? 'ring-2 ring-indigo-500' : ''}`}>
-            <CardHeader className="bg-slate-50/50 border-b border-slate-100 flex flex-row justify-between items-start">
+            <CardHeader className="bg-bizrent-light border-b border-slate-100 flex flex-row justify-between items-start">
               <div>
-                <Badge variant="outline" className="mb-2 bg-indigo-50 text-indigo-700 border-indigo-200 uppercase tracking-widest text-[10px] font-bold">
+                <Badge variant="outline" className="mb-2 bg-indigo-50 text-indigo-700 border-indigo-200 uppercase tracking-widest text-xxs font-bold">
                   {tier.tier}
                 </Badge>
                 <CardTitle className="text-xl">{tier.tier} Plan</CardTitle>
@@ -85,7 +85,7 @@ export default function SuperAdminSettings() {
                   <span className="text-slate-500 flex items-center gap-2"><CreditCard size={14} /> Monthly Price</span>
                   {editingId === tier.id ? (
                     <div className="flex items-center gap-2 w-32 font-mono">
-                      <span className="text-[10px]">RWF</span>
+                      <span className="text-xxs">RWF</span>
                       <Input 
                         value={editForm?.monthly_price_rwf} 
                         onChange={(e) => setEditForm({...editForm, monthly_price_rwf: e.target.value})}
@@ -167,7 +167,7 @@ export default function SuperAdminSettings() {
                   <Button variant="outline" className="w-fit px-3" onClick={() => setEditingId(null)}>Cancel</Button>
                 </>
               ) : (
-                <div className="text-[10px] text-slate-400 flex items-center italic gap-1">
+                <div className="text-xxs text-slate-400 flex items-center italic gap-1">
                   <AlertCircle size={10} /> Limits automatically synced to organization RLS functions
                 </div>
               )}

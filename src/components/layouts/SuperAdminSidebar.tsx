@@ -94,7 +94,7 @@ export function SuperAdminSidebar() {
               <BizRentLogo className="text-emerald-400 h-8 w-8" />
               <div className="flex flex-col">
                 <span className="text-xl font-bold tracking-tight text-white">BizRent</span>
-                <span className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold">Super Admin</span>
+                <span className="text-xxs uppercase tracking-widest text-emerald-400 font-bold">Super Admin</span>
               </div>
             </Link>
           </div>
@@ -103,7 +103,7 @@ export function SuperAdminSidebar() {
           <nav className="flex-1 overflow-y-auto px-3 py-2 mt-1 space-y-4">
             {navGroups.map((group) => (
               <div key={group.label}>
-                <p className="px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{group.label}</p>
+                <p className="px-3 mb-1 text-xxs font-bold uppercase tracking-widest text-slate-500">{group.label}</p>
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const isActive = location.pathname === item.href;

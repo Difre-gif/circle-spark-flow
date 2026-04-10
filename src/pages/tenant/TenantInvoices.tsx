@@ -24,8 +24,8 @@ export default function TenantInvoices() {
               {(invoices ?? []).map(inv => (
                 <TableRow key={inv.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/tenant/invoices/${inv.id}`)}>
                   <TableCell className="font-medium text-primary">{inv.invoice_number}</TableCell>
-                  <TableCell>{formatRWF(inv.amount_due)}</TableCell>
-                  <TableCell className="font-medium">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</TableCell>
+                  <TableCell className="font-mono">{formatRWF(inv.amount_due)}</TableCell>
+                  <TableCell className="font-mono font-bold text-bizrent-navy">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</TableCell>
                   <TableCell><StatusBadge status={inv.status} /></TableCell>
                   <TableCell className="text-sm text-muted-foreground">{formatDate(inv.due_date)}</TableCell>
                 </TableRow>

@@ -33,9 +33,10 @@ import PendingPayments from "@/pages/landlord/PendingPayments";
 import PaymentDetail from "@/pages/landlord/PaymentDetail";
 import Reports from "@/pages/landlord/Reports";
 import Receipts from "@/pages/landlord/Receipts";
-import TeamManagement from "@/pages/landlord/TeamManagement";
 import AuditLogs from "@/pages/landlord/AuditLogs";
 import Settings from "@/pages/landlord/Settings";
+import Profile from "@/pages/landlord/Profile";
+import Billing from "@/pages/landlord/Billing";
 import Notifications from "@/pages/landlord/Notifications";
 
 // Super Admin pages
@@ -132,9 +133,10 @@ function AppRoutes() {
         <Route path="payments/:id" element={<PaymentDetail />} />
         <Route path="reports" element={<Reports />} />
         <Route path="receipts" element={<Receipts />} />
-        <Route path="team" element={<TeamManagement />} />
         <Route path="audit" element={<AuditLogs />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="billing" element={<Billing />} />
         <Route path="notifications" element={<Notifications />} />
       </Route>
 

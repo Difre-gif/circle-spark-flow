@@ -88,7 +88,7 @@ export default function PendingPayments() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Collections</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Payments Queue</span>
@@ -109,7 +109,7 @@ export default function PendingPayments() {
               BizRent uses MoMo to process tenant payments. Tenants send funds to your Merchant Code, then enter the Transaction ID here. 
               Always verify the amount and Transaction ID in your MoMo app before approving a payment below.
             </p>
-            <Button variant="link" className="p-0 h-auto text-bizrent-navy font-bold text-xs mt-2" onClick={() => console.log('Help Article')}>
+            <Button variant="link" className="p-0 h-auto font-bold text-bizrent-navy text-xs mt-2" onClick={() => console.log('Help Article')}>
               Read full guide <ChevronRight className="h-3 w-3 ml-1" />
             </Button>
           </div>
@@ -147,7 +147,7 @@ export default function PendingPayments() {
                     <StatusBadge status={p.status} />
                   </div>
 
-                  <div className="text-3xl font-extrabold font-tabular-nums text-bizrent-navy">{formatRWF(p.amount)}</div>
+                  <div className="text-3xl font-extrabold font-mono text-bizrent-navy">{formatRWF(p.amount)}</div>
 
                   {p.transaction_id && (
                     <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg">
@@ -166,7 +166,7 @@ export default function PendingPayments() {
                   <div className="flex gap-3 pt-2">
                     <Button
                       size="sm"
-                      className="flex-1 bg-[#ffcc00] hover:bg-[#e6b800] text-bizrent-navy font-bold shadow-sm rounded-xl"
+                      className="flex-1 bg-[#ffcc00] hover:bg-[#e6b800] font-bold text-bizrent-navy shadow-sm rounded-xl"
                       disabled={processingId === p.id}
                       onClick={() => handleApprove(p.id)}
                     >
@@ -213,11 +213,11 @@ export default function PendingPayments() {
                 placeholder="Search tenant or TX ID..." 
                 value={historySearch} 
                 onChange={e => setHistorySearch(e.target.value)} 
-                className="pl-9 h-10 rounded-full bg-muted/30 border-transparent focus-visible:ring-bizrent-navy/20 text-sm font-medium w-full" 
+                className="pl-9 h-10 rounded-full bg-muted/30 border-transparent focus-visible:ring-bizrent-blue/20/20 text-sm font-medium w-full" 
               />
             </div>
             <Select value={historyStatus} onValueChange={setHistoryStatus}>
-              <SelectTrigger className="w-[140px] h-10 rounded-full bg-muted/30 border-transparent focus:ring-bizrent-navy/20 font-medium">
+              <SelectTrigger className="w-[140px] h-10 rounded-full bg-muted/30 border-transparent focus:ring-bizrent-blue/20 font-medium">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -231,7 +231,7 @@ export default function PendingPayments() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[700px] text-sm">
               <thead>
                 <tr className="bg-muted/20 text-muted-foreground font-semibold border-b border-border/40">
                   <th className="text-left px-6 py-4">Tenant</th>
@@ -241,11 +241,11 @@ export default function PendingPayments() {
                   <th className="text-left px-6 py-4">Date</th>
                 </tr>
               </thead>
-              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+              <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
                 {filteredHistory.map(p => (
-                  <tr key={p.id} className="border-b border-border/20 cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
+                  <tr key={p.id} className="border-b border-border/20 cursor-pointer hover:bg-white transition-colors" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
                     <td className="px-6 py-4 font-bold text-bizrent-navy">{(p.tenant as any)?.full_name ?? '—'}</td>
-                    <td className="px-6 py-4 font-semibold text-bizrent-slate text-right font-tabular-nums">{formatRWF(p.amount)}</td>
+                    <td className="px-6 py-4 font-semibold text-bizrent-slate text-right font-mono">{formatRWF(p.amount)}</td>
                     <td className="px-6 py-4">
                       <code className="text-xs font-bold bg-muted/50 px-2 py-1 rounded text-bizrent-navy">{p.transaction_id ?? '—'}</code>
                     </td>
@@ -283,7 +283,7 @@ export default function PendingPayments() {
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-xl font-semibold" onClick={() => { setRejectModal({ open: false, paymentId: null }); setRejectReason(''); }}>Cancel</Button>
-            <Button variant="destructive" className="rounded-xl font-semibold bg-bizrent-red hover:bg-red-700" disabled={rejectReason.length < 10 || !!processingId} onClick={handleReject}>
+            <Button variant="destructive" className="rounded-xl font-semibold bg-bizrent-red hover:bg-bizrent-red/90" disabled={rejectReason.length < 10 || !!processingId} onClick={handleReject}>
               {processingId ? 'Rejecting...' : 'Confirm Rejection'}
             </Button>
           </DialogFooter>

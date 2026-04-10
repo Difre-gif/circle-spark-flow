@@ -42,7 +42,7 @@ export default function Receipts() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Collections</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Receipts</span>
@@ -100,16 +100,16 @@ export default function Receipts() {
           placeholder="Search by receipt, tenant or invoice..." 
           value={search} 
           onChange={e => setSearch(e.target.value)} 
-          className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium" 
+          className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20 text-sm font-medium" 
         />
       </div>
 
       <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[700px] text-sm">
               <thead>
-                <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-[10px] tracking-widest">
+                <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
                   <th className="text-left px-8 py-4 whitespace-nowrap">Receipt #</th>
                   <th className="text-left px-4 py-4">Linked Invoice</th>
                   <th className="text-left px-4 py-4">Tenant</th>
@@ -119,15 +119,15 @@ export default function Receipts() {
                   <th className="px-8 py-4"></th>
                 </tr>
               </thead>
-              <tbody className="[&_tr:nth-child(even)]:bg-muted/5">
+              <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
                 {filtered.map(r => (
-                  <tr key={r.id} className="transition-all hover:bg-muted/10 border-b border-border/10 group">
+                  <tr key={r.id} className="transition-all hover:bg-white border-b border-border/10 group">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-bizrent-emerald/10 rounded-lg group-hover:scale-110 transition-transform">
                           <FileCheck className="h-4 w-4 text-bizrent-emerald" />
                         </div>
-                        <span className="font-extrabold text-bizrent-navy">{r.receipt_number}</span>
+                        <span className="font-extrabold text-bizrent-navy">BR-2026-{r.receipt_number.split("-").pop()}</span>
                       </div>
                     </td>
                     <td className="px-4 py-5 font-bold text-bizrent-blue">
@@ -136,7 +136,7 @@ export default function Receipts() {
                     <td className="px-4 py-5 font-semibold text-bizrent-navy">
                       {(r.tenant as any)?.full_name ?? '—'}
                     </td>
-                    <td className="px-4 py-5 text-right font-extrabold text-bizrent-navy font-tabular-nums">
+                    <td className="px-4 py-5 text-right font-extrabold text-bizrent-navy font-mono">
                       {formatRWF((r.invoice as any)?.amount_paid ?? 0)}
                     </td>
                     <td className="px-4 py-5 text-center">

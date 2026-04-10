@@ -22,7 +22,7 @@ export default function AuditLogs() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">System</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Compliance</span>
@@ -41,16 +41,16 @@ export default function AuditLogs() {
           placeholder="Filter by action or actor..." 
           value={search} 
           onChange={e => setSearch(e.target.value)} 
-          className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium" 
+          className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20/20 text-sm font-medium" 
         />
       </div>
 
       <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[700px] text-sm">
               <thead>
-                <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-[10px] tracking-widest">
+                <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
                   <th className="text-left px-8 py-4">Event Type</th>
                   <th className="text-left px-4 py-4">Actor</th>
                   <th className="text-left px-4 py-4">Target Type</th>
@@ -58,15 +58,15 @@ export default function AuditLogs() {
                   <th className="text-left px-8 py-4 text-right">Timestamp</th>
                 </tr>
               </thead>
-              <tbody className="[&_tr:nth-child(even)]:bg-muted/5">
+              <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
                 {filtered.map(l => (
-                  <tr key={l.id} className="transition-all hover:bg-muted/10 border-b border-border/10 group">
+                  <tr key={l.id} className="transition-all hover:bg-white border-b border-border/10 group">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-bizrent-navy/5 rounded-lg text-bizrent-navy border border-bizrent-navy/10">
                           <History className="h-4 w-4" />
                         </div>
-                        <Badge variant="secondary" className="px-3 font-mono text-[10px] font-bold bg-muted/80 text-bizrent-navy border-0">
+                        <Badge variant="secondary" className="px-3 font-mono text-xxs font-bold bg-muted/80 text-bizrent-navy border-0">
                           {l.action}
                         </Badge>
                       </div>
@@ -83,11 +83,11 @@ export default function AuditLogs() {
                       {l.target_type}
                     </td>
                     <td className="px-4 py-5">
-                      <code className="text-[10px] bg-slate-100 px-2 py-1 rounded font-mono text-bizrent-slate">
+                      <code className="text-xxs bg-slate-100 px-2 py-1 rounded font-mono text-bizrent-slate">
                         {(l.target_id as string)?.substring(0, 8)}...
                       </code>
                     </td>
-                    <td className="px-8 py-5 text-right font-bold text-muted-foreground text-xs font-tabular-nums">
+                    <td className="px-8 py-5 text-right font-bold text-muted-foreground text-xs font-mono">
                       {new Date(l.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                     </td>
                   </tr>

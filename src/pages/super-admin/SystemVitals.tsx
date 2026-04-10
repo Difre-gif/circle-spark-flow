@@ -190,9 +190,9 @@ export default function SystemVitals() {
                   <CardContent className="p-4 flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className={`text-[10px] ${typeColor}`}>{ann.type}</Badge>
-                        <Badge className="bg-slate-700 text-slate-300 border-slate-600 text-[10px]">{ann.audience}</Badge>
-                        {ann.is_active && <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]">LIVE</Badge>}
+                        <Badge className={`text-xxs ${typeColor}`}>{ann.type}</Badge>
+                        <Badge className="bg-slate-700 text-slate-300 border-slate-600 text-xxs">{ann.audience}</Badge>
+                        {ann.is_active && <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xxs">LIVE</Badge>}
                       </div>
                       <p className="text-white text-sm">{ann.message}</p>
                       <p className="text-slate-500 text-xs mt-1">
@@ -229,10 +229,10 @@ export default function SystemVitals() {
                   <div>
                     <p className="text-white text-sm font-medium font-mono">{flag.flag_key}</p>
                     <p className="text-slate-400 text-xs mt-0.5">{flag.description ?? 'No description'}</p>
-                    {flag.updated_at && <p className="text-slate-600 text-[10px] mt-0.5">Last updated {formatDate(flag.updated_at)}</p>}
+                    {flag.updated_at && <p className="text-slate-600 text-xxs mt-0.5">Last updated {formatDate(flag.updated_at)}</p>}
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge className={`text-[10px] ${flag.is_enabled ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>
+                    <Badge className={`text-xxs ${flag.is_enabled ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>
                       {flag.is_enabled ? 'ON' : 'OFF'}
                     </Badge>
                     <Switch

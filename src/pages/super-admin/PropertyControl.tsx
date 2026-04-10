@@ -186,7 +186,7 @@ export default function PropertyControl() {
         ].map(({ label, value, color }) => (
           <Card key={label} className="bg-slate-800 border-slate-700">
             <CardContent className="p-3">
-              <p className="text-slate-500 text-[10px] uppercase tracking-wider mb-1">{label}</p>
+              <p className="text-slate-500 text-xxs uppercase tracking-wider mb-1">{label}</p>
               {propsLoading || unitsLoading ? (
                 <Skeleton className="h-7 w-10 bg-slate-700" />
               ) : (
@@ -228,7 +228,7 @@ export default function PropertyControl() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">Property</th>
@@ -262,16 +262,16 @@ export default function PropertyControl() {
                         </td>
                         <td className="px-4 py-4 text-slate-300 text-xs">{p.org_name}</td>
                         <td className="px-4 py-4">
-                          <Badge className="text-[10px] bg-slate-700 text-slate-300 border-slate-600">{p.property_type}</Badge>
+                          <Badge className="text-xxs bg-slate-700 text-slate-300 border-slate-600">{p.property_type}</Badge>
                         </td>
                         <td className="px-4 py-4 text-center">
                           <span className="text-white text-sm font-semibold">{p.unit_count}</span>
                         </td>
                         <td className="px-4 py-4 text-center">
                           {p.is_active ? (
-                            <Badge className="text-[10px] bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Active</Badge>
+                            <Badge className="text-xxs bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Active</Badge>
                           ) : (
-                            <Badge className="text-[10px] bg-slate-600/50 text-slate-400 border-slate-600">Inactive</Badge>
+                            <Badge className="text-xxs bg-slate-600/50 text-slate-400 border-slate-600">Inactive</Badge>
                           )}
                         </td>
                       </tr>
@@ -307,7 +307,7 @@ export default function PropertyControl() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">Unit</th>
@@ -356,7 +356,7 @@ export default function PropertyControl() {
                           {u.monthly_rent.toLocaleString()}
                         </td>
                         <td className="px-4 py-4 text-center">
-                          <Badge className={`text-[10px] ${UNIT_STATUS_STYLES[u.status] ?? 'bg-slate-600/50 text-slate-400 border-slate-600'}`}>
+                          <Badge className={`text-xxs ${UNIT_STATUS_STYLES[u.status] ?? 'bg-slate-600/50 text-slate-400 border-slate-600'}`}>
                             {u.status}
                           </Badge>
                         </td>
@@ -364,7 +364,7 @@ export default function PropertyControl() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-6 text-[10px] border-purple-500/30 text-purple-400 hover:bg-purple-500/10 px-2"
+                            className="h-6 text-xxs border-purple-500/30 text-purple-400 hover:bg-purple-500/10 px-2"
                             onClick={() => { setUnitStatusTarget(u); setNewStatus(u.status); }}
                           >
                             Override
@@ -397,7 +397,7 @@ export default function PropertyControl() {
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
-              <p className="text-xs text-slate-400 mb-2">Current status: <Badge className={`ml-1 text-[10px] ${UNIT_STATUS_STYLES[unitStatusTarget?.status ?? ''] ?? ''}`}>{unitStatusTarget?.status}</Badge></p>
+              <p className="text-xs text-slate-400 mb-2">Current status: <Badge className={`ml-1 text-xxs ${UNIT_STATUS_STYLES[unitStatusTarget?.status ?? ''] ?? ''}`}>{unitStatusTarget?.status}</Badge></p>
               <Select value={newStatus} onValueChange={setNewStatus}>
                 <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
                   <SelectValue placeholder="Select new status" />

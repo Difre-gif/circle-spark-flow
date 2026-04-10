@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Bell, Search, LogOut, Menu } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Bell, Search, LogOut, Menu, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,13 +17,20 @@ export function TopBar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const { data: notifications } = useNotifications();
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        if (window.innerWidth < 768) {
+          setIsMobileSearchOpen(true);
+          setTimeout(() => mobileSearchInputRef.current?.focus(), 50);
+        } else {
+          searchInputRef.current?.focus();
+        }
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -36,6 +43,25 @@ export function TopBar() {
     await logout();
     navigate('/login');
   };
+
+  if (isMobileSearchOpen) {
+    return (
+      <header className="sticky top-0 z-20 flex h-20 items-center px-4 md:hidden bg-white/95 backdrop-blur-md border-b border-border/40 gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            ref={mobileSearchInputRef}
+            placeholder="Search properties, tenants..."
+            className="pl-11 h-11 w-full rounded-full bg-muted/30 border-transparent shadow-sm focus-visible:ring-bizrent-blue/20 focus-visible:bg-white transition-all text-sm font-medium"
+            autoFocus
+          />
+        </div>
+        <Button variant="ghost" size="icon" className="shrink-0 h-11 w-11 rounded-full" onClick={() => setIsMobileSearchOpen(false)}>
+          <X className="h-5 w-5 text-muted-foreground" />
+        </Button>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-20 flex h-20 items-center justify-between px-4 md:px-8 bg-white/80 backdrop-blur-md border-b border-border/40">
@@ -70,19 +96,26 @@ export function TopBar() {
           <Input 
             ref={searchInputRef}
             placeholder="Search properties, tenants..." 
-            className="pl-11 pr-16 h-11 rounded-full bg-muted/30 border-transparent shadow-sm focus-visible:ring-bizrent-navy/20 focus-visible:bg-white transition-all text-sm font-medium" 
+            className="pl-11 pr-16 h-11 rounded-full bg-muted/30 border-transparent shadow-sm focus-visible:ring-bizrent-blue/20 focus-visible:bg-white transition-all text-sm font-medium" 
           />
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none opacity-50 font-bold text-[10px] tracking-widest uppercase">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none opacity-50 font-bold text-xxs tracking-widest uppercase">
             <kbd className="font-sans">⌘</kbd>K
           </div>
         </div>
 
         {/* Mobile Actions (Hidden on Desktop because Sidebar handles this) */}
         <div className="flex md:hidden items-center gap-2">
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-muted-foreground" onClick={() => {
+            setIsMobileSearchOpen(true);
+            setTimeout(() => mobileSearchInputRef.current?.focus(), 50);
+          }}>
+            <Search className="h-5 w-5" />
+          </Button>
+
           <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full bg-white shadow-sm border border-border/50 text-bizrent-navy" onClick={() => navigate('/landlord/notifications')}>
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-bizrent-red text-[9px] font-bold text-white shadow-sm border border-white">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-bizrent-red text-xxxs font-bold text-white shadow-sm border border-white">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}

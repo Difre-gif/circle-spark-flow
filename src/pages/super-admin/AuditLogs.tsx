@@ -111,20 +111,20 @@ export default function SuperAdminAuditLogs() {
             <Table>
               <TableHeader className="bg-slate-900">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6 w-[250px]">Timestamp</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Actor (Super Admin)</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Mission Event</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Target Workspace</TableHead>
-                  <TableHead className="text-right px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Meta</TableHead>
+                  <TableHead className="px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6 w-[250px]">Timestamp</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Actor (Super Admin)</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Mission Event</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Target Workspace</TableHead>
+                  <TableHead className="text-right px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Meta</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredLogs.map((log) => (
-                  <TableRow key={log.id} className="hover:bg-slate-50/50 transition-colors border-slate-50 group">
+                  <TableRow key={log.id} className="hover:bg-bizrent-light transition-colors border-slate-50 group">
                     <TableCell className="px-8 py-6">
                       <div className="flex flex-col">
-                        <span className="text-[13px] font-black text-slate-900 tracking-tight">{new Date(log.created_at).toLocaleDateString()}</span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                        <span className="text-sm font-black text-slate-900 tracking-tight">{new Date(log.created_at).toLocaleDateString()}</span>
+                        <span className="text-xxs text-slate-400 font-bold uppercase tracking-widest">{new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -133,13 +133,13 @@ export default function SuperAdminAuditLogs() {
                           <User size={16} />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[12px] font-black text-slate-900 truncate max-w-[120px]">{log.actor?.full_name || "System Process"}</span>
-                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">ID: ...{log.actor_user_id?.slice(-6)}</span>
+                          <span className="text-xs font-black text-slate-900 truncate max-w-[120px]">{log.actor?.full_name || "System Process"}</span>
+                          <span className="text-xxs text-slate-400 font-bold uppercase tracking-tighter">ID: ...{log.actor_user_id?.slice(-6)}</span>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={`${getActionColor(log.action)} border-none text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg`}>
+                      <Badge variant="outline" className={`${getActionColor(log.action)} border-none text-xxxs font-black uppercase tracking-widest px-2.5 py-1 rounded-lg`}>
                         {log.action.replace(/_/g, ' ')}
                       </Badge>
                     </TableCell>
@@ -147,10 +147,10 @@ export default function SuperAdminAuditLogs() {
                       {log.org ? (
                         <div className="flex items-center gap-2">
                           <Building2 size={12} className="text-slate-300" />
-                          <span className="text-[12px] font-bold text-slate-700">{log.org.name}</span>
+                          <span className="text-xs font-bold text-slate-700">{log.org.name}</span>
                         </div>
                       ) : (
-                        <span className="text-[11px] text-slate-300 font-bold uppercase italic tracking-widest">Global Action</span>
+                        <span className="text-xs text-slate-300 font-bold uppercase italic tracking-widest">Global Action</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right px-8">

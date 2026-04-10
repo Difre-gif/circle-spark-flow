@@ -159,7 +159,7 @@ export default function FraudDetection() {
           <Card className="bg-slate-800 border-slate-700">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">Severity</th>
@@ -193,12 +193,12 @@ export default function FraudDetection() {
                       }).map((s, i) => (
                         <tr key={i} className="border-b border-slate-700/50 hover:bg-slate-700/20">
                           <td className="px-6 py-3">
-                            <Badge className={`text-[10px] ${SEVERITY_STYLES[s.severity] ?? 'bg-slate-600/50 text-slate-300 border-slate-600'}`}>
+                            <Badge className={`text-xxs ${SEVERITY_STYLES[s.severity] ?? 'bg-slate-600/50 text-slate-300 border-slate-600'}`}>
                               {s.severity}
                             </Badge>
                           </td>
                           <td className="px-4 py-3">
-                            <code className="text-[10px] bg-slate-900/50 text-red-300 px-2 py-0.5 rounded">{s.type}</code>
+                            <code className="text-xxs bg-slate-900/50 text-red-300 px-2 py-0.5 rounded">{s.type}</code>
                           </td>
                           <td className="px-4 py-3 text-white text-xs font-medium">{s.org_name}</td>
                           <td className="px-4 py-3 text-slate-400 text-xs max-w-xs truncate">{s.detail}</td>
@@ -261,7 +261,7 @@ export default function FraudDetection() {
                       <p className="font-semibold text-white text-sm">{title}</p>
                       <p className="text-slate-400 text-xs mt-1 leading-relaxed">{desc}</p>
                     </div>
-                    <Badge className={`text-[9px] whitespace-nowrap shrink-0 ${statusColor}`}>{status}</Badge>
+                    <Badge className={`text-xxxs whitespace-nowrap shrink-0 ${statusColor}`}>{status}</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -303,7 +303,7 @@ export default function FraudDetection() {
                         'bg-amber-500'
                       }`} />
                       <div>
-                        <p className="text-white text-sm font-medium">{s.org_name} — <code className="text-[11px] text-slate-300">{s.type}</code></p>
+                        <p className="text-white text-sm font-medium">{s.org_name} — <code className="text-xs text-slate-300">{s.type}</code></p>
                         <p className="text-slate-400 text-xs">{s.detail}</p>
                         <p className="text-slate-600 text-xs font-mono mt-0.5">{formatDate(s.detected_at)}</p>
                       </div>
@@ -340,7 +340,7 @@ export default function FraudDetection() {
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
                       <code className="text-xs text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded">{issue.table_name}</code>
-                      <Badge className="text-[9px] bg-red-500/20 text-red-400 border-red-500/30">{issue.issue_type}</Badge>
+                      <Badge className="text-xxxs bg-red-500/20 text-red-400 border-red-500/30">{issue.issue_type}</Badge>
                     </div>
                     <span className="text-xs text-slate-400">{issue.affected_rows} row{issue.affected_rows !== 1 ? 's' : ''}</span>
                   </div>

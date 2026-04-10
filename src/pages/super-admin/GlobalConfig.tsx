@@ -104,11 +104,11 @@ export default function GlobalConfig() {
                       <div className="flex items-center gap-2">
                         <span className="font-black text-slate-900 font-mono text-sm">{setting.key}</span>
                         {isDanger && (
-                          <Badge className="bg-amber-500 text-white border-none text-[8px] uppercase font-black px-1.5 py-0.5 rounded-md tracking-tighter gap-1">
+                          <Badge className="bg-amber-500 text-white border-none text-xxxs uppercase font-black px-1.5 py-0.5 rounded-md tracking-tighter gap-1">
                             <AlertTriangle size={8} /> High Impact
                           </Badge>
                         )}
-                        <Badge variant="outline" className="text-slate-400 border-slate-100 text-[8px] uppercase tracking-widest font-black">{setting.type}</Badge>
+                        <Badge variant="outline" className="text-slate-400 border-slate-100 text-xxxs uppercase tracking-widest font-black">{setting.type}</Badge>
                       </div>
                       <p className="text-slate-500 text-xs font-medium">{setting.description}</p>
                     </div>

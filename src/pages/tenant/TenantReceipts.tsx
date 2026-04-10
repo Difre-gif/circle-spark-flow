@@ -21,7 +21,7 @@ export default function TenantReceipts() {
             <TableBody>
               {(receipts ?? []).map(r => (
                 <TableRow key={r.id}>
-                  <TableCell className="font-medium">{r.receipt_number}</TableCell>
+                  <TableCell className="font-extrabold text-bizrent-navy font-mono">BR-2026-{r.receipt_number.split("-").pop()}</TableCell>
                   <TableCell>{(r.invoice as any)?.invoice_number ?? '—'}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{formatDate(r.generated_at)}</TableCell>
                   <TableCell><Button size="sm" variant="outline"><Download className="mr-1 h-3 w-3" /> PDF</Button></TableCell>

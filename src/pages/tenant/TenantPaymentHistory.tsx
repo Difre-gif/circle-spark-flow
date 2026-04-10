@@ -23,7 +23,7 @@ export default function TenantPaymentHistory() {
                 <TableRow key={p.id}>
                   <TableCell className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
                   <TableCell>{(p.invoice as any)?.invoice_number ?? '—'}</TableCell>
-                  <TableCell className="font-semibold">{formatRWF(p.amount)}</TableCell>
+                  <TableCell className="font-mono font-bold text-bizrent-navy">{formatRWF(p.amount)}</TableCell>
                   <TableCell>{p.payment_method?.replace('_', ' ')}</TableCell>
                   <TableCell><StatusBadge status={p.status} /></TableCell>
                   <TableCell className="text-sm text-muted-foreground">{formatDate(p.submitted_at)}</TableCell>

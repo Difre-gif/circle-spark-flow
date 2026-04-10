@@ -116,11 +116,11 @@ export default function SuperAdminUsers() {
             <Table>
               <TableHeader className="bg-slate-900">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Global Identity</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Contact Channels</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Organization Roles</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Joined</TableHead>
-                  <TableHead className="text-right px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Identity Control</TableHead>
+                  <TableHead className="px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Global Identity</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Contact Channels</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Organization Roles</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Joined</TableHead>
+                  <TableHead className="text-right px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Identity Control</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -129,7 +129,7 @@ export default function SuperAdminUsers() {
                   const isAllActive = u.roles?.every(r => r.is_active) ?? true;
                   
                   return (
-                    <TableRow key={u.id} className="hover:bg-slate-50/50 transition-colors group border-slate-50">
+                    <TableRow key={u.id} className="hover:bg-bizrent-light transition-colors group border-slate-50">
                       <TableCell className="px-8 py-6">
                         <div className="flex items-center gap-4">
                           <div className={`h-12 w-12 rounded-[18px] flex items-center justify-center font-black text-xs shadow-inner transition-transform group-hover:scale-105 ${isRoot ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
@@ -139,20 +139,20 @@ export default function SuperAdminUsers() {
                             <span className="font-black text-slate-900 tracking-tight flex items-center gap-2">
                               {u.full_name}
                               {isRoot && (
-                                <Badge variant="outline" className="bg-amber-500 text-white border-none text-[8px] uppercase font-black px-1.5 py-0.5 rounded-md tracking-tighter">Root Admin</Badge>
+                                <Badge variant="outline" className="bg-amber-500 text-white border-none text-xxxs uppercase font-black px-1.5 py-0.5 rounded-md tracking-tighter">Root Admin</Badge>
                               )}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-bold font-mono tracking-tighter">{u.id}</span>
+                            <span className="text-xxs text-slate-400 font-bold font-mono tracking-tighter">{u.id}</span>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-2 text-[12px] font-bold text-slate-600">
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
                             <Mail size={12} className="text-slate-400" /> {u.email}
                           </div>
                           {u.phone && (
-                            <div className="flex items-center gap-2 text-[12px] font-bold text-slate-600">
+                            <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
                               <Phone size={12} className="text-slate-400" /> {u.phone}
                             </div>
                           )}
@@ -163,20 +163,20 @@ export default function SuperAdminUsers() {
                           {u.roles?.map((r, idx) => (
                             <div key={idx} className={`flex flex-col p-2 rounded-xl border transition-all ${r.is_active ? 'border-slate-100 bg-white' : 'border-red-100 bg-red-50/30 opacity-70'} min-w-[140px] shadow-sm`}>
                               <div className="flex items-center justify-between gap-2 mb-1.5">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] truncate max-w-[80px]">{r.org?.name || "Global"}</span>
+                                <span className="text-xxxs font-black text-slate-400 uppercase tracking-[0.1em] truncate max-w-[80px]">{r.org?.name || "Global"}</span>
                                 {!r.is_active && <ShieldOff size={10} className="text-red-500" />}
                               </div>
-                              <Badge variant="outline" className={`${getRoleBadge(r.role)} border-none text-[9px] font-black uppercase tracking-widest px-2 h-5 w-fit rounded-lg`}>
+                              <Badge variant="outline" className={`${getRoleBadge(r.role)} border-none text-xxxs font-black uppercase tracking-widest px-2 h-5 w-fit rounded-lg`}>
                                 {r.role}
                               </Badge>
                             </div>
                           ))}
                           {(!u.roles || u.roles.length === 0) && (
-                            <span className="text-[10px] text-slate-300 font-black uppercase tracking-widest italic">Abandoned Identity</span>
+                            <span className="text-xxs text-slate-300 font-black uppercase tracking-widest italic">Abandoned Identity</span>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-[11px] text-slate-500 font-bold uppercase tracking-tight">
+                      <TableCell className="text-xs text-slate-500 font-bold uppercase tracking-tight">
                         {formatDate(u.created_at)}
                       </TableCell>
                       <TableCell className="text-right px-8">
@@ -187,7 +187,7 @@ export default function SuperAdminUsers() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-[200px] rounded-2xl p-2 shadow-2xl border-slate-100">
-                            <DropdownMenuLabel className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 py-2">Mission Control</DropdownMenuLabel>
+                            <DropdownMenuLabel className="text-xxs font-black text-slate-400 uppercase tracking-widest px-3 py-2">Mission Control</DropdownMenuLabel>
                             <DropdownMenuItem 
                               className="rounded-xl font-bold text-sm py-2.5 px-3 cursor-pointer focus:bg-indigo-50 text-indigo-600 flex items-center gap-3"
                               disabled={isRoot}
@@ -206,7 +206,7 @@ export default function SuperAdminUsers() {
                               <ShieldAlert size={16} /> Login As User
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-2 bg-slate-100" />
-                            <DropdownMenuLabel className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 py-2">Account Security</DropdownMenuLabel>
+                            <DropdownMenuLabel className="text-xxs font-black text-slate-400 uppercase tracking-widest px-3 py-2">Account Security</DropdownMenuLabel>
                             <DropdownMenuItem 
                               className="rounded-xl font-bold text-sm py-2.5 px-3 cursor-pointer focus:bg-slate-50 flex items-center gap-3"
                               onClick={() => handleResetPassword(u.email)}

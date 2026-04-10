@@ -81,15 +81,15 @@ export default function SuperAdminDashboard() {
                 <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
                   <stat.icon size={24} />
                 </div>
-                <div className="flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-widest">
+                <div className="flex items-center gap-1 text-xxs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-widest">
                   <TrendingUp size={12} />
                   {stat.change}
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{stat.title}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.title}</p>
                 <h3 className="text-2xl font-black text-slate-900 mt-1">{stat.value}</h3>
-                <p className="text-[10px] text-slate-400 font-medium mt-1 uppercase tracking-tight">{stat.description}</p>
+                <p className="text-xxs text-slate-400 font-medium mt-1 uppercase tracking-tight">{stat.description}</p>
               </div>
             </CardContent>
           </Card>
@@ -119,7 +119,7 @@ export default function SuperAdminDashboard() {
                 <div key={i} className="p-6 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{service.label}</span>
-                    <span className="text-[10px] font-black text-emerald-600 uppercase italic">{service.status}</span>
+                    <span className="text-xxs font-black text-emerald-600 uppercase italic">{service.status}</span>
                   </div>
                   <p className="text-sm font-bold text-slate-900">{service.check}</p>
                 </div>
@@ -135,7 +135,7 @@ export default function SuperAdminDashboard() {
               <CardTitle className="text-xl font-bold">Activation Queue</CardTitle>
               <CardDescription>New landlord registrations</CardDescription>
             </div>
-            <Button variant="outline" size="sm" className="text-[10px] h-7 font-black uppercase tracking-widest border-slate-200">
+            <Button variant="outline" size="sm" className="text-xxs h-7 font-black uppercase tracking-widest border-slate-200">
               <Link to="/super-admin/organizations">Manage All</Link>
             </Button>
           </CardHeader>
@@ -161,11 +161,11 @@ export default function SuperAdminDashboard() {
                         {org.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[13px] font-bold text-slate-900 truncate max-w-[140px]">{org.name}</span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{new Date(org.created_at).toLocaleDateString()}</span>
+                        <span className="text-sm font-bold text-slate-900 truncate max-w-[140px]">{org.name}</span>
+                        <span className="text-xxs text-slate-400 font-bold uppercase tracking-widest">{new Date(org.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" asChild className="h-8 rounded-lg text-indigo-600 hover:bg-indigo-600 hover:text-white border-indigo-100 font-bold text-[11px] px-4 shadow-sm transition-all">
+                    <Button variant="outline" size="sm" asChild className="h-8 rounded-lg text-indigo-600 hover:bg-indigo-600 hover:text-white border-indigo-100 font-bold text-xs px-4 shadow-sm transition-all">
                       <Link to="/super-admin/organizations">Review</Link>
                     </Button>
                   </div>

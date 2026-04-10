@@ -35,7 +35,6 @@ const navigationItems = [
   { title: 'Invoices', url: '/landlord/invoices', icon: FileText },
   { title: 'Payments', url: '/landlord/payments', icon: CreditCard, highlight: true },
   { title: 'Receipts', url: '/landlord/receipts', icon: Receipt },
-  { title: 'Staff / Users', url: '/landlord/team', icon: Shield },
   { title: 'Reports', url: '/landlord/reports', icon: BarChart },
   { title: 'Settings', url: '/landlord/settings', icon: Settings }
 ];
@@ -78,32 +77,32 @@ export function LandlordSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border/40 bg-white transition-all duration-300">
+    <Sidebar collapsible="icon" className="border-r-0 bg-bizrent-navy text-white transition-all duration-300">
       {/* 1. Header: Branding & Org Switcher */}
       <SidebarHeader className="pt-8 pb-6 px-4">
         <div className={cn("px-2 mb-8 transition-all duration-300", isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto")}>
-          <BizRentLogo variant="full" size="md" className="text-bizrent-navy" />
+          <BizRentLogo variant="full" size="md" theme="dark" className="text-white" />
         </div>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="w-full h-12 px-2 rounded-2xl border border-border/60 bg-slate-50/50 hover:bg-slate-50 shadow-sm transition-all group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton size="lg" className="w-full h-12 px-2 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white text-white shadow-sm transition-all group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center">
               <div className="flex items-center gap-3 overflow-hidden">
-                <div className="h-8 w-8 rounded-xl bg-white border border-border/40 flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-105">
-                  <Building2 className="h-4 w-4 text-bizrent-blue" />
+                <div className="h-8 w-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-105">
+                  <Building2 className="h-4 w-4 text-white" />
                 </div>
                 {!isCollapsed && (
                   <div className="flex flex-col items-start overflow-hidden">
-                    <span className="text-[13px] font-bold text-bizrent-navy truncate w-[130px]">{org?.name || 'Loading...'}</span>
-                    <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Workspace</span>
+                    <span className="text-sm font-bold text-white truncate w-[130px]">{org?.name || 'Loading...'}</span>
+                    <span className="text-xxs text-white/70 font-medium uppercase tracking-widest">Workspace</span>
                   </div>
                 )}
               </div>
-              {!isCollapsed && <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground/50" />}
+              {!isCollapsed && <ChevronsUpDown className="ml-auto h-4 w-4 text-white/50" />}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[212px] rounded-2xl shadow-xl border-border/40 p-1.5" align="start" sideOffset={12}>
-            <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">Organizations</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xxs text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">Organizations</DropdownMenuLabel>
             
             {userOrgs.map((o) => (
               <DropdownMenuItem 
@@ -127,7 +126,7 @@ export function LandlordSidebar() {
                 </div>
                 <div className="flex flex-col overflow-hidden">
                   <span className="truncate text-xs">{o.name}</span>
-                  {o.role !== 'OWNER' && <span className="text-[8px] uppercase tracking-widest opacity-60 font-extrabold">{o.role}</span>}
+                  {o.role !== 'OWNER' && <span className="text-xxxs uppercase tracking-widest opacity-60 font-extrabold">{o.role}</span>}
                 </div>
               </DropdownMenuItem>
             ))}
@@ -183,27 +182,27 @@ export function LandlordSidebar() {
           {navigationItems.map((item) => {
             // Updated logic to ensure top-level match doesn't falsely trigger for sub-routes if it's the exact Dashboard route
             const isActive = location.pathname === item.url || (item.url !== '/landlord' && location.pathname.startsWith(item.url));
-            
+
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton 
-                  asChild 
-                  isActive={isActive} 
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive}
                   tooltip={item.title}
                   className={cn(
                     "relative w-full py-6 transition-all rounded-2xl group",
-                    isActive ? "bg-bizrent-blue/5 text-bizrent-blue" : "text-muted-foreground hover:bg-slate-50 hover:text-bizrent-navy"
+                    isActive ? "bg-bizrent-blue/20 text-white" : "text-white/70 hover:bg-white/10 hover:text-white"
                   )}
                 >
                   <NavLink to={item.url} end={item.url === '/landlord'} className="flex items-center gap-3 w-full h-full px-4">
-                    <item.icon className={cn("h-5 w-5 shrink-0 transition-transform group-hover:scale-110", isActive ? "text-bizrent-blue" : "text-muted-foreground/60")} strokeWidth={isActive ? 2.5 : 1.5} />
-                    {!isCollapsed && <span className="text-[13px] font-bold tracking-tight">{item.title}</span>}
+                    <item.icon className={cn("h-5 w-5 shrink-0 transition-transform group-hover:scale-110", isActive ? "text-bizrent-blue" : "text-white/60 group-hover:text-white")} strokeWidth={isActive ? 2.5 : 1.5} />
+                    {!isCollapsed && <span className="text-sm font-bold tracking-tight">{item.title}</span>}
                     
                     {!isCollapsed && item.highlight && (
                       <div className="ml-auto flex items-center">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="bg-[#ffcc00] text-bizrent-navy text-[8px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-[#ffcc00]/50 cursor-help">
+                            <span className="bg-bizrent-gold text-bizrent-navy text-xxxs px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-bizrent-gold/50 cursor-help">
                               MoMo
                             </span>
                           </TooltipTrigger>
@@ -226,24 +225,24 @@ export function LandlordSidebar() {
       </SidebarContent>
 
       {/* 3. Footer: User Anchor */}
-      <SidebarFooter className="p-4 border-t border-border/40 bg-slate-50/30">
+      <SidebarFooter className="p-4 border-t border-white/10 bg-black/10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className={cn("flex items-center gap-3 w-full cursor-pointer hover:bg-black/5 p-2 rounded-xl transition-colors", isCollapsed && "justify-center p-0")}>
-              <div className="h-10 w-10 rounded-2xl bg-bizrent-navy text-white flex items-center justify-center font-bold shrink-0 shadow-lg shadow-bizrent-navy/10 relative group transition-transform hover:scale-105 active:scale-95">
+            <div className={cn("flex items-center gap-3 w-full cursor-pointer hover:bg-white/10 p-2 rounded-xl transition-colors", isCollapsed && "justify-center p-0")}>
+              <div className="h-10 w-10 rounded-2xl bg-white text-bizrent-navy flex items-center justify-center font-bold shrink-0 shadow-lg shadow-black/20 relative group transition-transform hover:scale-105 active:scale-95">
                 {getInitials(user?.name)}
-                <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-green-500 border-[3px] border-white rounded-full transition-transform group-hover:scale-110" />
+                <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-green-500 border-[3px] border-bizrent-navy rounded-full transition-transform group-hover:scale-110" />
               </div>
               {!isCollapsed && (
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-[13px] font-bold text-bizrent-navy truncate leading-tight">{user?.name}</p>
-                  <p className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">{user?.email}</p>
+                  <p className="text-sm font-bold text-white truncate leading-tight">{user?.name}</p>
+                  <p className="text-xs font-medium text-white/70 truncate mt-0.5">{user?.email}</p>
                 </div>
               )}
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[212px] rounded-2xl shadow-xl border-border/40 p-1.5" align="start" sideOffset={12}>
-            <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">My Account</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xxs text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">My Account</DropdownMenuLabel>
             
             {isSuperAdmin && (
               <>
@@ -255,7 +254,7 @@ export function LandlordSidebar() {
               </>
             )}
 
-            <DropdownMenuItem className="font-bold text-bizrent-navy py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5" onClick={() => navigate('/landlord/settings')}>
+            <DropdownMenuItem className="font-bold text-bizrent-navy py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5" onClick={() => navigate('/landlord/profile')}>
               <div className="h-6 w-6 rounded flex items-center justify-center bg-bizrent-navy/10 text-bizrent-navy"><Settings className="h-3.5 w-3.5" /></div>
               <span>Profile Settings</span>
             </DropdownMenuItem>

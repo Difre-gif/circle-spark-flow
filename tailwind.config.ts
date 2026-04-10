@@ -16,6 +16,10 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      fontSize: {
+        'xxxs': '0.5rem',
+        'xxs': '0.625rem',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -70,6 +74,7 @@ export default {
           orange: "#EA580C",
           slate: "#0F172A",
           light: "#F8FAFC",
+          gold: "#FFCC00",
         },
         status: {
           "pending-bg": "#F59E0B",

@@ -42,7 +42,7 @@ export default function Notifications() {
     <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">System</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Updates</span>
@@ -94,7 +94,7 @@ export default function Notifications() {
                     <p className={cn('text-base tracking-tight leading-tight', !n.is_read ? 'font-extrabold text-bizrent-navy' : 'font-bold text-muted-foreground')}>
                       {n.title}
                     </p>
-                    <span className="text-[10px] font-bold text-muted-foreground/60 whitespace-nowrap pt-1">
+                    <span className="text-xxs font-bold text-muted-foreground/60 whitespace-nowrap pt-1">
                       {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
@@ -102,7 +102,7 @@ export default function Notifications() {
                     {n.body}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[10px] font-extrabold text-bizrent-slate uppercase tracking-tighter">
+                    <span className="text-xxs font-extrabold text-bizrent-slate uppercase tracking-tighter">
                       {formatDate(n.created_at)}
                     </span>
                   </div>

@@ -74,11 +74,11 @@ export default function InvoiceDetail() {
             <Separator />
             <div className="flex justify-between"><span className="text-muted-foreground">Due Date</span><span>{formatDate(invoice.due_date)}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-bold text-lg">{formatRWF(invoice.amount_due)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-mono text-lg text-bizrent-navy font-bold">{formatRWF(invoice.amount_due)}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Paid</span><span className="text-bizrent-emerald font-medium">{formatRWF(invoice.amount_paid)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Paid</span><span className="font-mono text-bizrent-emerald font-bold">{formatRWF(invoice.amount_paid)}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Balance</span><span className="font-bold text-lg">{formatRWF(balance)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Balance</span><span className="font-mono text-lg text-bizrent-navy font-bold">{formatRWF(balance)}</span></div>
           </CardContent>
         </Card>
 
@@ -93,7 +93,7 @@ export default function InvoiceDetail() {
                 ) : payments.map(p => (
                   <TableRow key={p.id}>
                     <TableCell className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
-                    <TableCell>{formatRWF(p.amount)}</TableCell>
+                    <TableCell className="font-mono">{formatRWF(p.amount)}</TableCell>
                     <TableCell><StatusBadge status={p.status} /></TableCell>
                     <TableCell className="text-sm">{formatDate(p.submitted_at)}</TableCell>
                   </TableRow>

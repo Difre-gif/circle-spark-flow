@@ -68,7 +68,7 @@ export default function Properties() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Management</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Properties</span>
@@ -87,7 +87,7 @@ export default function Properties() {
           const occupied = p.occupied_units || 0;
           const occupancyRate = total > 0 ? Math.round((occupied / total) * 100) : 0;
           return (
-            <Card key={p.id} className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white group cursor-pointer hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all" onClick={() => navigate(`/landlord/properties/${p.id}`)}>
+            <Card key={p.id} className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white group cursor-pointer hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bizrent-blue/20 transition-all" onClick={() => navigate(`/landlord/properties/${p.id}`)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/landlord/properties/${p.id}`); } }}>
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center gap-4">
@@ -107,10 +107,10 @@ export default function Properties() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
-                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-navy transition-colors" onClick={() => setEditTarget({ id: p.id, name: p.name, property_type: p.property_type, address_line1: (p as any).address_line1 ?? '', city: (p as any).city ?? 'Kigali', district: (p as any).district ?? '' })}>
+                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-blue transition-colors" onClick={() => setEditTarget({ id: p.id, name: p.name, property_type: p.property_type, address_line1: (p as any).address_line1 ?? '', city: (p as any).city ?? 'Kigali', district: (p as any).district ?? '' })}>
                           <Edit2 className="h-4 w-4" /> Edit Property
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors" onClick={() => setDeleteTarget({ id: p.id, name: p.name })}>
+                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-bizrent-red transition-colors" onClick={() => setDeleteTarget({ id: p.id, name: p.name })}>
                           <Trash2 className="h-4 w-4" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -121,12 +121,12 @@ export default function Properties() {
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/40">
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Units</p>
-                    <p className="font-extrabold text-xl text-bizrent-navy font-tabular-nums">{p.total_units}</p>
+                    <p className="font-extrabold text-xl text-bizrent-navy font-mono">{p.total_units}</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Occupancy</p>
                     <div className="flex items-center gap-2">
-                      <p className="font-extrabold text-xl text-bizrent-navy font-tabular-nums">{occupancyRate}%</p>
+                      <p className="font-extrabold text-xl text-bizrent-navy font-mono">{occupancyRate}%</p>
                       <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
                         <div className="h-full bg-bizrent-blue rounded-full" style={{ width: `${occupancyRate}%` }} />
                       </div>

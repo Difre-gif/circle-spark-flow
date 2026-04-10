@@ -70,7 +70,7 @@ export default function Reports() {
     <div className="space-y-6">
       <div className="page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Analytics</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Reports</span>
@@ -178,7 +178,7 @@ export default function Reports() {
                     <TableRow className="bg-muted/50 font-bold">
                       <TableCell>Total Outstanding</TableCell>
                       <TableCell>{agingBuckets.reduce((a, b) => a + b.count, 0)}</TableCell>
-                      <TableCell>{formatRWF(agingBuckets.reduce((a, b) => a + b.amount, 0))}</TableCell>
+                      <TableCell className="font-mono">{formatRWF(agingBuckets.reduce((a, b) => a + b.amount, 0))}</TableCell>
                     </TableRow>
                   )}
                   {agingBuckets.length === 0 && <TableRow><TableCell colSpan={3} className="text-center py-8 text-muted-foreground">No overdue invoices</TableCell></TableRow>}

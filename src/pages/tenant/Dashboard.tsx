@@ -29,7 +29,7 @@ export default function TenantDashboard() {
       </div>
 
       {currentInvoice && Number(currentInvoice.balance ?? (currentInvoice.amount_due - currentInvoice.amount_paid)) > 0 && (
-        <Card className="border-l-4 border-l-bizrent-amber shadow-md bg-gradient-to-r from-amber-50 to-white">
+        <Card className="border-l-4 border-l-bizrent-amber shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
           <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-bizrent-amber/10 rounded-full">
@@ -38,7 +38,7 @@ export default function TenantDashboard() {
               <div>
                 <p className="text-lg font-bold text-bizrent-navy">Payment Due</p>
                 <p className="text-sm text-muted-foreground font-medium">
-                  Invoice {currentInvoice.invoice_number} · <span className="text-bizrent-slate">{formatRWF(Number(currentInvoice.balance ?? (currentInvoice.amount_due - currentInvoice.amount_paid)))} balance</span>
+                  Invoice {currentInvoice.invoice_number} · <span className="font-mono text-bizrent-slate">{formatRWF(Number(currentInvoice.balance ?? (currentInvoice.amount_due - currentInvoice.amount_paid)))} balance</span>
                 </p>
                 <p className="text-xs text-bizrent-red mt-1 font-semibold">Due on {formatDate(currentInvoice.due_date)}</p>
               </div>
@@ -76,7 +76,7 @@ export default function TenantDashboard() {
               {(payments ?? []).slice(0, 5).map(p => (
                 <TableRow key={p.id} className="transition-colors hover:bg-muted/50">
                   <TableCell className="font-mono text-sm text-bizrent-slate">{p.transaction_id ?? '—'}</TableCell>
-                  <TableCell className="font-semibold">{formatRWF(p.amount)}</TableCell>
+                  <TableCell className="font-mono font-bold text-bizrent-navy">{formatRWF(p.amount)}</TableCell>
                   <TableCell><StatusBadge status={p.status} /></TableCell>
                   <TableCell className="text-sm text-muted-foreground font-medium">{formatDate(p.submitted_at)}</TableCell>
                 </TableRow>

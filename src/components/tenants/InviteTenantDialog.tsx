@@ -68,7 +68,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-[13px] font-bold text-bizrent-navy ml-1">Email Address <span className="text-red-500">*</span></Label>
+            <Label htmlFor="email" className="text-sm font-bold text-bizrent-navy ml-1">Email Address <span className="text-red-500">*</span></Label>
             <Input
               id="email"
               type="email"
@@ -81,7 +81,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="unit" className="text-[13px] font-bold text-bizrent-navy ml-1 flex items-center gap-1.5">
+            <Label htmlFor="unit" className="text-sm font-bold text-bizrent-navy ml-1 flex items-center gap-1.5">
               <Home className="h-3.5 w-3.5" /> Assign to Unit (Optional)
             </Label>
             <Select value={unitId} onValueChange={setUnitId}>

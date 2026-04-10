@@ -69,7 +69,7 @@ export default function PaymentDetail() {
             <Separator />
             <div className="flex justify-between"><span className="text-muted-foreground">Invoice</span><span className="text-primary font-medium">{(payment.invoice as any)?.invoice_number ?? '—'}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="text-xl font-bold">{formatRWF(payment.amount)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="text-xl font-bold text-bizrent-navy font-mono">{formatRWF(payment.amount)}</span></div>
             <Separator />
             <div className="flex justify-between"><span className="text-muted-foreground">Method</span><span>{payment.payment_method?.replace('_', ' ')}</span></div>
             <Separator />

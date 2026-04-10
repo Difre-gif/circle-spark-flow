@@ -51,7 +51,7 @@ export default function Tenants() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Management</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Tenants Directory</span>
@@ -82,27 +82,27 @@ export default function Tenants() {
               placeholder="Search by name or email..." 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
-              className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium transition-all" 
+              className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20/20 text-sm font-medium transition-all" 
             />
           </div>
 
           <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-[10px] tracking-widest">
+                    <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
                       <th className="text-left px-8 py-4 whitespace-nowrap">Name</th>
                       <th className="text-left px-4 py-4">Contact Info</th>
                       <th className="text-left px-8 py-4">Joined Date</th>
                       <th className="text-right px-8 py-4">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="[&_tr:nth-child(even)]:bg-muted/5">
+                  <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
                     {filtered.map(t => {
                       const user = t.user as any;
                       return (
-                        <tr key={t.user_id} className="transition-all hover:bg-muted/10 border-b border-border/10 group">
+                        <tr key={t.user_id} className="transition-all hover:bg-white border-b border-border/10 group">
                           <td className="px-8 py-5">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-xl bg-bizrent-blue/10 text-bizrent-blue flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-all">
@@ -114,7 +114,7 @@ export default function Tenants() {
                           <td className="px-4 py-5">
                             <div className="flex flex-col">
                               <span className="text-muted-foreground font-semibold text-xs">{user?.email ?? '—'}</span>
-                              <span className="text-[11px] font-bold text-bizrent-slate">{user?.phone ?? '—'}</span>
+                              <span className="text-xs font-bold text-bizrent-slate">{user?.phone ?? '—'}</span>
                             </div>
                           </td>
                           <td className="px-8 py-5 text-muted-foreground text-xs font-bold">{formatDate(t.created_at)}</td>
@@ -127,13 +127,13 @@ export default function Tenants() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
                                 <DropdownMenuItem 
-                                  className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-navy transition-colors"
+                                  className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-blue transition-colors"
                                   onClick={() => setEditTenantTarget({ id: user?.id, name: user?.full_name || '', phone: user?.phone || '' })}
                                 >
                                   <Edit2 className="h-4 w-4" /> Edit Profile
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
-                                  className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors"
+                                  className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-bizrent-red transition-colors"
                                   onClick={() => setDeleteTenantTarget({ id: user?.id, name: user?.full_name })}
                                 >
                                   <Trash2 className="h-4 w-4" /> Remove
@@ -187,15 +187,15 @@ export default function Tenants() {
                         <div className="flex justify-between items-start pr-12">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className="text-[13px] font-bold text-bizrent-navy truncate max-w-[140px] cursor-help">{inv.email}</span>
+                              <span className="text-sm font-bold text-bizrent-navy truncate max-w-[140px] cursor-help">{inv.email}</span>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>{inv.email}</p>
                             </TooltipContent>
                           </Tooltip>
-                          <span className="text-[9px] font-extrabold bg-[#ffcc00]/20 text-[#8a6e00] px-2 py-0.5 rounded-full uppercase tracking-tighter">Sent</span>
+                          <span className="text-xxxs font-extrabold bg-[#ffcc00]/20 text-[#8a6e00] px-2 py-0.5 rounded-full uppercase tracking-tighter">Sent</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-xxs font-semibold text-muted-foreground">
                           <Mail className="h-3 w-3" />
                           Invited {formatDate(inv.created_at)}
                         </div>
@@ -220,7 +220,7 @@ export default function Tenants() {
                       </div>
                     ))}
                     {(invitations ?? []).length === 0 && (
-                      <div className="text-center py-10 px-4 border-2 border-dashed border-muted rounded-[2rem] bg-muted/10">
+                      <div className="text-center py-10 px-4 border-2 border-dashed border-muted rounded-[2rem] bg-slate-50">
                         <p className="text-xs font-bold text-muted-foreground/60 italic leading-relaxed">Your invitation list <br/> is currently empty</p>
                       </div>
                     )}
@@ -277,8 +277,8 @@ export default function Tenants() {
           </DialogHeader>
           <div className="py-6 space-y-5">
             <div className="space-y-2">
-              <Label className="text-bizrent-navy font-bold px-1 text-xs uppercase tracking-widest opacity-70">Personal Info</Label>
-              <div className="space-y-4 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+              <Label className="font-bold text-bizrent-navy px-1 text-xs uppercase tracking-widest opacity-70">Personal Info</Label>
+              <div className="space-y-4 p-4 bg-bizrent-light rounded-2xl border border-slate-100">
                 <div className="space-y-1.5">
                   <Label className="text-xs font-bold text-slate-500 ml-1">Full Name</Label>
                   <Input 
@@ -301,7 +301,7 @@ export default function Tenants() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-bizrent-navy font-bold px-1 text-xs uppercase tracking-widest opacity-70">Unit Assignment</Label>
+              <Label className="font-bold text-bizrent-navy px-1 text-xs uppercase tracking-widest opacity-70">Unit Assignment</Label>
               <div className="p-4 bg-blue-50/30 rounded-2xl border border-blue-100/50 space-y-4">
                 <div className="space-y-1.5">
                   <Label className="text-xs font-bold text-slate-500 ml-1">Move into Unit</Label>
@@ -324,7 +324,7 @@ export default function Tenants() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-[10px] font-semibold text-slate-400 mt-1 ml-1">
+                  <p className="text-xxs font-semibold text-slate-400 mt-1 ml-1">
                     Only vacant units are shown here.
                   </p>
                 </div>
@@ -376,7 +376,7 @@ export default function Tenants() {
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-slate-500 ml-1 flex items-center justify-between">
                         <span>Period Anchor Day</span>
-                        <span className="text-[9px] uppercase tracking-widest text-bizrent-blue bg-bizrent-blue/10 px-2 py-0.5 rounded-full">Override</span>
+                        <span className="text-xxxs uppercase tracking-widest text-bizrent-blue bg-bizrent-blue/10 px-2 py-0.5 rounded-full">Override</span>
                       </Label>
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-medium text-slate-400">Day</span>
@@ -391,7 +391,7 @@ export default function Tenants() {
                         />
                         <span className="text-xs font-medium text-slate-400">of the month</span>
                       </div>
-                      <p className="text-[10px] text-slate-400 leading-tight ml-1 mt-1">Leave blank to use the organisation's default billing day.</p>
+                      <p className="text-xxs text-slate-400 leading-tight ml-1 mt-1">Leave blank to use the organisation's default billing day.</p>
                     </div>
                   </div>
                 )}

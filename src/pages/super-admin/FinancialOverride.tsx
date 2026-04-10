@@ -145,7 +145,7 @@ export default function FinancialOverride() {
       <Tabs defaultValue="queue">
         <TabsList className="bg-slate-800 border border-slate-700">
           <TabsTrigger value="queue" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
-            Global Payment Queue {(payments?.length ?? 0) > 0 && <Badge className="ml-2 bg-red-500 text-white text-[10px] px-1.5">{payments?.length}</Badge>}
+            Global Payment Queue {(payments?.length ?? 0) > 0 && <Badge className="ml-2 bg-red-500 text-white text-xxs px-1.5">{payments?.length}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="debt" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
             Debt Control
@@ -166,7 +166,7 @@ export default function FinancialOverride() {
           <Card className="bg-slate-800 border-slate-700">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">Tenant</th>
@@ -194,7 +194,7 @@ export default function FinancialOverride() {
                           <td className="px-4 py-4 text-slate-300 text-xs font-mono">{inv?.invoice_number ?? '—'}</td>
                           <td className="px-4 py-4 font-bold text-white">{formatRWF(p.amount)}</td>
                           <td className="px-4 py-4">
-                            <code className="text-[10px] bg-slate-900 text-emerald-300 px-2 py-0.5 rounded">{p.transaction_id ?? '—'}</code>
+                            <code className="text-xxs bg-slate-900 text-emerald-300 px-2 py-0.5 rounded">{p.transaction_id ?? '—'}</code>
                           </td>
                           <td className="px-4 py-4 text-slate-400 text-xs whitespace-nowrap">{formatDate(p.submitted_at)}</td>
                           <td className="px-4 py-4">
@@ -245,7 +245,7 @@ export default function FinancialOverride() {
           <Card className="bg-slate-800 border-slate-700">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">Invoice</th>
@@ -273,19 +273,19 @@ export default function FinancialOverride() {
                           <td className="px-4 py-4 text-emerald-400 text-xs font-tabular-nums">{formatRWF(inv.amount_paid)}</td>
                           <td className="px-4 py-4 font-bold text-red-400 text-xs font-tabular-nums">{formatRWF(balance)}</td>
                           <td className="px-4 py-4">
-                            <Badge className={`text-[10px] ${inv.status === 'OVERDUE' ? 'bg-red-500/20 text-red-300 border-red-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'}`}>
+                            <Badge className={`text-xxs ${inv.status === 'OVERDUE' ? 'bg-red-500/20 text-red-300 border-red-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'}`}>
                               {inv.status}
                             </Badge>
                           </td>
                           <td className="px-4 py-4">
                             <div className="flex items-center justify-center gap-2">
                               <Button size="sm" variant="outline"
-                                className="h-7 text-[10px] border-slate-600 text-slate-300 hover:bg-slate-700"
+                                className="h-7 text-xxs border-slate-600 text-slate-300 hover:bg-slate-700"
                                 onClick={() => { setAdjustTarget(inv); setAdjustForm({ amountDue: String(inv.amount_due), amountPaid: String(inv.amount_paid) }); }}>
                                 <Pencil className="h-3 w-3 mr-1" /> Adjust
                               </Button>
                               <Button size="sm" variant="outline"
-                                className="h-7 text-[10px] border-red-500/40 text-red-400 hover:bg-red-500/10"
+                                className="h-7 text-xxs border-red-500/40 text-red-400 hover:bg-red-500/10"
                                 onClick={() => setWipeTarget({ id: inv.id, number: inv.invoice_number, balance })}>
                                 <Trash2 className="h-3 w-3 mr-1" /> Wipe
                               </Button>

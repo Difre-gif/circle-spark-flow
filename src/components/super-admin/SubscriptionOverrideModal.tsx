@@ -85,7 +85,7 @@ export function SubscriptionOverrideModal({
             </div>
             <div>
               <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight">Financial Override</DialogTitle>
-              <DialogDescription className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">
+              <DialogDescription className="font-bold text-slate-400 uppercase tracking-widest text-xxs">
                 Control Panel: {orgName}
               </DialogDescription>
             </div>
@@ -101,14 +101,14 @@ export function SubscriptionOverrideModal({
           <div className="space-y-6 py-4">
             <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-3">
               <ShieldAlert className="text-amber-600 shrink-0 mt-0.5" size={18} />
-              <p className="text-[11px] font-bold text-amber-800 leading-relaxed uppercase tracking-tight">
+              <p className="text-xs font-bold text-amber-800 leading-relaxed uppercase tracking-tight">
                 GOD-MODE NOTICE: These changes bypass standard payment gateways. All manual overrides are logged for co-founder review.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Subscription Tier</Label>
+                <Label className="text-xxs font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Subscription Tier</Label>
                 <Select value={selectedTier} onValueChange={setSelectedTier}>
                   <SelectTrigger className="rounded-xl h-12 border-slate-100 font-bold text-slate-900 bg-slate-50/50">
                     <SelectValue placeholder="Select Tier" />
@@ -124,7 +124,7 @@ export function SubscriptionOverrideModal({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Status Override</Label>
+                <Label className="text-xxs font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Status Override</Label>
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                   <SelectTrigger className="rounded-xl h-12 border-slate-100 font-bold text-slate-900 bg-slate-50/50">
                     <SelectValue placeholder="Select Status" />
@@ -140,7 +140,7 @@ export function SubscriptionOverrideModal({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Trial/Period End Date</Label>
+              <Label className="text-xxs font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Trial/Period End Date</Label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <Input 
@@ -154,8 +154,8 @@ export function SubscriptionOverrideModal({
 
             <div className="pt-4 border-t border-slate-50">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Current Authorization</span>
-                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-none px-2 py-0.5 rounded-lg font-black text-[9px] uppercase">Super Admin Override</Badge>
+                <span className="text-xxs font-black uppercase tracking-widest text-slate-400">Current Authorization</span>
+                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-none px-2 py-0.5 rounded-lg font-black text-xxxs uppercase">Super Admin Override</Badge>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                 <div className="p-2 bg-white rounded-lg shadow-sm">
@@ -163,7 +163,7 @@ export function SubscriptionOverrideModal({
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-black text-slate-900 italic">Financial Handshake Required</span>
-                  <span className="text-[10px] font-bold text-slate-400">Database rows will be modified directly upon save.</span>
+                  <span className="text-xxs font-bold text-slate-400">Database rows will be modified directly upon save.</span>
                 </div>
               </div>
             </div>

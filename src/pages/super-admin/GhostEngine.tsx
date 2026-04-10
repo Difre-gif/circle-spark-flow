@@ -109,7 +109,7 @@ export default function GhostEngine() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">User</th>
@@ -142,13 +142,13 @@ export default function GhostEngine() {
                           </td>
                           <td className="px-4 py-4">
                             {isSuperAdmin ? (
-                              <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px]">SUPER ADMIN</Badge>
+                              <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xxs">SUPER ADMIN</Badge>
                             ) : roles.length === 0 ? (
                               <span className="text-slate-500 text-xs italic">No roles</span>
                             ) : (
                               <div className="flex flex-wrap gap-1">
                                 {roles.slice(0, 3).map((r: any, i: number) => (
-                                  <Badge key={i} className={`text-[10px] ${r.role === 'OWNER' ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : r.role === 'TENANT' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'bg-slate-600/50 text-slate-300 border-slate-600'}`}>
+                                  <Badge key={i} className={`text-xxs ${r.role === 'OWNER' ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : r.role === 'TENANT' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'bg-slate-600/50 text-slate-300 border-slate-600'}`}>
                                     {r.role}
                                   </Badge>
                                 ))}
@@ -196,12 +196,12 @@ export default function GhostEngine() {
               <CardTitle className="text-white text-base flex items-center gap-2">
                 <Shield className="h-4 w-4 text-emerald-400" />
                 Admin Action History
-                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]">{ghostLogs.length} entries</Badge>
+                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xxs">{ghostLogs.length} entries</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">Timestamp</th>
@@ -220,7 +220,7 @@ export default function GhostEngine() {
                         <td className="px-6 py-3 text-slate-400 text-xs font-mono whitespace-nowrap">{formatDate(log.created_at)}</td>
                         <td className="px-4 py-3 text-white text-xs">{(log.actor as any)?.full_name ?? (log.actor as any)?.email ?? '—'}</td>
                         <td className="px-4 py-3">
-                          <code className="text-[10px] bg-slate-900/50 text-emerald-300 px-2 py-0.5 rounded">{log.action}</code>
+                          <code className="text-xxs bg-slate-900/50 text-emerald-300 px-2 py-0.5 rounded">{log.action}</code>
                         </td>
                         <td className="px-4 py-3 text-slate-400 text-xs">{(log.org as any)?.name ?? '—'}</td>
                       </tr>
@@ -252,7 +252,7 @@ export default function GhostEngine() {
                   <div>
                     <p className="font-semibold text-white text-sm">{title}</p>
                     <p className="text-slate-400 text-xs mt-1 leading-relaxed">{desc}</p>
-                    <Badge className="mt-2 bg-slate-700 text-slate-400 border-slate-600 text-[9px]">{tag}</Badge>
+                    <Badge className="mt-2 bg-slate-700 text-slate-400 border-slate-600 text-xxxs">{tag}</Badge>
                   </div>
                 </CardContent>
               </Card>

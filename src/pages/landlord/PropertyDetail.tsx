@@ -23,7 +23,7 @@ function InlineRentEdit({ unit, updateUnit }: { unit: any, updateUnit: any }) {
     return (
       <div className="flex items-center gap-2">
         <Input type="number" className="w-24 h-8 text-xs font-bold font-mono" value={rent || ''} onChange={e => setRent(Number(e.target.value))} autoFocus />
-        <Button size="sm" className="h-8 bg-bizrent-emerald hover:bg-emerald-600 text-white font-semibold rounded-lg px-3" onClick={handleSave} disabled={updateUnit.isPending}>
+        <Button size="sm" className="h-8 bg-bizrent-emerald hover:bg-bizrent-emerald/90 text-white font-semibold rounded-lg px-3" onClick={handleSave} disabled={updateUnit.isPending}>
           {updateUnit.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Save'}
         </Button>
         <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground rounded-lg" onClick={() => { setIsEditing(false); setRent(unit.monthly_rent); }}>✕</Button>
@@ -33,7 +33,7 @@ function InlineRentEdit({ unit, updateUnit }: { unit: any, updateUnit: any }) {
   
   return (
     <div className="flex items-center gap-2 group cursor-pointer hover:bg-slate-50 p-1.5 -ml-1.5 rounded-lg transition-colors w-fit" onClick={() => setIsEditing(true)}>
-      <span className="font-bold text-bizrent-slate font-tabular-nums">{formatRWF(unit.monthly_rent)}</span>
+      <span className="font-bold text-bizrent-slate font-mono font-bold">{formatRWF(unit.monthly_rent)}</span>
       <Edit2 className="h-3.5 w-3.5 text-bizrent-blue opacity-0 group-hover:opacity-100 transition-opacity" />
     </div>
   );
@@ -78,7 +78,7 @@ export default function PropertyDetail() {
             <p className="text-sm text-muted-foreground font-medium flex items-center gap-2 mt-1">
               <span>{property.address_line1}, {property.district}, {property.city}</span>
               <span className="h-1 w-1 rounded-full bg-slate-300"></span>
-              <span className="font-bold text-bizrent-blue tracking-widest uppercase text-[10px]">{property.property_type}</span>
+              <span className="font-bold text-bizrent-blue tracking-widest uppercase text-xxs">{property.property_type}</span>
             </p>
           </div>
         </div>
@@ -121,11 +121,11 @@ export default function PropertyDetail() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/10 hover:bg-muted/10 border-b border-border/40">
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-muted-foreground px-8 py-4">Unit</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-muted-foreground py-4">Type</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-muted-foreground py-4">Monthly Rent</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-muted-foreground px-8 py-4 text-right">Status</TableHead>
+                  <TableRow className="bg-slate-50 hover:bg-white border-b border-border/40">
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground px-8 py-4">Unit</TableHead>
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground py-4">Type</TableHead>
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground py-4">Monthly Rent</TableHead>
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground px-8 py-4 text-right">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -133,7 +133,7 @@ export default function PropertyDetail() {
                     <TableRow key={u.id} className="border-b border-border/20 transition-colors hover:bg-muted/20">
                       <TableCell className="px-8 py-4">
                         <div className="font-bold text-bizrent-navy">{u.unit_number}</div>
-                        {u.floor && <div className="text-[10px] font-semibold text-muted-foreground">Floor {u.floor}</div>}
+                        {u.floor && <div className="text-xxs font-semibold text-muted-foreground">Floor {u.floor}</div>}
                       </TableCell>
                       <TableCell className="font-medium text-muted-foreground text-xs">{u.unit_type}</TableCell>
                       <TableCell>
@@ -177,7 +177,7 @@ export default function PropertyDetail() {
                         </div>
                         <div>
                           <p className="text-xs font-bold text-bizrent-navy leading-none">{u?.full_name}</p>
-                          <p className="text-[10px] font-medium text-muted-foreground mt-0.5">{u?.email}</p>
+                          <p className="text-xxs font-medium text-muted-foreground mt-0.5">{u?.email}</p>
                         </div>
                       </div>
                       {isOwner && (
@@ -199,7 +199,7 @@ export default function PropertyDetail() {
               <div className="text-center py-6 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
                 <Users className="h-6 w-6 text-slate-300 mx-auto mb-2" />
                 <p className="text-xs font-bold text-slate-500">No managers assigned</p>
-                <p className="text-[10px] text-slate-400 mt-1">Owners can see everything.</p>
+                <p className="text-xxs text-slate-400 mt-1">Owners can see everything.</p>
               </div>
             )}
 

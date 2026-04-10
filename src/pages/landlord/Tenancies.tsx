@@ -30,8 +30,8 @@ export default function Tenancies() {
                   <TableCell>{(t.unit as any)?.unit_number ?? '—'}</TableCell>
                   <TableCell>{(t.unit as any)?.property?.name ?? '—'}</TableCell>
                   <TableCell className="text-sm">{formatDate(t.start_date)}</TableCell>
-                  <TableCell>{formatRWF(t.agreed_rent)}</TableCell>
-                  <TableCell>{formatRWF(t.deposit_amount)}</TableCell>
+                  <TableCell className="font-mono">{formatRWF(t.agreed_rent)}</TableCell>
+                  <TableCell className="font-mono">{formatRWF(t.deposit_amount)}</TableCell>
                   <TableCell><StatusBadge status={t.status} /></TableCell>
                 </TableRow>
               ))}

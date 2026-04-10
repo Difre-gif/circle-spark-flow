@@ -55,7 +55,7 @@ export default function Units() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Management</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Units</span>
@@ -63,7 +63,7 @@ export default function Units() {
           <h1 className="page-title">Units</h1>
           <p className="page-description">Manage {units?.length ?? 0} individual rental units</p>
         </div>
-        <Button className="bg-bizrent-blue hover:bg-bizrent-navy text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
+        <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Unit
         </Button>
       </div>
@@ -75,11 +75,11 @@ export default function Units() {
             placeholder="Search by unit number or property..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium w-full"
+            className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20/20 text-sm font-medium w-full"
           />
         </div>
         <Select value={propertyFilter} onValueChange={setPropertyFilter}>
-          <SelectTrigger className="w-full sm:w-[250px] h-11 bg-white border-border/50 shadow-sm focus:ring-bizrent-navy/20 font-medium rounded-full">
+          <SelectTrigger className="w-full sm:w-[250px] h-11 bg-white border-border/50 shadow-sm focus:ring-bizrent-blue/20 font-medium rounded-full">
             <SelectValue placeholder="Filter by property" />
           </SelectTrigger>
           <SelectContent>
@@ -94,7 +94,7 @@ export default function Units() {
       <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[700px] text-sm">
               <thead>
                 <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
                   <th className="text-left px-6 py-4 whitespace-nowrap">Unit #</th>
@@ -105,9 +105,9 @@ export default function Units() {
                   <th className="text-right px-6 py-4">Actions</th>
                 </tr>
               </thead>
-              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+              <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
                 {filtered.map(u => (
-                  <tr key={u.id} className="transition-colors hover:bg-muted/30 border-b border-border/20">
+                  <tr key={u.id} className="transition-colors hover:bg-white border-b border-border/20">
                     <td className="px-6 py-4 font-bold text-bizrent-navy">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-bizrent-blue/10 rounded-md">
@@ -118,7 +118,7 @@ export default function Units() {
                     </td>
                     <td className="px-6 py-4 font-medium text-muted-foreground">{(u as any).properties?.name ?? '—'}</td>
                     <td className="px-6 py-4 text-muted-foreground capitalize">{u.unit_type.toLowerCase()}</td>
-                    <td className="px-6 py-4 font-semibold text-bizrent-slate font-tabular-nums text-right">{formatRWF(u.monthly_rent)}</td>
+                    <td className="px-6 py-4 font-semibold text-bizrent-slate font-mono font-bold text-right">{formatRWF(u.monthly_rent)}</td>
                     <td className="px-6 py-4 text-center"><StatusBadge status={u.status} /></td>
                     <td className="px-6 py-4 text-right">
                       <DropdownMenu>
@@ -129,13 +129,13 @@ export default function Units() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
                           <DropdownMenuItem
-                            className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-navy transition-colors"
+                            className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-blue transition-colors"
                             onClick={() => setEditTarget({ id: u.id, unit_number: u.unit_number, unit_type: u.unit_type, monthly_rent: u.monthly_rent })}
                           >
                             <Edit2 className="h-4 w-4" /> Edit Unit
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors focus:text-red-700 focus:bg-red-50"
+                            className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-bizrent-red transition-colors focus:text-red-700 focus:bg-red-50"
                             onClick={() => setDeleteTarget({ id: u.id, name: u.unit_number })}
                           >
                             <Trash2 className="h-4 w-4" /> Delete Unit
@@ -222,7 +222,7 @@ export default function Units() {
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-bizrent-blue hover:bg-bizrent-navy rounded-xl font-semibold" onClick={handleCreate} disabled={createUnit.isPending}>
+            <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 rounded-xl font-semibold" onClick={handleCreate} disabled={createUnit.isPending}>
               {createUnit.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {createUnit.isPending ? 'Saving...' : 'Save Unit'}
             </Button>
@@ -265,7 +265,7 @@ export default function Units() {
           )}
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-xl font-semibold" onClick={() => setEditTarget(null)}>Cancel</Button>
-            <Button className="bg-bizrent-blue hover:bg-bizrent-navy rounded-xl font-semibold" onClick={handleEditSave} disabled={updateUnit.isPending}>
+            <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 rounded-xl font-semibold" onClick={handleEditSave} disabled={updateUnit.isPending}>
               {updateUnit.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Changes'}
             </Button>
           </DialogFooter>

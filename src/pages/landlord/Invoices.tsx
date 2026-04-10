@@ -50,7 +50,7 @@ export default function Invoices() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Collections</span>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-bizrent-blue">Invoices</span>
@@ -67,7 +67,7 @@ export default function Invoices() {
             placeholder="Search by tenant or invoice #..." 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
-            className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-navy/20 text-sm font-medium" 
+            className="pl-11 h-11 rounded-full bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20 text-sm font-medium" 
           />
         </div>
         
@@ -95,7 +95,7 @@ export default function Invoices() {
       <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[700px] text-sm">
               <thead>
                 <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
                   <th className="text-left px-6 py-4 whitespace-nowrap">Invoice #</th>
@@ -112,7 +112,7 @@ export default function Invoices() {
                   </th>
                   <th className="text-left px-6 py-4 text-right">
                     Outstanding Balance
-                    <span className="block text-[10px] font-normal text-muted-foreground mt-0.5">(after partial payments)</span>
+                    <span className="block text-xxs font-normal text-muted-foreground mt-0.5">(after partial payments)</span>
                   </th>
                   <th className="text-left px-6 py-4 text-center">Status</th>
                   <th 
@@ -126,9 +126,9 @@ export default function Invoices() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+              <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
                 {filtered.map(inv => (
-                  <tr key={inv.id} className="cursor-pointer transition-colors hover:bg-muted/30 border-b border-border/20" onClick={() => navigate(`/landlord/invoices/${inv.id}`)}>
+                  <tr key={inv.id} className="cursor-pointer transition-colors hover:bg-white border-b border-border/20" onClick={() => navigate(`/landlord/invoices/${inv.id}`)}>
                     <td className="px-6 py-4 font-bold text-bizrent-navy">
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-bizrent-blue/70" />
@@ -137,8 +137,8 @@ export default function Invoices() {
                     </td>
                     <td className="px-6 py-4 font-bold text-bizrent-navy">{(inv.tenant as any)?.full_name ?? '—'}</td>
                     <td className="px-6 py-4 text-muted-foreground font-medium">{(inv.unit as any)?.unit_number ?? '—'}</td>
-                    <td className="px-6 py-4 text-right font-medium text-muted-foreground font-tabular-nums">{formatRWF(inv.amount_due)}</td>
-                    <td className="px-6 py-4 text-right font-extrabold text-bizrent-navy font-tabular-nums">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</td>
+                    <td className="px-6 py-4 text-right font-medium text-muted-foreground font-mono">{formatRWF(inv.amount_due)}</td>
+                    <td className="px-6 py-4 text-right font-extrabold text-bizrent-navy font-mono">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</td>
                     <td className="px-6 py-4 text-center"><StatusBadge status={inv.status} /></td>
                     <td className="px-6 py-4 text-xs font-semibold text-muted-foreground">{formatDate(inv.due_date)}</td>
                   </tr>

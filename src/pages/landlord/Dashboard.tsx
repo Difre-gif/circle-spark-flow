@@ -67,10 +67,10 @@ export default function LandlordDashboard() {
     if (vacantUnits > 0) {
       // Assuming average rent is 150,000 for calculation if we don't have exact numbers
       const estLoss = vacantUnits * 150000;
-      return <span className="flex items-center gap-1.5"><Activity className="h-4 w-4 text-bizrent-red" /> You have <strong className="text-bizrent-navy">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong> losing approx {formatRWF(estLoss)}/month. <span className="text-bizrent-blue cursor-pointer hover:underline" onClick={() => navigate('/landlord/units')}>List them now &rarr;</span></span>;
+      return <span className="flex items-center gap-1.5"><Activity className="h-4 w-4 text-bizrent-red" /> You have <strong className="text-bizrent-navy">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong> losing approx {formatRWF(estLoss)}/month. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/units')}>List them now &rarr;</button></span>;
     }
     if (invCount > 0) {
-      return <span className="flex items-center gap-1.5"><Send className="h-4 w-4 text-[#ffcc00]" /> {invCount} tenant{invCount > 1 ? 's' : ''} invited, awaiting sign-up. <span className="text-bizrent-blue cursor-pointer hover:underline" onClick={() => navigate('/landlord/tenants')}>Review invites &rarr;</span></span>;
+      return <span className="flex items-center gap-1.5"><Send className="h-4 w-4 text-bizrent-gold" /> {invCount} tenant{invCount > 1 ? 's' : ''} invited, awaiting sign-up. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/tenants')}>Review invites &rarr;</button></span>;
     }
     return `Managing ${org?.name || 'your workspace'}.`;
   };
@@ -81,7 +81,7 @@ export default function LandlordDashboard() {
     <div className="space-y-6 pb-12 animate-in fade-in duration-500">
       <div className="page-header">
         <div>
-          <p className="text-[13px] font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
+          <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
             <Home className="h-3.5 w-3.5" /> <span className="text-bizrent-blue">Home / Overview</span>
           </p>
           <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">
@@ -95,7 +95,7 @@ export default function LandlordDashboard() {
 
       {/* Get Started — shown only when account has no properties yet */}
       {!occLoading && (!occupancy || occupancy.length === 0) && (
-        <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] bg-gradient-to-r from-bizrent-navy to-bizrent-blue text-white overflow-hidden">
+        <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] bg-bizrent-navy text-white overflow-hidden">
           <CardContent className="p-8">
             <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Welcome to BizRent</p>
             <h2 className="text-2xl font-extrabold mb-1">Set up your first property</h2>
@@ -142,18 +142,18 @@ export default function LandlordDashboard() {
               {statsLoading ? (
                 <Skeleton className="h-12 w-48 mb-2" />
               ) : (
-                <h2 className="text-4xl font-extrabold text-bizrent-navy tracking-tight font-tabular-nums">
+                <h2 className="text-4xl font-extrabold text-bizrent-navy tracking-tight font-mono">
                   {formatRWF(stats?.outstanding ?? 0)}
                 </h2>
               )}
-              
+
               {!statsLoading && (stats?.outstanding ?? 0) > 0 ? (
                 <p className="text-xs font-bold text-bizrent-red mt-3 bg-bizrent-red/10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-bizrent-red opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-bizrent-red"></span>
                   </span>
-                  Requires Attention
+                  Overdue Rent
                 </p>
               ) : !statsLoading ? (
                 <p className="text-xs font-bold text-bizrent-emerald mt-3 bg-bizrent-emerald/10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
@@ -195,7 +195,7 @@ export default function LandlordDashboard() {
                 ) : (
                   <>
                     {(occupancy ?? []).slice(0, 3).map((prop, idx) => (
-                      <div key={prop.property_id} className="flex items-center justify-between p-3 rounded-xl border border-border/40 hover:bg-muted/30 transition-colors">
+                      <div key={prop.property_id} className="flex items-center justify-between p-3 rounded-xl border border-border/40 hover:bg-white transition-colors">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg
                             ${idx === 0 ? 'bg-bizrent-navy text-white' : idx === 1 ? 'bg-bizrent-emerald text-white' : 'bg-bizrent-blue text-white'}`}>
@@ -210,12 +210,12 @@ export default function LandlordDashboard() {
                           {prop.total_units === 0 ? (
                             <>
                               <p className="font-bold text-sm text-bizrent-slate">—</p>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase cursor-pointer hover:text-bizrent-blue hover:underline" onClick={() => navigate('/landlord/units')}>Add units &rarr;</p>
+                              <button className="text-xxs font-bold text-muted-foreground uppercase hover:text-bizrent-blue hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bizrent-blue/20 rounded" onClick={() => navigate('/landlord/units')}>Add units &rarr;</button>
                             </>
                           ) : (
                             <>
-                              <p className="font-bold text-sm text-bizrent-navy font-tabular-nums">{prop.occupancy_rate_pct}%</p>
-                              <p className="text-[10px] font-bold text-bizrent-emerald uppercase">Active</p>
+                              <p className="font-bold text-sm text-bizrent-navy font-mono">{prop.occupancy_rate_pct}%</p>
+                              <p className="text-xxs font-bold text-bizrent-emerald uppercase">Active</p>
                             </>
                           )}
                         </div>
@@ -238,7 +238,7 @@ export default function LandlordDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-2 space-y-4">
-              <div className="bg-[#ffcc00] rounded-2xl p-5 shadow-sm relative overflow-hidden text-bizrent-navy">
+              <div className="bg-bizrent-gold rounded-2xl p-5 shadow-sm relative overflow-hidden text-bizrent-navy">
                 <div className="absolute -right-4 -top-4 opacity-10">
                   <div className="w-24 h-24 rounded-full border-4 border-bizrent-navy"></div>
                 </div>
@@ -246,7 +246,7 @@ export default function LandlordDashboard() {
                   <p className="text-xs font-bold opacity-80 uppercase tracking-widest">MTN Mobile Money</p>
                   <div className="flex items-center gap-2">
                     <Activity className="h-5 w-5 opacity-80" />
-                    <span className="bg-black/10 rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase">🔒 Secure</span>
+                    <span className="bg-black/10 rounded-full px-2 py-0.5 text-xxxs font-extrabold uppercase">🔒 Secure</span>
                   </div>
                 </div>
                 <p className="text-sm font-semibold opacity-90 mb-1">Merchant Code</p>
@@ -270,7 +270,7 @@ export default function LandlordDashboard() {
                 )}
                 <div className="mt-4 flex justify-between items-end text-xs font-bold opacity-80">
                   <p>{org?.name || <Skeleton className="h-3 w-20" />}</p>
-                  <p className="px-2 py-1 bg-bizrent-navy text-white rounded-md text-[10px] uppercase">Active</p>
+                  <p className="px-2 py-1 bg-bizrent-navy text-white rounded-md text-xxs uppercase">Active</p>
                 </div>
               </div>
             </CardContent>
@@ -286,7 +286,7 @@ export default function LandlordDashboard() {
             {/* 4 Colored Stats Grid */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-4">
               {/* Highlight Stat (Amber) */}
-              <div className="bg-[#ffcc00] rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy relative overflow-hidden group">
+              <div className="bg-bizrent-gold rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
                   <Wallet className="w-16 h-16" />
                 </div>
@@ -294,11 +294,11 @@ export default function LandlordDashboard() {
                 {statsLoading ? (
                   <Skeleton className="h-8 w-12 bg-bizrent-navy/20" />
                 ) : (
-                  <h3 className="text-3xl font-extrabold font-tabular-nums">{stats?.pendingPayments ?? 0}</h3>
+                  <h3 className="text-3xl font-extrabold font-mono">{stats?.pendingPayments ?? 0}</h3>
                 )}
                 
                 {(!statsLoading && (stats?.pendingPayments ?? 0) > 0) ? (
-                  <p className="text-[10px] font-bold mt-3 bg-bizrent-navy text-white self-start px-2.5 py-1 rounded-md uppercase flex items-center gap-1.5 shadow-md">
+                  <p className="text-xxs font-bold mt-3 bg-bizrent-navy text-white self-start px-2.5 py-1 rounded-md uppercase flex items-center gap-1.5 shadow-md">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -306,7 +306,7 @@ export default function LandlordDashboard() {
                     Review Now
                   </p>
                 ) : !statsLoading ? (
-                  <p className="text-[10px] font-bold mt-3 bg-bizrent-navy/10 self-start px-2.5 py-1 rounded-md uppercase">
+                  <p className="text-xxs font-bold mt-3 bg-bizrent-navy/10 self-start px-2.5 py-1 rounded-md uppercase">
                     Caught up
                   </p>
                 ) : null}
@@ -318,18 +318,18 @@ export default function LandlordDashboard() {
                 {statsLoading ? (
                   <Skeleton className="h-8 w-16" />
                 ) : (
-                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-tabular-nums">{stats?.collectionRate ?? 0}%</h3>
+                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-mono">{stats?.collectionRate ?? 0}%</h3>
                 )}
                 {!statsLoading && (stats?.collectionRate ?? 0) === 0 ? (
-                  <p className="text-[10px] font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
+                  <p className="text-xxs font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
                     Needs Action
                   </p>
                 ) : !statsLoading && (stats?.collectionRate ?? 0) < 60 ? (
-                  <p className="text-[10px] font-bold mt-3 text-bizrent-amber flex items-center bg-bizrent-amber/10 self-start px-2.5 py-1 rounded-md uppercase">
+                  <p className="text-xxs font-bold mt-3 text-bizrent-amber flex items-center bg-bizrent-amber/10 self-start px-2.5 py-1 rounded-md uppercase">
                     Below Target
                   </p>
                 ) : !statsLoading ? (
-                  <p className="text-[10px] font-bold mt-3 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2.5 py-1 rounded-md uppercase">
+                  <p className="text-xxs font-bold mt-3 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2.5 py-1 rounded-md uppercase">
                     On Track
                   </p>
                 ) : null}
@@ -341,9 +341,9 @@ export default function LandlordDashboard() {
                 {statsLoading ? (
                   <Skeleton className="h-8 w-16" />
                 ) : (
-                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-tabular-nums">{stats?.occupiedUnits ?? 0}</h3>
+                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-mono">{stats?.occupiedUnits ?? 0}</h3>
                 )}
-                <p className="text-[10px] font-bold mt-3 text-bizrent-blue flex items-center bg-bizrent-blue/10 self-start px-2.5 py-1 rounded-md uppercase">
+                <p className="text-xxs font-bold mt-3 text-bizrent-blue flex items-center bg-bizrent-blue/10 self-start px-2.5 py-1 rounded-md uppercase">
                   out of {stats?.totalUnits ?? 0}
                 </p>
               </div>
@@ -354,9 +354,9 @@ export default function LandlordDashboard() {
                 {statsLoading ? (
                   <Skeleton className="h-8 w-16" />
                 ) : (
-                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-tabular-nums">{stats?.vacantUnits ?? 0}</h3>
+                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-mono">{stats?.vacantUnits ?? 0}</h3>
                 )}
-                <p className="text-[10px] font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
+                <p className="text-xxs font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
                   Lost Revenue
                 </p>
               </div>
@@ -370,8 +370,8 @@ export default function LandlordDashboard() {
               </CardHeader>
               <CardContent className="px-6 pt-6 pb-2">
                 <div className="flex justify-end gap-4 mb-4 text-xs font-bold">
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-blue"></span> Collected</div>
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Outstanding</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-emerald"></span> Collected</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-amber"></span> Outstanding</div>
                 </div>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -380,8 +380,8 @@ export default function LandlordDashboard() {
                       <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} dy={10} />
                       <YAxis hide />
                       <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                      <Bar dataKey="collected" stackId="a" fill="hsl(222 72% 48%)" radius={[0, 0, 4, 4]} />
-                      <Bar dataKey="outstanding" stackId="a" fill="hsl(38 92% 50%)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="collected" stackId="a" fill="#10B981" radius={[0, 0, 4, 4]} />
+                      <Bar dataKey="outstanding" stackId="a" fill="#F59E0B" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -397,24 +397,24 @@ export default function LandlordDashboard() {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                  <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 text-sm rounded-full bg-muted/30 border border-transparent outline-none focus:ring-2 focus:ring-bizrent-navy/20 transition-all w-32 md:w-48" />
+                  <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 text-sm rounded-full bg-muted/30 border border-transparent outline-none focus:ring-2 focus:ring-bizrent-blue/20 transition-all w-32 md:w-48" />
                 </div>
                 <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-muted"><Download className="h-4 w-4" /></Button>
               </div>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="bg-muted/20 text-muted-foreground font-semibold border-b border-border/40">
-                      <th className="text-left px-8 py-4 whitespace-nowrap">Transaction ID</th>
-                      <th className="text-left px-4 py-4">Tenant</th>
-                      <th className="text-left px-4 py-4 text-right">Amount</th>
-                      <th className="text-left px-4 py-4 text-center">Status</th>
-                      <th className="text-left px-8 py-4">Date</th>
+                      <th scope="col" className="text-left px-8 py-4 whitespace-nowrap min-w-[150px]">Transaction ID</th>
+                      <th scope="col" className="text-left px-4 py-4 min-w-[150px]">Tenant</th>
+                      <th scope="col" className="text-left px-4 py-4 text-right min-w-[120px]">Amount</th>
+                      <th scope="col" className="text-left px-4 py-4 text-center min-w-[120px]">Status</th>
+                      <th scope="col" className="text-left px-8 py-4 min-w-[120px]">Date</th>
                     </tr>
                   </thead>
-                  <tbody className="[&_tr:nth-child(even)]:bg-muted/10">
+                  <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
                     {paymentsLoading ? (
                       Array.from({ length: 5 }).map((_, i) => (
                         <tr key={i} className="border-b border-border/20">
@@ -428,16 +428,16 @@ export default function LandlordDashboard() {
                     ) : (
                       <>
                         {(recentPayments ?? []).slice(0, 6).map((p, idx) => (
-                          <tr key={p.id} className="border-b border-border/20 hover:bg-muted/30 transition-colors group">
+                          <tr key={p.id} className="border-b border-border/20 hover:bg-white transition-colors group">
                             <td className="px-8 py-4">
-                              <code className="font-mono text-[11px] font-bold bg-muted/50 px-2 py-1 rounded-md text-bizrent-navy group-hover:bg-white transition-colors">
+                              <code className="font-mono text-xs font-bold bg-muted/50 px-2 py-1 rounded-md text-bizrent-navy group-hover:bg-white transition-colors">
                                 {p.transaction_id || `TXN_${idx}00${idx}`}
                               </code>
                             </td>
                             <td className="px-4 py-4 font-bold text-bizrent-navy whitespace-nowrap">
                               {(p.tenant as any)?.full_name ?? '—'}
                             </td>
-                            <td className="px-4 py-4 font-semibold text-bizrent-slate whitespace-nowrap text-right font-tabular-nums">
+                            <td className="px-4 py-4 font-semibold text-bizrent-slate whitespace-nowrap text-right font-mono">
                               {formatRWF(p.amount)}
                             </td>
                             <td className="px-4 py-4 text-center">
@@ -481,7 +481,7 @@ export default function LandlordDashboard() {
               <div key={inv.id} className="p-3 rounded-xl border border-border/50 bg-muted/20 flex justify-between items-center">
                 <div>
                   <p className="text-xs font-bold text-bizrent-navy">{(inv.tenant as any)?.full_name}</p>
-                  <p className="text-[10px] text-muted-foreground font-medium">{inv.invoice_number} · Overdue {formatDate(inv.due_date)}</p>
+                  <p className="text-xxs text-muted-foreground font-medium">{inv.invoice_number} · Overdue {formatDate(inv.due_date)}</p>
                 </div>
                 <p className="text-sm font-extrabold text-bizrent-red">{formatRWF(inv.amount_due - (inv.amount_paid ?? 0))}</p>
               </div>

@@ -50,8 +50,8 @@ export function LandlordLayout() {
       <SidebarInset className="flex flex-col flex-1 w-full h-screen overflow-hidden bg-background font-sans relative">
         <SubscriptionBanner />
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-          <div className="max-w-[1600px] mx-auto">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 custom-scrollbar bg-bizrent-light">
+          <div className="max-w-[1600px] mx-auto w-full">
             <Outlet />
           </div>
         </main>

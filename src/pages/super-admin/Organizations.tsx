@@ -128,11 +128,11 @@ export default function SuperAdminOrganizations() {
   const getTierBadge = (tier: string) => {
     switch (tier) {
       case 'STARTER':
-        return <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-bold uppercase text-[9px] tracking-widest border-none">Starter</Badge>;
+        return <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-bold uppercase text-xxxs tracking-widest border-none">Starter</Badge>;
       case 'GROWTH':
-        return <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase text-[9px] tracking-widest">Growth</Badge>;
+        return <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase text-xxxs tracking-widest">Growth</Badge>;
       case 'PRO':
-        return <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-100 font-bold uppercase text-[9px] tracking-widest">Pro</Badge>;
+        return <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-100 font-bold uppercase text-xxxs tracking-widest">Pro</Badge>;
       default:
         return <Badge variant="outline" className="text-slate-400 border-slate-100 italic">{tier}</Badge>;
     }
@@ -156,15 +156,15 @@ export default function SuperAdminOrganizations() {
 
       <Tabs defaultValue="pending" className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-slate-100 p-1 rounded-2xl">
-          <TabsTrigger value="pending" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold uppercase text-[10px] tracking-widest h-10">
+          <TabsTrigger value="pending" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold uppercase text-xxs tracking-widest h-10">
             Activation Requests 
             {pending && pending.length > 0 && (
-              <span className="ml-2 px-1.5 py-0.5 bg-amber-500 text-white text-[10px] rounded-full font-bold">
+              <span className="ml-2 px-1.5 py-0.5 bg-amber-500 text-white text-xxs rounded-full font-bold">
                 {pending.length}
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="all" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold uppercase text-[10px] tracking-widest h-10">Total Directory</TabsTrigger>
+          <TabsTrigger value="all" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold uppercase text-xxs tracking-widest h-10">Total Directory</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="mt-0">
@@ -189,17 +189,17 @@ export default function SuperAdminOrganizations() {
                 </div>
               ) : (
                 <Table>
-                  <TableHeader className="bg-slate-50/50">
+                  <TableHeader className="bg-bizrent-light">
                     <TableRow className="hover:bg-transparent border-none">
-                      <TableHead className="px-8 font-bold uppercase text-[10px] tracking-widest text-slate-400">Organization Identity</TableHead>
-                      <TableHead className="font-bold uppercase text-[10px] tracking-widest text-slate-400">Contact Email</TableHead>
-                      <TableHead className="font-bold uppercase text-[10px] tracking-widest text-slate-400">Registration</TableHead>
-                      <TableHead className="text-right px-8 font-bold uppercase text-[10px] tracking-widest text-slate-400">Governance</TableHead>
+                      <TableHead className="px-8 font-bold uppercase text-xxs tracking-widest text-slate-400">Organization Identity</TableHead>
+                      <TableHead className="font-bold uppercase text-xxs tracking-widest text-slate-400">Contact Email</TableHead>
+                      <TableHead className="font-bold uppercase text-xxs tracking-widest text-slate-400">Registration</TableHead>
+                      <TableHead className="text-right px-8 font-bold uppercase text-xxs tracking-widest text-slate-400">Governance</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {pending.map((org) => (
-                      <TableRow key={org.id} className="hover:bg-slate-50/50 transition-colors border-slate-50">
+                      <TableRow key={org.id} className="hover:bg-bizrent-light transition-colors border-slate-50">
                         <TableCell className="px-8 py-5">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-black text-xs">
@@ -209,11 +209,11 @@ export default function SuperAdminOrganizations() {
                           </div>
                         </TableCell>
                         <TableCell className="text-slate-500 font-medium">{org.email || "N/A"}</TableCell>
-                        <TableCell className="text-slate-400 text-[11px] font-bold uppercase tracking-tight">{formatDate(org.created_at)}</TableCell>
+                        <TableCell className="text-slate-400 text-xs font-bold uppercase tracking-tight">{formatDate(org.created_at)}</TableCell>
                         <TableCell className="text-right px-8">
                           <Button 
                             size="sm" 
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold h-9 px-6 shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-[11px] uppercase tracking-widest"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold h-9 px-6 shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-xs uppercase tracking-widest"
                             onClick={() => handleApprove(org.id)}
                             disabled={approveMutation.isPending}
                           >
@@ -276,11 +276,11 @@ export default function SuperAdminOrganizations() {
                 <Table>
                   <TableHeader className="bg-slate-900">
                     <TableRow className="hover:bg-transparent border-none">
-                      <TableHead className="px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Organization Profile</TableHead>
-                      <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Status</TableHead>
-                      <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Tier</TableHead>
-                      <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Contact Email</TableHead>
-                      <TableHead className="text-right px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">God-Mode</TableHead>
+                      <TableHead className="px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Organization Profile</TableHead>
+                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Status</TableHead>
+                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Tier</TableHead>
+                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Contact Email</TableHead>
+                      <TableHead className="text-right px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">God-Mode</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -293,7 +293,7 @@ export default function SuperAdminOrganizations() {
                             </div>
                             <div className="flex flex-col">
                               <span className="font-black text-slate-900 tracking-tight">{org.name}</span>
-                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{org.slug}</span>
+                              <span className="text-xxs text-slate-400 font-bold uppercase tracking-widest">{org.slug}</span>
                             </div>
                           </div>
                         </TableCell>

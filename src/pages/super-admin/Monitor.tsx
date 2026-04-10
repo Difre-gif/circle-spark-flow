@@ -57,7 +57,7 @@ export default function SuperAdminMonitor() {
           <Card key={stat.label} className="border-none shadow-md rounded-3xl">
             <CardContent className="p-6 flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
+                <p className="text-xxs font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
                 <p className={`text-3xl font-black mt-1 ${stat.color}`}>{stat.value}</p>
               </div>
               {stat.icon}
@@ -88,18 +88,18 @@ export default function SuperAdminMonitor() {
             <Table>
               <TableHeader className="bg-slate-900">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Job Type</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Error</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Attempts</TableHead>
-                  <TableHead className="font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Age</TableHead>
-                  <TableHead className="text-right px-8 font-black uppercase text-[9px] tracking-[0.2em] text-slate-400 py-6">Action</TableHead>
+                  <TableHead className="px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Job Type</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Error</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Attempts</TableHead>
+                  <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Age</TableHead>
+                  <TableHead className="text-right px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {pendingJobs.map((job: any) => (
                   <TableRow key={job.id} className="hover:bg-red-50/30 transition-colors border-slate-50">
                     <TableCell className="px-8 py-5">
-                      <Badge className="bg-red-100 text-red-700 border-none font-black uppercase text-[9px] tracking-widest rounded-lg">
+                      <Badge className="bg-red-100 text-red-700 border-none font-black uppercase text-xxxs tracking-widest rounded-lg">
                         {job.job_type || "NOTIFICATION"}
                       </Badge>
                     </TableCell>

@@ -79,11 +79,11 @@ export default function TenantInvoiceDetail() {
           <Separator />
           <div className="flex justify-between"><span className="text-muted-foreground">Unit</span><span className="font-medium">{(invoice.unit as any)?.unit_number ?? '—'}</span></div>
           <Separator />
-          <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-bold text-lg">{formatRWF(invoice.amount_due)}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-mono text-lg text-bizrent-navy font-bold">{formatRWF(invoice.amount_due)}</span></div>
           <Separator />
-          <div className="flex justify-between"><span className="text-muted-foreground">Paid</span><span className="text-bizrent-emerald font-medium">{formatRWF(invoice.amount_paid)}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Paid</span><span className="font-mono text-bizrent-emerald font-bold">{formatRWF(invoice.amount_paid)}</span></div>
           <Separator />
-          <div className="flex justify-between"><span className="text-muted-foreground">Balance</span><span className="font-bold text-lg">{formatRWF(balance)}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Balance</span><span className="font-mono text-lg text-bizrent-navy font-bold">{formatRWF(balance)}</span></div>
           <Separator />
           <div className="flex justify-between"><span className="text-muted-foreground">Due Date</span><span className="font-medium">{formatDate(invoice.due_date)}</span></div>
         </CardContent>
