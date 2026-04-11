@@ -63,6 +63,8 @@ import TenantPaymentHistory from "@/pages/tenant/TenantPaymentHistory";
 import TenantProfile from "@/pages/tenant/TenantProfile";
 
 
+import LandingPageStatic from "@/pages/LandingPageStatic";
+
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -92,7 +94,7 @@ function AppRoutes() {
       <Route path="/" element={
         isAuthenticated
           ? <Navigate to={user?.role === 'tenant' ? '/tenant' : '/landlord'} replace />
-          : <Navigate to="/static-landing-page.html" replace />
+          : <LandingPageStatic />
       } />
 
       {/* Super Admin portal */}
