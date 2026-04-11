@@ -1,3 +1,7 @@
+[build]
+  command = "npm run build && cp public/landing-content.html dist/landing-content.html"
+  publish = "dist"
+
 [[redirects]]
   from = "/"
   to = "/landing-content.html"
