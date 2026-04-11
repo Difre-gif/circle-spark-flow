@@ -64,6 +64,7 @@ import TenantProfile from "@/pages/tenant/TenantProfile";
 
 
 import LandingPageStatic from "@/pages/LandingPageStatic";
+import LandingPage from "@/pages/LandingPage";
 
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -94,7 +95,7 @@ function AppRoutes() {
       <Route path="/" element={
         isAuthenticated
           ? <Navigate to={user?.role === 'tenant' ? '/tenant' : '/landlord'} replace />
-          : <LandingPageStatic />
+          : <LandingPage />
       } />
 
       {/* Super Admin portal */}
