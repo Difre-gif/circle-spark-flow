@@ -94,7 +94,7 @@ const HowItWorksSection: React.FC = () => {
 
         {/* How It Works Visual - Phone Mockups Placeholder */}
         <motion.div
-          className="mt-20 flex flex-col lg:flex-row justify-center items-center lg:items-end gap-8 bg-[#0D1B3E] p-8 rounded-3xl relative overflow-hidden"
+          className="mt-20 flex flex-col lg:flex-row justify-center items-center lg:items-end gap-8 bg-gray-50 p-8 rounded-3xl relative overflow-hidden"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -106,13 +106,13 @@ const HowItWorksSection: React.FC = () => {
               <defs>
                 <radialGradient id="gradient1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                   <stop offset="0%" stopColor="#00C853" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#0D1B3E" stopOpacity="0" />
+                  <stop offset="100%" stopColor="#E0E7EB" stopOpacity="0" />
                 </radialGradient>
               </defs>
               <circle cx="20" cy="20" r="15" fill="url(#gradient1)" />
               <circle cx="80" cy="80" r="20" fill="url(#gradient1)" />
-              <rect x="10" y="60" width="10" height="10" fill="#FFB300" opacity="0.1" />
-              <rect x="70" y="10" width="15" height="15" fill="#00C853" opacity="0.15" />
+              <rect x="10" y="60" width="10" height="10" fill="#FFB300" opacity="0.05" />
+              <rect x="70" y="10" width="15" height="15" fill="#00C853" opacity="0.08" />
             </svg>
           </div>
 
@@ -134,23 +134,23 @@ const HowItWorksSection: React.FC = () => {
 
           {/* Phone 2: Landlord verify */}
           <div className="relative w-64 h-auto rounded-3xl shadow-xl bg-gray-800 p-1.5 transform -rotate-3 z-20 mt-8 lg:mt-0">
-            <div className="w-full h-full bg-[#0D1B3E] rounded-2xl p-6 text-left flex flex-col justify-between text-white">
+            <div className="w-full h-full bg-white rounded-2xl p-6 text-left flex flex-col justify-between text-gray-900">
               <div>
                 <div className="font-bold text-lg mb-4">Verify Payment — Mutoni C.</div>
                 <div className="mb-3">
-                  <p className="text-xs text-gray-400 mb-0.5">MoMo Transaction ID</p>
+                  <p className="text-xs text-gray-600 mb-0.5">MoMo Transaction ID</p>
                   <strong className="font-mono text-sm">TXN-2024-039281</strong>
                 </div>
                 <div className="mb-3">
-                  <p className="text-xs text-gray-400 mb-0.5">Tenant</p>
+                  <p className="text-xs text-gray-600 mb-0.5">Tenant</p>
                   <strong className="text-sm">Mutoni Claudette · Unit 4B</strong>
                 </div>
                 <div className="mb-3">
-                  <p className="text-xs text-gray-400 mb-0.5">Amount</p>
+                  <p className="text-xs text-gray-600 mb-0.5">Amount</p>
                   <strong className="font-mono text-sm">RWF 150,000</strong>
                 </div>
                 <div className="mb-4">
-                  <p className="text-xs text-gray-400 mb-0.5">Date submitted</p>
+                  <p className="text-xs text-gray-600 mb-0.5">Date submitted</p>
                   <strong className="text-sm">April 18, 2025 · 14:32 CAT</strong>
                 </div>
               </div>

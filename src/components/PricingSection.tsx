@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
+import { Waves } from '@/components/ui/wave-background';
 
 interface PricingCardProps {
   tier: string;
@@ -16,7 +17,7 @@ interface PricingCardProps {
 const PricingCard: React.FC<PricingCardProps> = ({ tier, price, units, features, isPopular, ctaText, ctaLink, staggerDelay }) => {
   return (
     <motion.div
-      className={`bg-white rounded-2xl p-8 shadow-lg border border-gray-100/50 flex flex-col ${isPopular ? 'border-2 border-[#00C853] relative transform scale-105' : ''}`}
+      className={`bg-white/30 rounded-2xl p-8 shadow-lg border border-gray-200 flex flex-col ${isPopular ? 'border-2 border-[#00C853] relative transform scale-105' : ''}`}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -27,13 +28,13 @@ const PricingCard: React.FC<PricingCardProps> = ({ tier, price, units, features,
           Most Popular
         </span>
       )}
-      <h3 className="text-2xl font-bold text-[#0D1B3E] mb-2">{tier}</h3>
-      <p className="text-5xl font-extrabold text-[#0D1B3E] mb-2">{price}</p>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier}</h3>
+      <p className="text-5xl font-extrabold text-gray-900 mb-2">{price}</p>
       <p className="text-gray-600 text-sm mb-6">{units}</p>
 
-      <ul className="flex-1 space-y-3 mb-8 text-left">
+      <ul className="flex-1 space-y-3 mb-8 text-left text-gray-800">
         {features.map((feature, index) => (
-          <li key={index} className="flex items-center text-gray-700">
+          <li key={index} className="flex items-center text-gray-800">
             <Check size={20} className="text-[#00C853] mr-3 flex-shrink-0" />
             <span>{feature}</span>
           </li>
@@ -42,7 +43,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ tier, price, units, features,
 
       <a
         href={ctaLink}
-        className={`w-full text-center py-3 rounded-full font-semibold transition-colors duration-300 ${isPopular ? 'bg-[#00C853] text-white hover:bg-green-600' : 'bg-gray-100 text-[#0D1B3E] hover:bg-gray-200'}`}
+        className={`w-full text-center py-3 rounded-full font-semibold transition-colors duration-300 ${isPopular ? 'bg-[#00C853] text-white hover:bg-green-600' : 'bg-gray-100 text-bizrent-navy hover:bg-gray-200 border border-gray-300'}`}
       >
         {ctaText}
       </a>
@@ -100,17 +101,10 @@ const PricingSection: React.FC = () => {
   ];
 
   return (
-    <section id="pricing" className="relative py-24 bg-gray-50 overflow-hidden">
-      {/* WebGL Animated Background Placeholder */}
-      <div className="absolute inset-0 opacity-20">
-        {/* This is a placeholder for a complex WebGL animation.
-            Implementing this requires a dedicated library (e.g., Three.js, Babylon.js)
-            or a custom shader, which is beyond the scope of a single component.
-            For now, a subtle gradient or pattern can be used as a visual substitute. */}
-        <div className="w-full h-full bg-gradient-to-br from-[#0D1B3E] to-[#00C853]/50"></div>
-      </div>
+    <section id="pricing" className="relative py-24 overflow-hidden">
+      <Waves backgroundColor="#F8FAFC" strokeColor="#00C853" pointerSize={0.8} className="absolute inset-0 z-0 opacity-90" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -119,7 +113,7 @@ const PricingSection: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="mb-16"
         >
-          <h2 className="text-5xl font-extrabold text-[#0D1B3E] mt-4 leading-tight">
+          <h2 className="text-5xl font-extrabold text-gray-900 mt-4 leading-tight">
             Simple pricing for every landlord.
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-6">

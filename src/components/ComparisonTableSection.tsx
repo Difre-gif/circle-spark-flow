@@ -117,8 +117,8 @@ const ComparisonTableSection: React.FC = () => {
                 <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                   Old Way (WhatsApp + Excel)
                 </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-[#00C853] relative rounded-tr-xl">
-                  BizRent <span className="absolute inset-y-0 right-0 w-2 bg-green-600 rounded-tr-xl"></span>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-green-700 uppercase tracking-wider bg-green-50 relative rounded-tr-xl">
+                  BizRent <span className="absolute inset-y-0 right-0 w-2 bg-green-200 rounded-tr-xl"></span>
                 </th>
               </tr>
             </thead>
