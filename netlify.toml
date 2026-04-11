@@ -3,6 +3,12 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/"
+  to = "/static-landing-page.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
