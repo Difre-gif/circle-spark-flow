@@ -85,9 +85,9 @@ export default function LandlordDashboard() {
             <Home className="h-3.5 w-3.5" /> <span className="text-bizrent-blue">Home / Overview</span>
           </p>
           <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">
-            {org ? `Good morning, ${firstName}` : <Skeleton className="h-8 w-64 inline-block" />}
+            {org ? `Good morning, ${firstName}` : <span><Skeleton className="h-8 w-64 inline-block" /></span>}
           </h1>
-          <p className="page-description font-medium text-muted-foreground mt-2 flex items-center gap-1">
+          <div className="page-description font-medium text-muted-foreground mt-2 flex items-center gap-1">
             {org ? getDynamicInsight() : <Skeleton className="h-4 w-96 inline-block" />}
           </p>
         </div>

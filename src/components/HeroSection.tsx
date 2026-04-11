@@ -36,7 +36,7 @@ const HeroSection: React.FC = () => {
   return (
     <div className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-white">
       <div className="absolute inset-0">
-        <SpiralAnimation />
+        <img src="/hero-background.png" alt="Hero Background" className="absolute inset-0 w-full h-full object-cover" />
       </div>
 
       <div className="relative z-10 text-center text-black"> {/* Changed text color to black */}

@@ -18,11 +18,13 @@ export default function Login() {
   const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  // If already authenticated, redirect
-  if (isAuthenticated && user) {
-    const target = user.role === 'tenant' ? '/tenant' : '/landlord';
-    navigate(target, { replace: true });
-  }
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const target = user.role === 'tenant' ? '/tenant' : '/landlord';
+      navigate(target, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

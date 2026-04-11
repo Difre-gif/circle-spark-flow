@@ -3,7 +3,6 @@ import React from 'react';
 import NavigationBar from '../components/NavigationBar';
 import HeroSection from '../components/HeroSection';
 import HeroContentSection from '../components/HeroContentSection';
-import { ParticleHeroBackground } from '../components/ui/particle-hero';
 import TickerSection from '../components/TickerSection';
 import { AnimatedShaderBackground } from '../components/ui/animated-shader-background';
 import ProblemSection from '../components/ProblemSection';
@@ -23,9 +22,7 @@ const LandingPage: React.FC = () => {
         <NavigationBar />
         <div className="landing-page">
       <HeroSection />
-      <ParticleHeroBackground>
       <HeroContentSection />
-</ParticleHeroBackground>
       <AnimatedShaderBackground>
       <TickerSection />
 </AnimatedShaderBackground>
@@ -41,9 +38,7 @@ const LandingPage: React.FC = () => {
       <TestimonialsSection />
 </WovenLightHeroBackground>
       <PricingSection />
-      <ParticleHeroBackground>
       <FinalCtaSection />
-</ParticleHeroBackground>
       <FooterSection />
     </div>
       </>
