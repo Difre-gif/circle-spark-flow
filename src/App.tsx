@@ -63,6 +63,7 @@ import TenantPaymentHistory from "@/pages/tenant/TenantPaymentHistory";
 import TenantProfile from "@/pages/tenant/TenantProfile";
 
 
+import LandingPageStatic from "@/pages/LandingPageStatic";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -89,6 +90,7 @@ function AppRoutes() {
       <Route path="/accept-invite" element={<AcceptInvite />} />
 
       {/* Root redirect */}
+      <Route path="/" element={<LandingPageStatic />} />
 
       {/* Super Admin portal */}
       <Route path="/super-admin" element={
