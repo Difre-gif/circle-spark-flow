@@ -89,11 +89,6 @@ function AppRoutes() {
       <Route path="/accept-invite" element={<AcceptInvite />} />
 
       {/* Root redirect */}
-      <Route path="/" element={
-        isAuthenticated
-          ? <Navigate to={user?.role === 'tenant' ? '/tenant' : '/landlord'} replace />
-          : <Navigate to="/login" replace />
-      } />
 
       {/* Super Admin portal */}
       <Route path="/super-admin" element={
