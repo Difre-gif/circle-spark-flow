@@ -1,47 +1,72 @@
+import React, { Suspense, lazy } from 'react';
 
-import React from 'react';
-import NavigationBar from '../components/NavigationBar';
-import HeroSection from '../components/HeroSection';
-import HeroContentSection from '../components/HeroContentSection';
-import TickerSection from '../components/TickerSection';
-import { AnimatedShaderBackground } from '../components/ui/animated-shader-background';
-import ProblemSection from '../components/ProblemSection';
-import { VectorFieldBackground } from '../components/ui/vector-field';
-import HowItWorksSection from '../components/HowItWorksSection';
-import FeaturesSection from '../components/FeaturesSection';
-import ComparisonTableSection from '../components/ComparisonTableSection';
-import TestimonialsSection from '../components/TestimonialsSection';
-import { WovenLightHeroBackground } from '../components/ui/woven-light-hero';
-import PricingSection from '../components/PricingSection';
-import FinalCtaSection from '../components/FinalCtaSection';
-import FooterSection from '../components/FooterSection';
+// ─── Navbar + Hero load immediately (above the fold) ─────────────────────────
+import Navbar from '@/components/landing/Navbar';
+import HeroSection from '@/components/landing/HeroSection';
+
+// ─── Below-fold sections: lazy loaded so hero renders instantly ───────────────
+const ProblemSection = lazy(() => import('@/components/landing/ProblemSection'));
+const SolutionSection = lazy(() => import('@/components/landing/SolutionSection'));
+const DashboardPreviewSection = lazy(() => import('@/components/landing/DashboardPreviewSection'));
+const FeaturesSection = lazy(() => import('@/components/landing/FeaturesSection'));
+const SocialProofSection = lazy(() => import('@/components/landing/SocialProofSection'));
+const PricingSection = lazy(() => import('@/components/landing/PricingSection'));
+const FinalCTASection = lazy(() => import('@/components/landing/FinalCTASection'));
+const Footer = lazy(() => import('@/components/landing/Footer'));
+
+// ─── Skeleton placeholder while lazy sections load ───────────────────────────
+const SectionSkeleton = () => (
+  <div className="py-24 px-6">
+    <div className="max-w-4xl mx-auto space-y-4 animate-pulse">
+      <div className="h-3 w-24 bg-white/5 rounded" />
+      <div className="h-10 w-2/3 bg-white/5 rounded" />
+      <div className="h-5 w-1/2 bg-white/5 rounded" />
+    </div>
+  </div>
+);
 
 const LandingPage: React.FC = () => {
   return (
-      <>
-        <NavigationBar />
-        <div className="landing-page">
+    <div className="bg-[#0F172A]" style={{ fontFamily: 'Inter, Arial, sans-serif' }}>
+      {/* Navbar — always visible, above fold */}
+      <Navbar />
+
+      {/* Hero — above fold, critical path */}
       <HeroSection />
-      <HeroContentSection />
-      <AnimatedShaderBackground>
-      <TickerSection />
-</AnimatedShaderBackground>
-      <VectorFieldBackground preset="small">
-      <ProblemSection />
-</VectorFieldBackground>
-      <HowItWorksSection />
-      <VectorFieldBackground preset="small">
-      <FeaturesSection />
-</VectorFieldBackground>
-      <ComparisonTableSection />
-      <WovenLightHeroBackground>
-      <TestimonialsSection />
-</WovenLightHeroBackground>
-      <PricingSection />
-      <FinalCtaSection />
-      <FooterSection />
+
+      {/* Below fold — lazy loaded */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <ProblemSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        <SolutionSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        <DashboardPreviewSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        <FeaturesSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        <SocialProofSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        <PricingSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        <FinalCTASection />
+      </Suspense>
+
+      <Suspense fallback={<div className="bg-[#0F172A] py-16" />}>
+        <Footer />
+      </Suspense>
     </div>
-      </>
   );
 };
 
