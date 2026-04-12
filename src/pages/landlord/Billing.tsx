@@ -32,7 +32,7 @@ export default function Billing() {
         {/* Current Plan Overview */}
         <Card className="lg:col-span-1 border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-white overflow-hidden flex flex-col">
           <CardHeader className="bg-white border-b border-border/40 pb-4 pt-6 px-6">
-            <CardTitle className="text-base font-bold text-bizrent-navy flex items-center gap-2"><Crown className="h-4 w-4 text-bizrent-gold"/> Current Plan</CardTitle>
+            <CardTitle className="text-base font-bold text-bizrent-navy flex items-center gap-2"><Crown className="h-4 w-4 text-bizrent-amber"/> Current Plan</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6 px-6 flex-1">
 

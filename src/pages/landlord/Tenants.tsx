@@ -167,7 +167,7 @@ export default function Tenants() {
           <Card className="border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white sticky top-6 overflow-hidden">
             <CardHeader className="pt-7 px-8 pb-4">
               <CardTitle className="text-lg font-extrabold text-bizrent-navy flex items-center gap-2">
-                <Clock className="h-5 w-5 text-[#ffcc00]" />
+                <Clock className="h-5 w-5 text-[#F59E0B]" />
                 Pending Invites
               </CardTitle>
             </CardHeader>
@@ -183,7 +183,7 @@ export default function Tenants() {
                 ) : (
                   <>
                     {(invitations ?? []).map(inv => (
-                      <div key={inv.id} className="p-4 rounded-2xl border border-border/50 bg-muted/30 space-y-2 group hover:border-[#ffcc00]/50 transition-all relative">
+                      <div key={inv.id} className="p-4 rounded-2xl border border-border/50 bg-muted/30 space-y-2 group hover:border-[#F59E0B]/50 transition-all relative">
                         <div className="flex justify-between items-start pr-12">
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -193,7 +193,7 @@ export default function Tenants() {
                               <p>{inv.email}</p>
                             </TooltipContent>
                           </Tooltip>
-                          <span className="text-xxxs font-extrabold bg-[#ffcc00]/20 text-[#8a6e00] px-2 py-0.5 rounded-full uppercase tracking-tighter">Sent</span>
+                          <span className="text-xxxs font-extrabold bg-[#F59E0B]/20 text-[#92400E] px-2 py-0.5 rounded-full uppercase tracking-tighter">Sent</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-xxs font-semibold text-muted-foreground">
                           <Mail className="h-3 w-3" />

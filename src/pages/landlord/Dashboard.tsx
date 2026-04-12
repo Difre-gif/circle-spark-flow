@@ -70,7 +70,7 @@ export default function LandlordDashboard() {
       return <span className="flex items-center gap-1.5"><Activity className="h-4 w-4 text-bizrent-red" /> You have <strong className="text-bizrent-navy">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong> losing approx {formatRWF(estLoss)}/month. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/units')}>List them now &rarr;</button></span>;
     }
     if (invCount > 0) {
-      return <span className="flex items-center gap-1.5"><Send className="h-4 w-4 text-bizrent-gold" /> {invCount} tenant{invCount > 1 ? 's' : ''} invited, awaiting sign-up. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/tenants')}>Review invites &rarr;</button></span>;
+      return <span className="flex items-center gap-1.5"><Send className="h-4 w-4 text-bizrent-amber" /> {invCount} tenant{invCount > 1 ? 's' : ''} invited, awaiting sign-up. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/tenants')}>Review invites &rarr;</button></span>;
     }
     return `Managing ${org?.name || 'your workspace'}.`;
   };
@@ -89,9 +89,47 @@ export default function LandlordDashboard() {
           </h1>
           <div className="page-description font-medium text-muted-foreground mt-2 flex items-center gap-1">
             {org ? getDynamicInsight() : <Skeleton className="h-4 w-96 inline-block" />}
-          </p>
+          </div>
         </div>
       </div>
+
+      {/* Pending payments alert — unmissable amber banner */}
+      {!statsLoading && (stats?.pendingPayments ?? 0) > 0 && (
+        <div className="flex items-center gap-4 bg-[#F59E0B]/10 border border-[#F59E0B]/40 rounded-[8px] px-5 py-4 shadow-card">
+          <div className="flex-shrink-0 p-2 bg-[#F59E0B] rounded-[6px]">
+            <FileText className="h-5 w-5 text-white" />
+          </div>
+          <p className="flex-1 text-sm font-semibold text-[#0F172A]">
+            <span className="font-bold text-[#92400E]">{stats.pendingPayments} payment{stats.pendingPayments !== 1 ? 's' : ''}</span>{' '}
+            waiting for review.
+          </p>
+          <Button
+            className="flex-shrink-0 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-[6px] h-9 px-4"
+            onClick={() => navigate('/landlord/payments')}
+          >
+            Review Now
+          </Button>
+        </div>
+      )}
+
+      {/* Overdue alert — red banner */}
+      {!statsLoading && (overdueInvoices?.length ?? 0) > 0 && (
+        <div className="flex items-center gap-4 bg-[#DC2626]/10 border border-[#DC2626]/30 rounded-[8px] px-5 py-4 shadow-card">
+          <div className="flex-shrink-0 p-2 bg-[#DC2626] rounded-[6px]">
+            <Activity className="h-5 w-5 text-white" />
+          </div>
+          <p className="flex-1 text-sm font-semibold text-[#0F172A]">
+            <span className="font-bold text-[#DC2626]">{overdueInvoices!.length} unit{overdueInvoices!.length !== 1 ? 's' : ''}</span>{' '}
+            overdue.
+          </p>
+          <Button
+            className="flex-shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm rounded-[6px] h-9 px-4"
+            onClick={() => navigate('/landlord/reports')}
+          >
+            View Overdue
+          </Button>
+        </div>
+      )}
 
       {/* Get Started — shown only when account has no properties yet */}
       {!occLoading && (!occupancy || occupancy.length === 0) && (
@@ -238,7 +276,7 @@ export default function LandlordDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-2 space-y-4">
-              <div className="bg-bizrent-gold rounded-2xl p-5 shadow-sm relative overflow-hidden text-bizrent-navy">
+              <div className="bg-bizrent-amber rounded-2xl p-5 shadow-sm relative overflow-hidden text-bizrent-navy">
                 <div className="absolute -right-4 -top-4 opacity-10">
                   <div className="w-24 h-24 rounded-full border-4 border-bizrent-navy"></div>
                 </div>
@@ -286,7 +324,7 @@ export default function LandlordDashboard() {
             {/* 4 Colored Stats Grid */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-4">
               {/* Highlight Stat (Amber) */}
-              <div className="bg-bizrent-gold rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy relative overflow-hidden group">
+              <div className="bg-bizrent-amber rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
                   <Wallet className="w-16 h-16" />
                 </div>

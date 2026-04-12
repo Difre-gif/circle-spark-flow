@@ -202,7 +202,7 @@ export function LandlordSidebar() {
                       <div className="ml-auto flex items-center">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="bg-bizrent-gold text-bizrent-navy text-xxxs px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-bizrent-gold/50 cursor-help">
+                            <span className="bg-bizrent-amber text-bizrent-navy text-xxxs px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-bizrent-amber/50 cursor-help">
                               MoMo
                             </span>
                           </TooltipTrigger>

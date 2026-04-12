@@ -128,7 +128,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     case 'TRIAL':
       label = 'Active Trial';
       icon = <Sparkles className="w-3 h-3 mr-1.5" />;
-      colorClasses = 'bg-purple-500/15 text-purple-600 dark:text-purple-400';
+      colorClasses = 'bg-[#F59E0B]/15 text-[#92400E]';
       break;
     case 'LAPSED':
       label = 'Lapsed';
@@ -145,12 +145,12 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     case 'COMMERCIAL':
       label = 'Commercial';
       icon = <Building2 className="w-3 h-3 mr-1.5" />;
-      colorClasses = 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20';
+      colorClasses = 'bg-[#1D4ED8]/10 text-[#1E3A8A] border border-[#1D4ED8]/20';
       break;
     case 'MIXED_USE':
       label = 'Mixed Use';
       icon = <Building className="w-3 h-3 mr-1.5" />;
-      colorClasses = 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20';
+      colorClasses = 'bg-[#065F46]/10 text-[#065F46] border border-[#065F46]/20';
       break;
       
     default:

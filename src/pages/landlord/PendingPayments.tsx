@@ -99,8 +99,8 @@ export default function PendingPayments() {
       </div>
 
       {showMomoExplainer && (
-        <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/30 rounded-2xl p-4 flex gap-4 items-start relative animate-in fade-in slide-in-from-top-4">
-          <div className="bg-[#ffcc00] h-10 w-10 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1">
+        <div className="bg-[#F59E0B]/10 border border-[#F59E0B]/30 rounded-2xl p-4 flex gap-4 items-start relative animate-in fade-in slide-in-from-top-4">
+          <div className="bg-[#F59E0B] h-10 w-10 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1">
             <HelpCircle className="h-5 w-5 text-bizrent-navy" />
           </div>
           <div className="flex-1 pr-8">
@@ -147,7 +147,7 @@ export default function PendingPayments() {
                     <StatusBadge status={p.status} />
                   </div>
 
-                  <div className="text-3xl font-extrabold font-mono text-bizrent-navy">{formatRWF(p.amount)}</div>
+                  <div className="text-3xl font-extrabold font-mono text-bizrent-navy tracking-tight">{formatRWF(p.amount)}</div>
 
                   {p.transaction_id && (
                     <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg">
@@ -166,7 +166,8 @@ export default function PendingPayments() {
                   <div className="flex gap-3 pt-2">
                     <Button
                       size="sm"
-                      className="flex-1 bg-[#ffcc00] hover:bg-[#e6b800] font-bold text-bizrent-navy shadow-sm rounded-xl"
+                      className="flex-1 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-[6px] min-h-[44px]"
+                      style={{ fontFamily: 'Inter, Arial, sans-serif', fontWeight: 600, fontSize: '14px' }}
                       disabled={processingId === p.id}
                       onClick={() => handleApprove(p.id)}
                     >
@@ -174,15 +175,20 @@ export default function PendingPayments() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="flex-1 border-border/80 text-bizrent-red hover:bg-red-50 hover:text-bizrent-red font-semibold rounded-xl"
+                      className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm rounded-[6px] min-h-[44px]"
+                      style={{ fontFamily: 'Inter, Arial, sans-serif', fontWeight: 600, fontSize: '14px' }}
                       disabled={processingId === p.id}
                       onClick={() => setRejectModal({ open: true, paymentId: p.id })}
                     >
                       <XCircle className="mr-1.5 h-4 w-4" /> Reject
                     </Button>
-                    <Button size="sm" variant="ghost" className="hover:bg-muted/80 rounded-xl px-3" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
-                      <Eye className="h-4 w-4 text-bizrent-navy" />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-[#1D4ED8] text-[#1D4ED8] hover:bg-[#EFF6FF] rounded-[6px] min-h-[44px] min-w-[44px] px-3"
+                      onClick={() => navigate(`/landlord/payments/${p.id}`)}
+                    >
+                      <Eye className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
@@ -196,8 +202,8 @@ export default function PendingPayments() {
             <div className="mx-auto w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
               <CheckCircle className="h-8 w-8 text-emerald-600" />
             </div>
-            <p className="text-xl font-bold text-bizrent-navy">All clear!</p>
-            <p className="text-muted-foreground mt-2 max-w-md mx-auto font-medium">No payments waiting for your review. New submissions from tenants will appear here.</p>
+            <p className="text-xl font-bold text-bizrent-navy">All clear.</p>
+            <p className="text-muted-foreground mt-2 max-w-md mx-auto font-medium">No payments waiting for your review. New submissions from tenants will appear here for you to approve or reject.</p>
           </CardContent>
         </Card>
       )}
@@ -233,21 +239,21 @@ export default function PendingPayments() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px] text-sm">
               <thead>
-                <tr className="bg-muted/20 text-muted-foreground font-semibold border-b border-border/40">
-                  <th className="text-left px-6 py-4">Tenant</th>
-                  <th className="text-left px-6 py-4 text-right">Amount</th>
-                  <th className="text-left px-6 py-4">Transaction ID</th>
-                  <th className="text-left px-6 py-4 text-center">Status</th>
-                  <th className="text-left px-6 py-4">Date</th>
+                <tr className="bg-[#1E3A8A] text-white font-semibold">
+                  <th className="text-left px-6 py-4 font-semibold text-sm">Tenant</th>
+                  <th className="px-6 py-4 font-semibold text-sm text-right">Amount</th>
+                  <th className="text-left px-6 py-4 font-semibold text-sm">Transaction ID</th>
+                  <th className="px-6 py-4 font-semibold text-sm text-center">Status</th>
+                  <th className="text-left px-6 py-4 font-semibold text-sm">Date</th>
                 </tr>
               </thead>
-              <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
+              <tbody className="[&_tr:nth-child(even)]:bg-[#F8FAFC] [&_tr:nth-child(odd)]:bg-white">
                 {filteredHistory.map(p => (
-                  <tr key={p.id} className="border-b border-border/20 cursor-pointer hover:bg-white transition-colors" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
-                    <td className="px-6 py-4 font-bold text-bizrent-navy">{(p.tenant as any)?.full_name ?? '—'}</td>
-                    <td className="px-6 py-4 font-semibold text-bizrent-slate text-right font-mono">{formatRWF(p.amount)}</td>
+                  <tr key={p.id} className="border-b border-[#E2E8F0] cursor-pointer hover:bg-[#EFF6FF] transition-colors" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
+                    <td className="px-6 py-4 font-semibold text-[#0F172A]">{(p.tenant as any)?.full_name ?? '—'}</td>
+                    <td className="px-6 py-4 font-semibold text-[#0F172A] text-right font-mono">{formatRWF(p.amount)}</td>
                     <td className="px-6 py-4">
-                      <code className="text-xs font-bold bg-muted/50 px-2 py-1 rounded text-bizrent-navy">{p.transaction_id ?? '—'}</code>
+                      <code className="text-xs font-mono bg-[#F8FAFC] px-2 py-1 rounded border border-[#E2E8F0] text-[#1E3A8A]">{p.transaction_id ?? '—'}</code>
                     </td>
                     <td className="px-6 py-4 text-center"><StatusBadge status={p.status} /></td>
                     <td className="px-6 py-4 text-muted-foreground font-medium text-xs">{formatDate(p.submitted_at)}</td>

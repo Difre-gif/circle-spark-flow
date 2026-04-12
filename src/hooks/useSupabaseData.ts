@@ -294,13 +294,15 @@ export function useInvoice(id: string | undefined) {
 // ─── Payments ───
 export function usePayments(filters?: { status?: string; tenantUserId?: string }) {
   const { orgId } = useAuth();
+  // Pending queue must always be fresh — poll every 30 seconds
+  const isPendingQueue = filters?.status === 'PENDING';
   return useQuery({
     queryKey: ['payments', orgId, filters],
     queryFn: async () => {
       let q = supabase
         .from('payments')
         .select('*, invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start), tenant:users!payments_tenant_user_id_fkey(full_name), reviewer:users!payments_reviewed_by_fkey(full_name)')
-        .order('submitted_at', { ascending: false });
+        .order('submitted_at', { ascending: true }); // FIFO: oldest first per brand spec
       if (orgId) q = q.eq('org_id', orgId);
       if (filters?.status) q = q.eq('status', filters.status as any);
       if (filters?.tenantUserId) q = q.eq('tenant_user_id', filters.tenantUserId);
@@ -309,6 +311,9 @@ export function usePayments(filters?: { status?: string; tenantUserId?: string }
       return data;
     },
     enabled: !!orgId || !!filters?.tenantUserId,
+    staleTime: isPendingQueue ? 1000 * 30 : 1000 * 60 * 2,   // 30s for pending, 2m for history
+    gcTime: 1000 * 60 * 5,                                    // 5 min cache
+    refetchInterval: isPendingQueue ? 1000 * 30 : false,      // auto-refresh pending queue
   });
 }
 

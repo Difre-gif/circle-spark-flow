@@ -46,8 +46,8 @@
     --sidebar-border: 214 32% 91%;
     --sidebar-ring: 222 72% 48%;
 
-    /* Increased radius for the pill-shape / bubbly aesthetic */
-    --radius: 0.85rem;
+    /* Brand-spec radius: 8px for cards, 6px for buttons, 4px for small elements */
+    --radius: 0.5rem;
 
     /* BizRent required tokens */
     --color-primary: #1E3A8A;

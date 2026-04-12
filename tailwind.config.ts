@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Arial', 'sans-serif'],
+        mono: ['Inter Mono', 'Courier New', 'monospace'],
       },
       fontSize: {
         'xxxs': '0.5rem',
@@ -74,7 +75,6 @@ export default {
           orange: "#EA580C",
           slate: "#0F172A",
           light: "#F8FAFC",
-          gold: "#FFCC00",
         },
         status: {
           "pending-bg": "#F59E0B",
@@ -96,9 +96,19 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: "4px",
+        DEFAULT: "6px",
+        md: "8px",
+        lg: "12px",
+        xl: "16px",
+        // shadcn compatibility aliases
+        "shadcn-lg": "var(--radius)",
+        "shadcn-md": "calc(var(--radius) - 2px)",
+        "shadcn-sm": "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        card: "0 1px 3px rgba(0,0,0,0.05)",
+        elevated: "0 4px 12px rgba(0,0,0,0.08)",
       },
       keyframes: {
         "accordion-down": {

@@ -276,7 +276,7 @@ export default function Settings() {
                   </div>
                   <div className="relative h-2 bg-slate-200 rounded-full w-full flex items-center">
                     <div className="absolute left-0 h-2 bg-bizrent-blue/40 rounded-l-full" style={{width: '30%'}}></div>
-                    <div className="absolute left-[30%] h-2 bg-bizrent-gold/50" style={{width: '20%'}}></div>
+                    <div className="absolute left-[30%] h-2 bg-bizrent-amber/50" style={{width: '20%'}}></div>
                     <div className="absolute left-[50%] h-2 bg-red-500/50 rounded-r-full" style={{width: '50%'}}></div>
 
                     {/* Markers */}
