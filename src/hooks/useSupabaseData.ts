@@ -716,7 +716,7 @@ export function useUpdateOrganisation() {
   const { orgId } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { name?: string; email?: string; phone?: string }) => {
+    mutationFn: async (input: { name?: string; email?: string; phone?: string; timezone?: string; settings?: Record<string, unknown> }) => {
       const { error } = await supabase
         .from('organisations')
         .update(input)
@@ -725,7 +725,27 @@ export function useUpdateOrganisation() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['organisation'] });
-      toast.success('Organisation updated');
+      toast.success('Saved successfully');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useUpdateUserProfile() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { full_name?: string; phone?: string }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+      const { error } = await supabase
+        .from('users')
+        .update(input)
+        .eq('id', user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['user-profile'] });
+      toast.success('Profile updated successfully');
     },
     onError: (e: Error) => toast.error(e.message),
   });

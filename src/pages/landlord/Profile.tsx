@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2, Eye, EyeOff, Shield, Smartphone, Globe } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,10 +9,25 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useUpdateUserProfile } from '@/hooks/useSupabaseData';
 import { toast } from 'sonner';
 
 export default function Profile() {
   const { user } = useAuth();
+  const updateProfile = useUpdateUserProfile();
+
+  const [profileForm, setProfileForm] = useState({ name: user?.name ?? '', phone: user?.phone ?? '' });
+
+  // Sync when user data loads
+  useEffect(() => {
+    if (user) {
+      setProfileForm({ name: user.name ?? '', phone: user.phone ?? '' });
+    }
+  }, [user?.id]);
+
+  const handleSaveProfile = () => {
+    updateProfile.mutate({ full_name: profileForm.name, phone: profileForm.phone });
+  };
 
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
   const [pwErrors, setPwErrors] = useState<Partial<Record<string, string>>>({});
@@ -73,18 +88,20 @@ export default function Profile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label className="text-[12px] font-medium uppercase tracking-wider text-slate-700">Full Name</Label>
-              <Input className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20" defaultValue={user?.name} />
+              <Input className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20" value={profileForm.name} onChange={e => setProfileForm(f => ({ ...f, name: e.target.value }))} />
             </div>
             <div className="space-y-2">
               <Label className="text-[12px] font-medium uppercase tracking-wider text-slate-700">Email Address</Label>
-              <Input className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20 bg-muted/30" defaultValue={user?.email} disabled />
+              <Input className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20 bg-muted/30" value={user?.email ?? ''} disabled />
             </div>
             <div className="space-y-2">
               <Label className="text-[12px] font-medium uppercase tracking-wider text-slate-700">Phone</Label>
-              <Input className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20" placeholder="+250 7XX XXX XXX" />
+              <Input className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20" placeholder="+250 7XX XXX XXX" value={profileForm.phone} onChange={e => setProfileForm(f => ({ ...f, phone: e.target.value }))} />
             </div>
           </div>
-          <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90">Save Changes</Button>
+          <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleSaveProfile} disabled={updateProfile.isPending}>
+            {updateProfile.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Changes'}
+          </Button>
         </CardContent>
       </Card>
 

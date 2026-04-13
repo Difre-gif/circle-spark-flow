@@ -32,28 +32,27 @@ export default function Settings() {
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-  // Initialize settings form when org loads
+  // Sync form state from org data (runs on first load and after successful save)
   useEffect(() => {
-    if (org && !settingsForm) {
-      const dbSettings = org.settings as any;
-      setSettingsForm({
-        default_due_day: dbSettings?.billing?.default_due_day || 1,
-        grace_period_days: dbSettings?.billing?.grace_period_days || 3,
-        days_before_due: dbSettings?.reminders?.days_before_due || [3],
-        days_after_due: dbSettings?.reminders?.days_after_due || [1, 5, 10]
-      });
-      setForm({
-        name: org.name ?? '',
-        email: org.email ?? '',
-        phone: org.phone ?? '',
-        timezone: (org as any).timezone ?? 'Africa/Kigali'
-      });
-    }
-  }, [org, settingsForm]);
+    if (!org) return;
+    const dbSettings = org.settings as any;
+    setSettingsForm({
+      default_due_day: dbSettings?.billing?.default_due_day || 1,
+      grace_period_days: dbSettings?.billing?.grace_period_days || 3,
+      days_before_due: dbSettings?.reminders?.days_before_due || [3],
+      days_after_due: dbSettings?.reminders?.days_after_due || [1, 5, 10]
+    });
+    setForm({
+      name: org.name ?? '',
+      email: org.email ?? '',
+      phone: org.phone ?? '',
+      timezone: (org as any).timezone ?? 'Africa/Kigali'
+    });
+  }, [org]);
 
   const handleSaveProfile = () => {
     if (!form) return;
-    updateOrg.mutate(form as any);
+    updateOrg.mutate({ name: form.name, email: form.email, phone: form.phone, timezone: form.timezone });
   };
 
   const handleSavePolicies = () => {

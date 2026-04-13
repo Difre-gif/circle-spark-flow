@@ -297,7 +297,7 @@ export default function DashboardPreviewSection() {
   const [firstApproved, setFirstApproved] = useState(false);
 
   return (
-    <section id="dashboard" className="relative bg-[#F8FAFC] py-24 lg:py-32 overflow-hidden">
+    <section id="how-it-works" className="relative bg-[#F8FAFC] py-24 lg:py-32 overflow-hidden">
       {/* Subtle dot grid */}
       <div
         className="absolute inset-0 opacity-[0.4]"
