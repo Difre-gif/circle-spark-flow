@@ -8,8 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useGlobalProperties, useGlobalUnits } from '@/hooks/useSupabaseData';
 import { toast } from 'sonner';
 
 interface GlobalProperty {
@@ -34,72 +35,6 @@ interface GlobalUnit {
   property_id: string;
   org_name: string;
   tenant_name: string | null;
-}
-
-function useGlobalProperties() {
-  return useQuery({
-    queryKey: ['global-properties'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('properties')
-        .select(`
-          id, name, address_line1, property_type, is_active, created_at,
-          organisation:organisations(id, name),
-          units(id)
-        `)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return (data ?? []).map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        address: p.address ?? '—',
-        property_type: p.property_type,
-        is_active: p.is_active,
-        unit_count: p.units?.length ?? 0,
-        org_name: p.organisation?.name ?? '—',
-        org_id: p.organisation?.id ?? '',
-        created_at: p.created_at,
-      })) as GlobalProperty[];
-    },
-    staleTime: 30_000,
-  });
-}
-
-function useGlobalUnits() {
-  return useQuery({
-    queryKey: ['global-units'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('units')
-        .select(`
-          id, unit_number, unit_type, monthly_rent, status,
-          property:properties(id, name,
-            organisation:organisations(name)
-          ),
-          tenancies(
-            tenant:users(full_name)
-          )
-        `)
-        .eq('is_active', true)
-        .order('status', { ascending: true });
-      if (error) throw error;
-      return (data ?? []).map((u: any) => {
-        const activeTenancy = u.tenancies?.find((t: any) => t.tenant);
-        return {
-          id: u.id,
-          unit_number: u.unit_number,
-          unit_type: u.unit_type,
-          monthly_rent: u.monthly_rent,
-          status: u.status,
-          property_name: u.property?.name ?? '—',
-          property_id: u.property?.id ?? '',
-          org_name: u.property?.organisation?.name ?? '—',
-          tenant_name: activeTenancy?.tenant?.full_name ?? null,
-        };
-      }) as GlobalUnit[];
-    },
-    staleTime: 30_000,
-  });
 }
 
 function useOverrideUnitStatus() {
@@ -134,16 +69,40 @@ export default function PropertyControl() {
   const [unitStatusTarget, setUnitStatusTarget] = useState<GlobalUnit | null>(null);
   const [newStatus, setNewStatus] = useState('');
 
-  const { data: properties, isLoading: propsLoading, refetch: refetchProps } = useGlobalProperties();
-  const { data: units, isLoading: unitsLoading, refetch: refetchUnits } = useGlobalUnits();
+  const { data: rawProperties, isLoading: propsLoading, refetch: refetchProps } = useGlobalProperties();
+  const { data: rawUnits, isLoading: unitsLoading, refetch: refetchUnits } = useGlobalUnits();
   const overrideStatus = useOverrideUnitStatus();
 
-  const filteredProps = (properties ?? []).filter(p => {
+  const properties: GlobalProperty[] = (rawProperties ?? []).map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    address: p.address_line1 ?? '—',
+    property_type: p.property_type ?? '—',
+    is_active: p.is_active,
+    unit_count: p.units?.length ?? 0,
+    org_name: p.org?.name ?? '—',
+    org_id: p.org?.id ?? '',
+    created_at: p.created_at,
+  }));
+
+  const units: GlobalUnit[] = (rawUnits ?? []).map((u: any) => ({
+    id: u.id,
+    unit_number: u.unit_number,
+    unit_type: u.unit_type ?? '—',
+    monthly_rent: u.monthly_rent ?? 0,
+    status: u.status ?? 'AVAILABLE',
+    property_name: u.property?.name ?? '—',
+    property_id: u.property?.id ?? '',
+    org_name: u.property?.org?.name ?? '—',
+    tenant_name: null,
+  }));
+
+  const filteredProps = properties.filter(p => {
     const q = propSearch.toLowerCase();
     return !q || p.name.toLowerCase().includes(q) || p.org_name.toLowerCase().includes(q) || p.address.toLowerCase().includes(q);
   });
 
-  const filteredUnits = (units ?? []).filter(u => {
+  const filteredUnits = units.filter(u => {
     const q = unitSearch.toLowerCase();
     return !q || u.unit_number.toLowerCase().includes(q) || u.property_name.toLowerCase().includes(q) || u.org_name.toLowerCase().includes(q);
   });
@@ -156,12 +115,12 @@ export default function PropertyControl() {
   };
 
   const stats = {
-    totalProps: (properties ?? []).length,
-    activeProps: (properties ?? []).filter(p => p.is_active).length,
-    totalUnits: (units ?? []).length,
-    available: (units ?? []).filter(u => u.status === 'AVAILABLE').length,
-    occupied: (units ?? []).filter(u => u.status === 'OCCUPIED').length,
-    maintenance: (units ?? []).filter(u => u.status === 'MAINTENANCE').length,
+    totalProps: properties.length,
+    activeProps: properties.filter(p => p.is_active).length,
+    totalUnits: units.length,
+    available: units.filter(u => u.status === 'AVAILABLE').length,
+    occupied: units.filter(u => u.status === 'OCCUPIED').length,
+    maintenance: units.filter(u => u.status === 'MAINTENANCE').length,
   };
 
   return (

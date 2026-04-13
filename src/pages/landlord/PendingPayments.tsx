@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { CheckCircle, XCircle, CreditCard, Copy, Check, Eye, HelpCircle, X, ChevronRight, Search, Filter } from 'lucide-react';
 import { StatCard } from '@/components/StatCard';
 import { usePayments, useApprovePayment, useRejectPayment, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { useAuth } from '@/contexts/AuthContext';
+import { can } from '@/lib/permissions';
 import { formatDistanceToNow } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export default function PendingPayments() {
   const navigate = useNavigate();
+  const { orgRole } = useAuth();
+  const canApprove = can(orgRole ?? '', 'payment:approve');
   const { data: pendingPayments, isLoading: pendingLoading } = usePayments({ status: 'PENDING' });
   const { data: allPayments, isLoading: allLoading } = usePayments();
   const approvePayment = useApprovePayment();
@@ -164,7 +168,7 @@ export default function PendingPayments() {
                   </p>
 
                   <div className="flex gap-3 pt-2">
-                    <Button
+                    {canApprove && <Button
                       size="sm"
                       className="flex-1 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-[6px] min-h-[44px]"
                       style={{ fontFamily: 'Inter, Arial, sans-serif', fontWeight: 600, fontSize: '14px' }}
@@ -172,8 +176,8 @@ export default function PendingPayments() {
                       onClick={() => handleApprove(p.id)}
                     >
                       <CheckCircle className="mr-1.5 h-4 w-4" /> Approve
-                    </Button>
-                    <Button
+                    </Button>}
+                    {canApprove && <Button
                       size="sm"
                       className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm rounded-[6px] min-h-[44px]"
                       style={{ fontFamily: 'Inter, Arial, sans-serif', fontWeight: 600, fontSize: '14px' }}
@@ -181,7 +185,7 @@ export default function PendingPayments() {
                       onClick={() => setRejectModal({ open: true, paymentId: p.id })}
                     >
                       <XCircle className="mr-1.5 h-4 w-4" /> Reject
-                    </Button>
+                    </Button>}
                     <Button
                       size="sm"
                       variant="outline"

@@ -7,10 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { formatDate } from '@/hooks/useSupabaseData';
+import { formatDate, useAdminFraudSignals } from '@/hooks/useSupabaseData';
 
 interface FraudSignal {
   type: string;
@@ -26,18 +26,6 @@ interface IntegrityIssue {
   issue_type: string;
   affected_rows: number;
   detail: string;
-}
-
-function useFraudSignals() {
-  return useQuery({
-    queryKey: ['fraud-signals'],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_fraud_signals');
-      if (error) throw error;
-      return (data ?? []) as FraudSignal[];
-    },
-    staleTime: 60_000,
-  });
 }
 
 function useDataIntegrityCheck() {
@@ -58,7 +46,7 @@ const SEVERITY_STYLES: Record<string, string> = {
 };
 
 export default function FraudDetection() {
-  const { data: signals, isLoading, refetch, isFetching } = useFraudSignals();
+  const { data: signals, isLoading, refetch, isFetching } = useAdminFraudSignals();
   const integrityCheck = useDataIntegrityCheck();
   const [integrityResults, setIntegrityResults] = useState<IntegrityIssue[] | null>(null);
   const [showIntegrityModal, setShowIntegrityModal] = useState(false);

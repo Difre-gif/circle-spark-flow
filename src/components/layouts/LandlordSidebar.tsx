@@ -25,22 +25,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { can } from '@/lib/permissions';
+import { WorkspaceSwitcher } from '@/components/shared/WorkspaceSwitcher';
 
-const navigationItems = [
-  { title: 'Dashboard', url: '/landlord', icon: LayoutDashboard },
-  { title: 'Properties', url: '/landlord/properties', icon: Building2 },
-  { title: 'Units', url: '/landlord/units', icon: Home },
-  { title: 'Tenants', url: '/landlord/tenants', icon: Users },
-  { title: 'Invoices', url: '/landlord/invoices', icon: FileText },
-  { title: 'Payments', url: '/landlord/payments', icon: CreditCard, highlight: true },
-  { title: 'Receipts', url: '/landlord/receipts', icon: Receipt },
-  { title: 'Reports', url: '/landlord/reports', icon: BarChart },
-  { title: 'Settings', url: '/landlord/settings', icon: Settings }
+const ALL_NAV_ITEMS = [
+  { title: 'Dashboard', url: '/landlord', icon: LayoutDashboard, action: null },
+  { title: 'Properties', url: '/landlord/properties', icon: Building2, action: 'property:view' as const },
+  { title: 'Units', url: '/landlord/units', icon: Home, action: 'unit:view' as const },
+  { title: 'Tenants', url: '/landlord/tenants', icon: Users, action: 'tenant:view' as const },
+  { title: 'Invoices', url: '/landlord/invoices', icon: FileText, action: 'invoice:view' as const },
+  { title: 'Payments', url: '/landlord/payments', icon: CreditCard, action: 'payment:view' as const, highlight: true },
+  { title: 'Receipts', url: '/landlord/receipts', icon: Receipt, action: 'receipt:view' as const },
+  { title: 'Reports', url: '/landlord/reports', icon: BarChart, action: 'report:view' as const },
+  { title: 'Settings', url: '/landlord/settings', icon: Settings, action: 'settings:view' as const },
 ];
 
 export function LandlordSidebar() {
-  const { user, logout, userOrgs, switchOrg, orgId, isSuperAdmin } = useAuth();
+  const { user, logout, userOrgs, switchOrg, orgId, orgRole, isSuperAdmin } = useAuth();
   const { data: org } = useOrganisation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,6 +51,11 @@ export function LandlordSidebar() {
   const [createOrgOpen, setCreateOrgOpen] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
   const createOrg = useCreateOrganisation();
+
+  const navigationItems = useMemo(
+    () => ALL_NAV_ITEMS.filter(item => !item.action || can(orgRole ?? '', item.action)),
+    [orgRole]
+  );
 
   const handleCreateOrg = async () => {
     if (!newOrgName.trim()) return;
@@ -84,63 +91,25 @@ export function LandlordSidebar() {
           <BizRentLogo variant="full" size="md" theme="dark" className="text-white" />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="w-full h-12 px-2 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white text-white shadow-sm transition-all group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center">
-              <div className="flex items-center gap-3 overflow-hidden">
-                <div className="h-8 w-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-105">
-                  <Building2 className="h-4 w-4 text-white" />
-                </div>
-                {!isCollapsed && (
-                  <div className="flex flex-col items-start overflow-hidden">
-                    <span className="text-sm font-bold text-white truncate w-[130px]">{org?.name || 'Loading...'}</span>
-                    <span className="text-xxs text-white/70 font-medium uppercase tracking-widest">Workspace</span>
-                  </div>
-                )}
-              </div>
-              {!isCollapsed && <ChevronsUpDown className="ml-auto h-4 w-4 text-white/50" />}
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[212px] rounded-2xl shadow-xl border-border/40 p-1.5" align="start" sideOffset={12}>
-            <DropdownMenuLabel className="text-xxs text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">Organizations</DropdownMenuLabel>
-            
-            {userOrgs.map((o) => (
-              <DropdownMenuItem 
-                key={o.id}
-                className={cn(
-                  "py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5 mb-1",
-                  o.id === orgId ? "font-bold text-bizrent-navy bg-slate-50/50" : "font-medium text-muted-foreground"
-                )}
-                onClick={() => {
-                  if (o.id !== orgId) {
-                    switchOrg(o.id);
-                    navigate('/landlord');
-                  }
-                }}
-              >
-                <div className={cn(
-                  "h-6 w-6 rounded flex items-center justify-center",
-                  o.id === orgId ? "bg-bizrent-blue/10 text-bizrent-blue" : "bg-muted text-muted-foreground"
-                )}>
-                  <Building2 className="h-3.5 w-3.5" />
-                </div>
-                <div className="flex flex-col overflow-hidden">
-                  <span className="truncate text-xs">{o.name}</span>
-                  {o.role !== 'OWNER' && <span className="text-xxxs uppercase tracking-widest opacity-60 font-extrabold">{o.role}</span>}
-                </div>
-              </DropdownMenuItem>
-            ))}
+        <WorkspaceSwitcher
+          workspaces={userOrgs.map(o => ({ id: o.id, name: o.name, role: o.role }))}
+          activeId={orgId}
+          onSwitch={id => { switchOrg(id); navigate('/landlord'); }}
+          isCollapsed={isCollapsed}
+        />
 
-            <DropdownMenuSeparator className="my-1.5 opacity-50" />
-            <DropdownMenuItem 
-              className="text-muted-foreground font-semibold py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5"
-              onClick={() => setCreateOrgOpen(true)}
-            >
-              <div className="h-6 w-6 rounded flex items-center justify-center border border-dashed border-muted-foreground/30"><Plus className="h-3.5 w-3.5" /></div>
-              <span>Add Organization</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* New workspace button */}
+        {!isCollapsed && (
+          <button
+            onClick={() => setCreateOrgOpen(true)}
+            className="mt-2 w-full flex items-center gap-2.5 px-2 py-2 text-xs text-white/50 hover:text-white/80 transition-colors rounded-xl hover:bg-white/5"
+          >
+            <div className="h-6 w-6 rounded flex items-center justify-center border border-dashed border-white/20 shrink-0">
+              <Plus className="h-3.5 w-3.5" />
+            </div>
+            <span className="font-semibold">Add Organization</span>
+          </button>
+        )}
 
         <Dialog open={createOrgOpen} onOpenChange={setCreateOrgOpen}>
           <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-8">

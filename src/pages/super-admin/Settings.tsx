@@ -1,24 +1,34 @@
 import { useState } from "react";
-import { 
-  useSubscriptionTiers, 
-  useUpdateSubscriptionTier, 
-  formatRWF 
+import {
+  useSubscriptionTiers,
+  useUpdateSubscriptionTier,
+  formatRWF,
+  useSuperAdminAllowlist,
+  useSuperAdminInvitations,
+  useInviteSuperAdmin,
+  useRevokeSuperAdminInvitation,
 } from "@/hooks/useSupabaseData";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { 
-  Loader2, 
-  Settings, 
-  CreditCard, 
-  CheckCircle2, 
-  Package, 
-  Save, 
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Loader2,
+  Settings,
+  CreditCard,
+  CheckCircle2,
+  Package,
+  Save,
   AlertCircle,
   Zap,
   Globe,
-  MessageSquare
+  MessageSquare,
+  Shield,
+  UserPlus,
+  Mail,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -28,9 +38,23 @@ export default function SuperAdminSettings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>(null);
 
+  const { data: allowlist, isLoading: allowlistLoading } = useSuperAdminAllowlist();
+  const { data: invitations, isLoading: invitationsLoading } = useSuperAdminInvitations();
+  const inviteMutation = useInviteSuperAdmin();
+  const revokeMutation = useRevokeSuperAdminInvitation();
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+
   const handleEdit = (tier: any) => {
     setEditingId(tier.id);
     setEditForm({ ...tier });
+  };
+
+  const handleInvite = async () => {
+    if (!inviteEmail.trim()) return;
+    await inviteMutation.mutateAsync(inviteEmail.trim());
+    setInviteEmail('');
+    setInviteDialogOpen(false);
   };
 
   const handleSave = async () => {
@@ -175,6 +199,133 @@ export default function SuperAdminSettings() {
           </Card>
         ))}
       </div>
+      {/* ─── Super Admin Access ─── */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-red-400" />
+          <h2 className="text-xl font-bold text-slate-900">Super Admin Access</h2>
+        </div>
+
+        {/* Current Super Admins */}
+        <Card className="border-none shadow-md">
+          <CardHeader className="border-b border-slate-100">
+            <CardTitle className="text-base text-slate-900">Current Super Admins</CardTitle>
+            <CardDescription>Accounts with full platform access. Changes require database intervention.</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            {allowlistLoading ? (
+              <div className="flex items-center gap-2 text-slate-400 text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+              </div>
+            ) : (allowlist ?? []).length === 0 ? (
+              <p className="text-slate-500 text-sm">No entries in the allowlist.</p>
+            ) : (
+              <ul className="space-y-2">
+                {(allowlist ?? []).map((entry: any) => (
+                  <li key={entry.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-slate-400" />
+                      <span className="text-slate-800 text-sm font-medium">{entry.email}</span>
+                    </div>
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-xs">Super Admin</Badge>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Pending Invitations */}
+        <Card className="border-none shadow-md">
+          <CardHeader className="border-b border-slate-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base text-slate-900">Pending Invitations</CardTitle>
+                <CardDescription>Invited emails that have not yet accepted super admin access.</CardDescription>
+              </div>
+              <Button
+                size="sm"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
+                onClick={() => { setInviteEmail(''); setInviteDialogOpen(true); }}
+              >
+                <UserPlus className="h-3.5 w-3.5 mr-1.5" /> Invite Super Admin
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4">
+            {invitationsLoading ? (
+              <div className="flex items-center gap-2 text-slate-400 text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+              </div>
+            ) : (invitations ?? []).filter((inv: any) => inv.status === 'PENDING').length === 0 ? (
+              <p className="text-slate-500 text-sm">No pending invitations.</p>
+            ) : (
+              <ul className="space-y-2">
+                {(invitations ?? [])
+                  .filter((inv: any) => inv.status === 'PENDING')
+                  .map((inv: any) => (
+                    <li key={inv.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-slate-400" />
+                        <div>
+                          <p className="text-slate-800 text-sm font-medium">{inv.invited_email}</p>
+                          <p className="text-slate-400 text-xs">Invited by {inv.invited_by}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">Pending</Badge>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs border-red-300 text-red-600 hover:bg-red-50"
+                          disabled={revokeMutation.isPending}
+                          onClick={() => revokeMutation.mutate(inv.id)}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" /> Revoke
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Invite Super Admin Dialog */}
+      <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+        <DialogContent className="bg-white border border-slate-200 text-slate-900">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-900">
+              <UserPlus className="h-4 w-4 text-indigo-600" /> Invite Super Admin
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Label className="text-slate-700 text-sm">Email address <span className="text-red-500">*</span></Label>
+            <Input
+              type="email"
+              placeholder="admin@bizrent.rw"
+              value={inviteEmail}
+              onChange={e => setInviteEmail(e.target.value)}
+              className="border-slate-300 text-slate-900 placeholder:text-slate-400"
+              onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="border-slate-300 text-slate-600" onClick={() => setInviteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              disabled={!inviteEmail.trim() || inviteMutation.isPending}
+              onClick={handleInvite}
+            >
+              {inviteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Send Invitation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

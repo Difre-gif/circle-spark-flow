@@ -12,9 +12,12 @@ import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProperties, useCreateProperty, useUpdateProperty, useDeleteProperty } from '@/hooks/useSupabaseData';
+import { useAuth } from '@/contexts/AuthContext';
+import { can } from '@/lib/permissions';
 
 export default function Properties() {
   const navigate = useNavigate();
+  const { orgRole } = useAuth();
   const { data: properties, isLoading } = useProperties();
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
@@ -76,9 +79,11 @@ export default function Properties() {
           <h1 className="page-title">Properties</h1>
           <p className="page-description">You manage {properties?.length ?? 0} propert{properties?.length === 1 ? 'y' : 'ies'}. {vacantUnits} units currently vacant.</p>
         </div>
-        <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Property
-        </Button>
+        {can(orgRole ?? '', 'property:create') && (
+          <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Add Property
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -99,23 +104,27 @@ export default function Properties() {
                       <p className="text-sm font-medium text-muted-foreground truncate">{p.district ? `${p.district}, ` : ''}{p.city}</p>
                     </div>
                   </div>
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity">
-                          <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
-                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-blue transition-colors" onClick={() => setEditTarget({ id: p.id, name: p.name, property_type: p.property_type, address_line1: (p as any).address_line1 ?? '', city: (p as any).city ?? 'Kigali', district: (p as any).district ?? '' })}>
-                          <Edit2 className="h-4 w-4" /> Edit Property
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-bizrent-red transition-colors" onClick={() => setDeleteTarget({ id: p.id, name: p.name })}>
-                          <Trash2 className="h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                  {can(orgRole ?? '', 'property:edit') && (
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
+                          <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-blue transition-colors" onClick={() => setEditTarget({ id: p.id, name: p.name, property_type: p.property_type, address_line1: (p as any).address_line1 ?? '', city: (p as any).city ?? 'Kigali', district: (p as any).district ?? '' })}>
+                            <Edit2 className="h-4 w-4" /> Edit Property
+                          </DropdownMenuItem>
+                          {can(orgRole ?? '', 'property:delete') && (
+                            <DropdownMenuItem className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-bizrent-red transition-colors" onClick={() => setDeleteTarget({ id: p.id, name: p.name })}>
+                              <Trash2 className="h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/40">

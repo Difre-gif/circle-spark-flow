@@ -9,43 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { formatRWF, formatDate, useGlobalPendingPayments, useGlobalOverdueInvoices } from '@/hooks/useSupabaseData';
 import { toast } from 'sonner';
 
 // ─── Hooks ───
-function useGlobalPendingPayments() {
-  return useQuery({
-    queryKey: ['sa-pending-payments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('payments')
-        .select('*, tenant:users!payments_tenant_user_id_fkey(full_name, email), invoice:invoices!payments_invoice_id_fkey(invoice_number, amount_due, org_id, unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name))), org:invoices!payments_invoice_id_fkey(organisations!invoices_org_id_fkey(name))')
-        .eq('status', 'PENDING')
-        .order('submitted_at', { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
-function useGlobalOverdueInvoices() {
-  return useQuery({
-    queryKey: ['sa-overdue-invoices'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select('*, tenant:users!invoices_tenant_user_id_fkey(full_name, email), unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)), org:organisations!invoices_org_id_fkey(name)')
-        .in('status', ['OVERDUE', 'PARTIAL'])
-        .order('due_date', { ascending: true })
-        .limit(100);
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
 function useForceApprove() {
   const qc = useQueryClient();
   return useMutation({
@@ -53,7 +22,7 @@ function useForceApprove() {
       const { error } = await supabase.rpc('superadmin_force_approve_payment', { p_payment_id: paymentId });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sa-pending-payments'] }); toast.success('Payment force-approved'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['global-pending-payments'] }); toast.success('Payment force-approved'); },
     onError: (e: Error) => toast.error(e.message),
   });
 }
@@ -65,7 +34,7 @@ function useForceReject() {
       const { error } = await supabase.rpc('superadmin_force_reject_payment', { p_payment_id: paymentId, p_reason: reason });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sa-pending-payments'] }); toast.success('Payment force-rejected'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['global-pending-payments'] }); toast.success('Payment force-rejected'); },
     onError: (e: Error) => toast.error(e.message),
   });
 }
@@ -77,7 +46,7 @@ function useWipeDebt() {
       const { error } = await supabase.rpc('superadmin_wipe_debt', { p_invoice_id: invoiceId });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sa-overdue-invoices'] }); toast.success('Debt wiped — invoice marked PAID'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['global-overdue-invoices'] }); toast.success('Debt wiped — invoice marked PAID'); },
     onError: (e: Error) => toast.error(e.message),
   });
 }
@@ -89,7 +58,7 @@ function useAdjustBalance() {
       const { error } = await supabase.rpc('superadmin_adjust_balance', { p_invoice_id: invoiceId, p_amount_due: amountDue, p_amount_paid: amountPaid });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sa-overdue-invoices'] }); toast.success('Balance adjusted'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['global-overdue-invoices'] }); toast.success('Balance adjusted'); },
     onError: (e: Error) => toast.error(e.message),
   });
 }
@@ -102,7 +71,7 @@ function useBulkMarkOverdue() {
       if (error) throw error;
       return data as number;
     },
-    onSuccess: (count) => { qc.invalidateQueries({ queryKey: ['sa-overdue-invoices'] }); toast.success(`${count} invoices marked OVERDUE`); },
+    onSuccess: (count) => { qc.invalidateQueries({ queryKey: ['global-overdue-invoices'] }); toast.success(`${count} invoices marked OVERDUE`); },
     onError: (e: Error) => toast.error(e.message),
   });
 }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { supabaseAdmin } from '@/integrations/supabase/adminClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
@@ -1023,8 +1024,13 @@ export function usePendingOrganisations() {
   return useQuery({
     queryKey: ['pending-organisations'],
     queryFn: async () => {
-      // PENDING_APPROVAL is deprecated. Return empty array to prevent breakages.
-      return [];
+      const { data, error } = await supabaseAdmin
+        .from('organisations')
+        .select('id, name, created_at, subscription_status')
+        .eq('subscription_status', 'PENDING_APPROVAL')
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
     },
     enabled: !!isSuperAdmin,
   });
@@ -1063,17 +1069,16 @@ export function useAllOrganisations() {
   return useQuery({
     queryKey: ['all-organisations'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('organisations')
         .select(`
-          *, 
+          *,
           subscriptions(tier, status),
           user_organisation_roles(
             role,
             users(id, email, full_name, phone)
           )
         `)
-        .eq('user_organisation_roles.role', 'OWNER')
         .order('created_at', { ascending: false });
       if (error) throw error;
       
@@ -1104,11 +1109,11 @@ export function usePlatformStats() {
   return useQuery({
     queryKey: ['platform-stats'],
     queryFn: async () => {
-      const { count: orgCount } = await supabase.from('organisations').select('*', { count: 'exact', head: true });
-      const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
-      const { count: unitCount } = await supabase.from('units').select('*', { count: 'exact', head: true });
-      const { data: payments } = await supabase.from('payments').select('amount').eq('status', 'APPROVED');
-      
+      const { count: orgCount } = await supabaseAdmin.from('organisations').select('*', { count: 'exact', head: true });
+      const { count: userCount } = await supabaseAdmin.from('users').select('*', { count: 'exact', head: true });
+      const { count: unitCount } = await supabaseAdmin.from('units').select('*', { count: 'exact', head: true });
+      const { data: payments } = await supabaseAdmin.from('payments').select('amount').eq('status', 'APPROVED');
+
       const totalVolume = payments?.reduce((acc, p) => acc + Number(p.amount), 0) || 0;
 
       return {
@@ -1127,7 +1132,7 @@ export function useGlobalAuditLogs() {
   return useQuery({
     queryKey: ['global-audit-logs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('audit_logs')
         .select(`
           *,
@@ -1148,19 +1153,20 @@ export function useGlobalUsers() {
   return useQuery({
     queryKey: ['global-users'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('users')
         .select(`
           *,
           roles:user_organisation_roles(
             role,
             is_active,
-            org:organisations(name)
+            org_id,
+            org:organisations(id, name)
           )
         `)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data;
+      return data ?? [];
     },
     enabled: !!isSuperAdmin,
   });
@@ -1203,7 +1209,7 @@ export function useGlobalAdminMetrics() {
   return useQuery({
     queryKey: ['global-admin-metrics'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_global_admin_metrics');
+      const { data, error } = await supabaseAdmin.rpc('get_global_admin_metrics');
       if (error) throw error;
       return data as {
         mrr: number;
@@ -1308,7 +1314,7 @@ export function useFailedJobs() {
   return useQuery({
     queryKey: ['failed-jobs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('failed_notification_jobs')
         .select('*')
         .order('created_at', { ascending: false });
@@ -1338,6 +1344,186 @@ export function useRetryJob() {
       queryClient.invalidateQueries({ queryKey: ['failed-jobs'] });
       toast.success("Job re-queued successfully");
     },
+  });
+}
+
+// ─── Super Admin: Global Payments (all orgs, for FinancialOverride) ───
+export function useGlobalPendingPayments() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['global-pending-payments'],
+    queryFn: async () => {
+      const { data, error } = await supabaseAdmin
+        .from('payments')
+        .select(`
+          *,
+          tenant:users!payments_tenant_user_id_fkey(full_name, email, phone),
+          invoice:invoices!payments_invoice_id_fkey(invoice_number, billing_period_start, amount_due,
+            unit:units!invoices_unit_id_fkey(unit_number,
+              property:properties!units_property_id_fkey(name, org:organisations!properties_org_id_fkey(name))
+            )
+          )
+        `)
+        .eq('status', 'PENDING')
+        .order('submitted_at', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!isSuperAdmin,
+    refetchInterval: 30_000,
+  });
+}
+
+export function useGlobalOverdueInvoices() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['global-overdue-invoices'],
+    queryFn: async () => {
+      const { data, error } = await supabaseAdmin
+        .from('invoices')
+        .select(`
+          *,
+          tenant:users!invoices_tenant_user_id_fkey(full_name, email),
+          unit:units!invoices_unit_id_fkey(unit_number,
+            property:properties!units_property_id_fkey(name, org:organisations!properties_org_id_fkey(name))
+          )
+        `)
+        .eq('status', 'OVERDUE')
+        .order('due_date', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useGlobalProperties() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['global-properties'],
+    queryFn: async () => {
+      const { data, error } = await supabaseAdmin
+        .from('properties')
+        .select(`
+          *,
+          org:organisations!properties_org_id_fkey(id, name),
+          units(id, unit_number, status)
+        `)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useGlobalUnits() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['global-units'],
+    queryFn: async () => {
+      const { data, error } = await supabaseAdmin
+        .from('units')
+        .select(`
+          *,
+          property:properties!units_property_id_fkey(name, org:organisations!properties_org_id_fkey(name))
+        `)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+// ─── Super Admin: Fraud Signals ───
+export function useAdminFraudSignals() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['admin-fraud-signals'],
+    queryFn: async () => {
+      // Try the RPC first; fall back to the direct table query if it fails
+      const { data, error } = await supabaseAdmin.rpc('get_fraud_signals');
+      if (!error && data) return data as any[];
+      // Fallback: direct table
+      const { data: rows, error: err2 } = await supabaseAdmin
+        .from('fraud_signals')
+        .select('*')
+        .order('detected_at', { ascending: false });
+      if (err2) return [];
+      return rows ?? [];
+    },
+    enabled: !!isSuperAdmin,
+    staleTime: 60_000,
+  });
+}
+
+// ─── Super Admin Allowlist & Invitations ───
+export function useSuperAdminAllowlist() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['sa-allowlist'],
+    queryFn: async () => {
+      const { data, error } = await supabaseAdmin
+        .from('super_admin_allowlist')
+        .select('*')
+        .order('added_at', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useSuperAdminInvitations() {
+  const { isSuperAdmin } = useAuth();
+  return useQuery({
+    queryKey: ['sa-invitations'],
+    queryFn: async () => {
+      const { data, error } = await supabaseAdmin
+        .from('super_admin_invitations')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!isSuperAdmin,
+  });
+}
+
+export function useInviteSuperAdmin() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (email: string) => {
+      const { error } = await supabaseAdmin
+        .from('super_admin_invitations')
+        .insert({ invited_email: email, invited_by: user?.email ?? 'system' });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sa-invitations'] });
+      toast.success('Invitation sent');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useRevokeSuperAdminInvitation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabaseAdmin
+        .from('super_admin_invitations')
+        .update({ status: 'REVOKED' })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sa-invitations'] });
+      toast.success('Invitation revoked');
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 

@@ -1,14 +1,16 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[];
+  requireSuperAdmin?: boolean;
 }
 
-export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, allowedRoles, requireSuperAdmin }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, isSuperAdmin, orgRole, user } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -22,7 +24,16 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/login" replace />;
   }
 
-  // Super Admin bypasses standard role checks
+  // Hard-lock: super admin routes require isSuperAdmin
+  const onSuperAdminRoute = location.pathname.startsWith('/super-admin');
+  if (onSuperAdminRoute || requireSuperAdmin) {
+    if (!isSuperAdmin) {
+      return <Navigate to="/login?error=unauthorized" replace />;
+    }
+    return <>{children}</>;
+  }
+
+  // Super admins can access landlord routes (for context switching / impersonation)
   if (isSuperAdmin) {
     return <>{children}</>;
   }

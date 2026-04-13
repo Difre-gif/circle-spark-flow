@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseAdmin } from '@/integrations/supabase/adminClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/hooks/useSupabaseData';
 import { toast } from 'sonner';
@@ -20,7 +20,7 @@ function useAnnouncements() {
   return useQuery({
     queryKey: ['sa-announcements'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('system_announcements')
         .select('*')
         .order('created_at', { ascending: false });
@@ -34,7 +34,7 @@ function useFeatureFlags() {
   return useQuery({
     queryKey: ['sa-feature-flags'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('feature_flags').select('*').order('flag_key');
+      const { data, error } = await supabaseAdmin.from('feature_flags').select('*').order('flag_key');
       if (error) throw error;
       return data;
     },
@@ -46,10 +46,10 @@ function usePlatformStats() {
     queryKey: ['sa-platform-stats'],
     queryFn: async () => {
       const [orgs, tenants, invoices, payments] = await Promise.all([
-        supabase.from('organisations').select('id, is_active, subscription_status', { count: 'exact' }),
-        supabase.from('user_organisation_roles').select('id', { count: 'exact' }).eq('role', 'TENANT').eq('is_active', true),
-        supabase.from('invoices').select('id, status, amount_due, amount_paid', { count: 'exact' }),
-        supabase.from('payments').select('id, status, amount', { count: 'exact' }).eq('status', 'APPROVED'),
+        supabaseAdmin.from('organisations').select('id, is_active, subscription_status', { count: 'exact' }),
+        supabaseAdmin.from('user_organisation_roles').select('id', { count: 'exact' }).eq('role', 'TENANT').eq('is_active', true),
+        supabaseAdmin.from('invoices').select('id, status, amount_due, amount_paid', { count: 'exact' }),
+        supabaseAdmin.from('payments').select('id, status, amount', { count: 'exact' }).eq('status', 'APPROVED'),
       ]);
       const totalRWF = (payments.data ?? []).reduce((s, p) => s + Number(p.amount), 0);
       const totalInvoiced = (invoices.data ?? []).reduce((s, i) => s + Number(i.amount_due), 0);
@@ -81,7 +81,7 @@ export default function SystemVitals() {
 
   const createAnnouncement = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('system_announcements').insert({
+      const { error } = await supabaseAdmin.from('system_announcements').insert({
         message: newAnn.message,
         type: newAnn.type,
         audience: newAnn.audience,
@@ -102,7 +102,7 @@ export default function SystemVitals() {
 
   const deleteAnnouncement = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('system_announcements').delete().eq('id', id);
+      const { error } = await supabaseAdmin.from('system_announcements').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['sa-announcements'] }); toast.success('Announcement removed'); },
@@ -110,7 +110,7 @@ export default function SystemVitals() {
 
   const toggleFlag = useMutation({
     mutationFn: async ({ id, enabled }: { id: string; enabled: boolean }) => {
-      const { error } = await supabase.from('feature_flags')
+      const { error } = await supabaseAdmin.from('feature_flags')
         .update({ is_enabled: enabled, updated_by: user?.id, updated_at: new Date().toISOString() })
         .eq('id', id);
       if (error) throw error;

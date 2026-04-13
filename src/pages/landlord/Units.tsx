@@ -9,8 +9,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUnits, useProperties, useCreateUnit, useDeleteUnit, useUpdateUnit, formatRWF } from '@/hooks/useSupabaseData';
+import { useAuth } from '@/contexts/AuthContext';
+import { can } from '@/lib/permissions';
 
 export default function Units() {
+  const { orgRole } = useAuth();
   const { data: units, isLoading } = useUnits();
   const { data: properties } = useProperties();
   const createUnit = useCreateUnit();
@@ -63,9 +66,9 @@ export default function Units() {
           <h1 className="page-title">Units</h1>
           <p className="page-description">Manage {units?.length ?? 0} individual rental units</p>
         </div>
-        <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
+        {can(orgRole ?? '', 'unit:create') && <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-sm rounded-xl font-semibold mt-4 md:mt-0" onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Unit
-        </Button>
+        </Button>}
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-4">
