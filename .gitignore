@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .dyad/
+
+# Local secrets
+.env.local
