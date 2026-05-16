@@ -209,6 +209,7 @@ export function useCreateTenancy() {
       end_date?: string;
       billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
       period_anchor_day?: number;
+      invoice_lead_days?: number;
       security_deposit_total?: number;
       advance_payment_months?: number;
     }) => {
@@ -943,6 +944,7 @@ export function useInviteTenant() {
       deposit_amount?: number;
       billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
       period_anchor_day?: number;
+      invoice_lead_days?: number;
     }) => {
       const { data: inserted, error } = await supabase
         .from('invitations')
@@ -958,6 +960,7 @@ export function useInviteTenant() {
           deposit_amount: input.deposit_amount ?? 0,
           billing_frequency: input.billing_frequency ?? 'MONTHLY',
           period_anchor_day: input.period_anchor_day ?? null,
+          invoice_lead_days: input.invoice_lead_days ?? null,
         })
         .select('id')
         .single();

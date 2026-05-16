@@ -38,6 +38,7 @@ export default function Tenants() {
     start_date?: string;
     billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
     period_anchor_day?: number;
+    invoice_lead_days?: number;
     security_deposit_total?: number;
   } | null>(null);
 
@@ -416,6 +417,25 @@ export default function Tenants() {
                         </p>
                       )}
                     </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.invoiceSendTiming')}</Label>
+                      <div className="flex items-center gap-3">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="30"
+                          placeholder={t('legacy.useWorkspaceDefault')}
+                          className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20 font-bold w-24 text-center"
+                          value={editTenantTarget?.invoice_lead_days ?? ''}
+                          onChange={e => setEditTenantTarget(prev => prev ? {
+                            ...prev,
+                            invoice_lead_days: e.target.value === '' ? undefined : Number(e.target.value),
+                          } : null)}
+                        />
+                        <span className="text-xs font-medium text-muted-foreground">{t('legacy.daysBeforeDueDate')}</span>
+                      </div>
+                      <p className="text-xxs text-muted-foreground leading-tight ml-1 mt-1">{t('legacy.leaveBlankToUseWorkspaceDefaultInvoiceTiming')}</p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -445,6 +465,7 @@ export default function Tenants() {
                       security_deposit_total: editTenantTarget.security_deposit_total,
                       billing_frequency: editTenantTarget.billing_frequency || 'MONTHLY',
                       period_anchor_day: editTenantTarget.period_anchor_day,
+                      invoice_lead_days: editTenantTarget.invoice_lead_days,
                     });
                   }
                   

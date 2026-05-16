@@ -1,5 +1,6 @@
 export type PolicyForm = {
   default_due_day: number;
+  default_invoice_lead_days: number;
   grace_period_days: number;
   days_before_due: number[];
   days_after_due: number[];
@@ -7,6 +8,7 @@ export type PolicyForm = {
 
 export const DEFAULT_POLICY_FORM: PolicyForm = {
   default_due_day: 1,
+  default_invoice_lead_days: 7,
   grace_period_days: 3,
   days_before_due: [3],
   days_after_due: [1, 5, 10],
@@ -19,6 +21,7 @@ export const samePolicy = (a: PolicyForm | null, b: PolicyForm | null) =>
   !!a &&
   !!b &&
   a.default_due_day === b.default_due_day &&
+  a.default_invoice_lead_days === b.default_invoice_lead_days &&
   a.grace_period_days === b.grace_period_days &&
   a.days_before_due.join(',') === b.days_before_due.join(',') &&
   a.days_after_due.join(',') === b.days_after_due.join(',');
@@ -31,6 +34,9 @@ export const getPolicyErrors = (policy: PolicyForm | null) => {
   }
   if (!Number.isInteger(policy.grace_period_days) || policy.grace_period_days < 0 || policy.grace_period_days > 30) {
     errors.push('Grace period must be a whole number between 0 and 30 days.');
+  }
+  if (!Number.isInteger(policy.default_invoice_lead_days) || policy.default_invoice_lead_days < 0 || policy.default_invoice_lead_days > 30) {
+    errors.push('Default invoice send timing must be a whole number between 0 and 30 days before the due date.');
   }
   if (policy.days_before_due.some(day => day < 1 || day > 30)) {
     errors.push('Pre-due reminders must be between 1 and 30 days before the due date.');

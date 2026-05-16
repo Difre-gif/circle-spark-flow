@@ -891,7 +891,14 @@ const sw = {
     "enable2faComingSoon": "Washa 2FA (Inakuja Hivi Karibuni)",
     "momoPaymentGuidance": "BizRent hutumia MoMo kuchakata malipo ya mpangaji. Wapangaji hutuma pesa kwa Nambari yako ya Muuzaji, kisha uweke Kitambulisho cha Muamala hapa. Thibitisha kiasi na Kitambulisho cha Muamala kila wakati katika programu yako ya MoMo kabla ya kuidhinisha malipo hapa chini.",
     "assignToUnitOptional": "Gawia Kitengo (Si lazima)",
-    "firstMonthlyCycle": "Mzunguko wa kwanza wa kila mwezi: {{lebo}}"
+    "firstMonthlyCycle": "Mzunguko wa kwanza wa kila mwezi: {{lebo}}",
+    "defaultBillingDayHelp": "Hii ndiyo siku chaguomsingi inayostahikishwa kwa wapangaji ambao hawana ubatilishaji wao wa mzunguko wa ukodishaji.",
+    "defaultInvoiceSendTiming": "Muda Chaguomsingi wa Kutuma Ankara",
+    "defaultInvoiceSendTimingHelp": "Chaguomsingi hii ya nafasi ya kazi inatumika kwa wapangaji wote isipokuwa mpangaji ana ubatilishaji wake.",
+    "daysBeforeDueDate": "siku kabla ya tarehe ya mwisho",
+    "invoiceSendTiming": "Muda wa Kutuma Ankara",
+    "useWorkspaceDefault": "Chaguomsingi",
+    "leaveBlankToUseWorkspaceDefaultInvoiceTiming": "Acha wazi ili kutumia muda wa ankara chaguomsingi wa nafasi ya kazi."
   },
   "countries": {
     "kenya": "Kenya",

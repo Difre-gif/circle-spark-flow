@@ -35,6 +35,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
   const [anchorDay, setAnchorDay] = useState(new Date().getDate());
   const [rent, setRent] = useState<number | ''>('');
   const [deposit, setDeposit] = useState<number | ''>('');
+  const [invoiceLeadDays, setInvoiceLeadDays] = useState<number | ''>('');
   const { data: units, isLoading: unitsLoading } = useUnits();
   const inviteTenant = useInviteTenant();
 
@@ -55,6 +56,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
         deposit_amount: unitId === 'none' ? undefined : Number(deposit || 0),
         billing_frequency: 'MONTHLY',
         period_anchor_day: unitId === 'none' ? undefined : anchorDay,
+        invoice_lead_days: unitId === 'none' || invoiceLeadDays === '' ? undefined : Number(invoiceLeadDays),
       });
 
       setEmail('');
@@ -63,6 +65,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
       setAnchorDay(new Date().getDate());
       setRent('');
       setDeposit('');
+      setInvoiceLeadDays('');
       onOpenChange(false);
     } catch (err) {
       // toast is handled in mutation onSuccess/onError
@@ -138,6 +141,14 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
                   <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.cycleStartsDay')}</Label>
                   <Input type="number" min="1" max="31" value={anchorDay} onChange={e => setAnchorDay(Number(e.target.value))} />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.invoiceSendTiming')}</Label>
+                <div className="flex items-center gap-3">
+                  <Input type="number" min="0" max="30" placeholder={t('legacy.useWorkspaceDefault')} value={invoiceLeadDays} onChange={e => setInvoiceLeadDays(e.target.value === '' ? '' : Number(e.target.value))} />
+                  <span className="text-xs font-medium text-muted-foreground">{t('legacy.daysBeforeDueDate')}</span>
+                </div>
+                <p className="text-xxs text-muted-foreground">{t('legacy.leaveBlankToUseWorkspaceDefaultInvoiceTiming')}</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">

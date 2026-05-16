@@ -891,7 +891,14 @@ const rw = {
     "enable2faComingSoon": "Gushoboza 2FA (Biza vuba)",
     "momoPaymentGuidance": "BizRent ikoresha MoMo mugutunganya ubwishyu bwabapangayi. Abapangayi bohereza amafaranga kuri Kode yawe yubucuruzi, hanyuma wandike indangamuntu hano. Buri gihe ugenzure umubare nindangamuntu muri porogaramu ya MoMo mbere yo kwemeza ubwishyu hepfo.",
     "assignToUnitOptional": "Shinga Igice (Bihitamo)",
-    "firstMonthlyCycle": "Ukwezi kwambere kwakwezi: {{label}}"
+    "firstMonthlyCycle": "Ukwezi kwambere kwakwezi: {{label}}",
+    "defaultBillingDayHelp": "Uyu niwo munsi uteganijwe kubakodesha badafite ubukode-cycle burenze.",
+    "defaultInvoiceSendTiming": "Inyemezabuguzi isanzwe yohereze igihe",
+    "defaultInvoiceSendTimingHelp": "Umwanya wakazi usanzwe ukoreshwa kubakodesha bose keretse uwukodesha afite ibyo arengaho.",
+    "daysBeforeDueDate": "iminsi mbere yitariki yagenwe",
+    "invoiceSendTiming": "Inyemezabuguzi Kohereza Igihe",
+    "useWorkspaceDefault": "Mburabuzi",
+    "leaveBlankToUseWorkspaceDefaultInvoiceTiming": "Kureka ubusa kugirango ukoreshe umwanya wibanze wa fagitire igihe."
   },
   "countries": {
     "kenya": "Kenya",
