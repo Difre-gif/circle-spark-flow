@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, CalendarClock, BellRing, UploadCloud, Users, Shield, UserPlus, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Loader2, CalendarClock, BellRing, UploadCloud, Shield, UserPlus, AlertTriangle, ChevronRight, RotateCcw, Plus, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,31 @@ import { useOrganisation, useUpdateOrganisation, useNotificationPrefs, useUpdate
 import { InviteStaffModal } from '@/components/layouts/InviteStaffModal';
 import { toast } from 'sonner';
 
+type PolicyForm = {
+  default_due_day: number;
+  grace_period_days: number;
+  days_before_due: number[];
+  days_after_due: number[];
+};
+
+const DEFAULT_POLICY_FORM: PolicyForm = {
+  default_due_day: 1,
+  grace_period_days: 3,
+  days_before_due: [3],
+  days_after_due: [1, 5, 10],
+};
+
+const normalizeDays = (days: number[]) =>
+  [...new Set(days.filter(day => Number.isInteger(day) && day > 0))].sort((a, b) => a - b);
+
+const samePolicy = (a: PolicyForm | null, b: PolicyForm | null) =>
+  !!a &&
+  !!b &&
+  a.default_due_day === b.default_due_day &&
+  a.grace_period_days === b.grace_period_days &&
+  a.days_before_due.join(',') === b.days_before_due.join(',') &&
+  a.days_after_due.join(',') === b.days_after_due.join(',');
+
 export default function Settings() {
   const navigate = useNavigate();
   const { data: org, isLoading: orgLoading } = useOrganisation();
@@ -23,12 +48,10 @@ export default function Settings() {
   const { data: teamMembers } = useTeamMembers();
 
   const [form, setForm] = useState<{ name: string; email: string; phone: string; timezone: string } | null>(null);
-  const [settingsForm, setSettingsForm] = useState<{
-    default_due_day: number;
-    grace_period_days: number;
-    days_before_due: number[];
-    days_after_due: number[];
-  } | null>(null);
+  const [settingsForm, setSettingsForm] = useState<PolicyForm | null>(null);
+  const [savedPolicy, setSavedPolicy] = useState<PolicyForm | null>(null);
+  const [customBeforeDay, setCustomBeforeDay] = useState('');
+  const [customAfterDay, setCustomAfterDay] = useState('');
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
@@ -36,12 +59,14 @@ export default function Settings() {
   useEffect(() => {
     if (!org) return;
     const dbSettings = org.settings as any;
-    setSettingsForm({
-      default_due_day: dbSettings?.billing?.default_due_day || 1,
-      grace_period_days: dbSettings?.billing?.grace_period_days || 3,
-      days_before_due: dbSettings?.reminders?.days_before_due || [3],
-      days_after_due: dbSettings?.reminders?.days_after_due || [1, 5, 10]
-    });
+    const nextPolicy = {
+      default_due_day: dbSettings?.billing?.default_due_day ?? DEFAULT_POLICY_FORM.default_due_day,
+      grace_period_days: dbSettings?.billing?.grace_period_days ?? DEFAULT_POLICY_FORM.grace_period_days,
+      days_before_due: normalizeDays(dbSettings?.reminders?.days_before_due ?? DEFAULT_POLICY_FORM.days_before_due),
+      days_after_due: normalizeDays(dbSettings?.reminders?.days_after_due ?? DEFAULT_POLICY_FORM.days_after_due),
+    };
+    setSettingsForm(nextPolicy);
+    setSavedPolicy(nextPolicy);
     setForm({
       name: org.name ?? '',
       email: org.email ?? '',
@@ -52,11 +77,43 @@ export default function Settings() {
 
   const handleSaveProfile = () => {
     if (!form) return;
+    if (!form.name.trim()) {
+      toast.error('Organisation name is required.');
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+      toast.error('Enter a valid support email address.');
+      return;
+    }
     updateOrg.mutate({ name: form.name, email: form.email, phone: form.phone, timezone: form.timezone });
   };
 
-  const handleSavePolicies = () => {
+  const policyErrors = useMemo(() => {
+    if (!settingsForm) return [];
+    const errors: string[] = [];
+    if (!Number.isInteger(settingsForm.default_due_day) || settingsForm.default_due_day < 1 || settingsForm.default_due_day > 28) {
+      errors.push('Default billing day must be a whole number between 1 and 28.');
+    }
+    if (!Number.isInteger(settingsForm.grace_period_days) || settingsForm.grace_period_days < 0 || settingsForm.grace_period_days > 30) {
+      errors.push('Grace period must be a whole number between 0 and 30 days.');
+    }
+    if (settingsForm.days_before_due.some(day => day < 1 || day > 30)) {
+      errors.push('Pre-due reminders must be between 1 and 30 days before the due date.');
+    }
+    if (settingsForm.days_after_due.some(day => day < 1 || day > 90)) {
+      errors.push('Overdue escalations must be between 1 and 90 days after the due date.');
+    }
+    return errors;
+  }, [settingsForm]);
+
+  const hasUnsavedPolicyChanges = !samePolicy(settingsForm, savedPolicy);
+
+  const handleSavePolicies = async () => {
     if (!settingsForm) return;
+    if (policyErrors.length > 0) {
+      toast.error(policyErrors[0]);
+      return;
+    }
 
     const currentSettings = (org?.settings as any) || {};
     const newSettings = {
@@ -68,19 +125,45 @@ export default function Settings() {
       },
       reminders: {
         ...currentSettings.reminders,
-        days_before_due: settingsForm.days_before_due,
-        days_after_due: settingsForm.days_after_due
+        days_before_due: normalizeDays(settingsForm.days_before_due),
+        days_after_due: normalizeDays(settingsForm.days_after_due)
       }
     };
 
-    updateOrg.mutate({ settings: newSettings } as any);
-    toast.success("Billing policies updated successfully.");
+    try {
+      await updateOrg.mutateAsync({ settings: newSettings } as any);
+    } catch {
+      // useUpdateOrganisation already surfaces the database error via toast.
+    }
   };
 
   const toggleDay = (array: number[], day: number, type: 'before' | 'after') => {
     const newArray = array.includes(day) ? array.filter(d => d !== day) : [...array, day].sort((a, b) => a - b);
     setSettingsForm(prev => prev ? { ...prev, [type === 'before' ? 'days_before_due' : 'days_after_due']: newArray } : null);
   };
+
+  const addCustomDay = (type: 'before' | 'after') => {
+    if (!settingsForm) return;
+    const rawValue = type === 'before' ? customBeforeDay : customAfterDay;
+    const day = Number(rawValue);
+    const max = type === 'before' ? 30 : 90;
+    if (!Number.isInteger(day) || day < 1 || day > max) {
+      toast.error(`Choose a whole number between 1 and ${max}.`);
+      return;
+    }
+    const key = type === 'before' ? 'days_before_due' : 'days_after_due';
+    setSettingsForm({ ...settingsForm, [key]: normalizeDays([...settingsForm[key], day]) });
+    if (type === 'before') setCustomBeforeDay('');
+    else setCustomAfterDay('');
+  };
+
+  const removeDay = (type: 'before' | 'after', day: number) => {
+    if (!settingsForm) return;
+    const key = type === 'before' ? 'days_before_due' : 'days_after_due';
+    setSettingsForm({ ...settingsForm, [key]: settingsForm[key].filter(value => value !== day) });
+  };
+
+  const resetPolicies = () => setSettingsForm(DEFAULT_POLICY_FORM);
 
   const [activeTab, setActiveTab] = useState('organisation');
 
@@ -114,14 +197,14 @@ export default function Settings() {
               <CardTitle className="text-base font-bold text-bizrent-navy">Organisation Profile</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6 px-6">
-              <div className="flex items-center gap-6 mb-8">
+              <div className="flex items-center gap-6 mb-8 opacity-80">
                 <div className="h-20 w-20 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-400 group cursor-pointer hover:border-bizrent-blue hover:text-bizrent-blue transition-colors">
                   <UploadCloud className="h-8 w-8" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-bizrent-navy">Organisation Logo</p>
                   <p className="text-xs font-medium text-slate-500 mt-1 mb-2">Recommended size: 256x256px. Max 2MB.</p>
-                  <Button variant="outline" size="sm" className="rounded-lg font-bold text-xs h-8">Upload Logo</Button>
+                  <Button variant="outline" size="sm" className="rounded-lg font-bold text-xs h-8" disabled>Upload coming soon</Button>
                 </div>
               </div>
 
@@ -182,7 +265,7 @@ export default function Settings() {
                     This will immediately hide your portfolio, disable all staff accounts under this workspace, and stop tenant access.
                   </p>
                 </div>
-                <Button variant="destructive" className="rounded-xl font-bold px-6">Deactivate Workspace</Button>
+                <Button variant="destructive" className="rounded-xl font-bold px-6" disabled>Contact support to deactivate</Button>
               </div>
             </CardContent>
           </Card>
@@ -300,7 +383,7 @@ export default function Settings() {
                           max="28"
                           className="w-20 h-10 rounded-xl font-bold text-center border-border/60 focus-visible:ring-bizrent-blue/20"
                           value={settingsForm.default_due_day}
-                          onChange={e => setSettingsForm({ ...settingsForm, default_due_day: Number(e.target.value) })}
+                          onChange={e => setSettingsForm({ ...settingsForm, default_due_day: e.target.value === '' ? 0 : Number(e.target.value) })}
                         />
                         <span className="text-sm font-medium text-muted-foreground">of the month</span>
                       </div>
@@ -322,7 +405,7 @@ export default function Settings() {
                           max="30"
                           className="w-20 h-10 rounded-xl font-bold text-center border-border/60 focus-visible:ring-bizrent-blue/20"
                           value={settingsForm.grace_period_days}
-                          onChange={e => setSettingsForm({ ...settingsForm, grace_period_days: Number(e.target.value) })}
+                          onChange={e => setSettingsForm({ ...settingsForm, grace_period_days: e.target.value === '' ? -1 : Number(e.target.value) })}
                         />
                         <span className="text-sm font-medium text-muted-foreground">days after due date</span>
                       </div>
@@ -354,8 +437,32 @@ export default function Settings() {
                           </button>
                         ))}
                       </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {settingsForm.days_before_due.map(day => (
+                          <span key={`before-${day}`} className="inline-flex items-center gap-1 rounded-full bg-bizrent-navy/10 px-2.5 py-1 text-xs font-bold text-bizrent-navy">
+                            {day} days
+                            <button type="button" onClick={() => removeDay('before', day)} aria-label={`Remove ${day} day pre-due reminder`}>
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min="1"
+                          max="30"
+                          value={customBeforeDay}
+                          onChange={e => setCustomBeforeDay(e.target.value)}
+                          placeholder="Custom day"
+                          className="h-9 w-28 rounded-xl"
+                        />
+                        <Button type="button" variant="outline" size="sm" className="h-9 rounded-xl" onClick={() => addCustomDay('before')}>
+                          <Plus className="mr-1 h-3.5 w-3.5" /> Add
+                        </Button>
+                      </div>
                       <p className="text-[12px] text-slate-500 font-medium mt-2 leading-relaxed">
-                        Automated email reminders to tenants before the due date.
+                        Automated email reminders to tenants before the due date. Leave empty to disable pre-due reminders.
                       </p>
                     </div>
                   </div>
@@ -381,8 +488,32 @@ export default function Settings() {
                           </button>
                         ))}
                       </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {settingsForm.days_after_due.map(day => (
+                          <span key={`after-${day}`} className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-1 text-xs font-bold text-red-600">
+                            +{day} days
+                            <button type="button" onClick={() => removeDay('after', day)} aria-label={`Remove ${day} day overdue escalation`}>
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min="1"
+                          max="90"
+                          value={customAfterDay}
+                          onChange={e => setCustomAfterDay(e.target.value)}
+                          placeholder="Custom day"
+                          className="h-9 w-28 rounded-xl"
+                        />
+                        <Button type="button" variant="outline" size="sm" className="h-9 rounded-xl" onClick={() => addCustomDay('after')}>
+                          <Plus className="mr-1 h-3.5 w-3.5" /> Add
+                        </Button>
+                      </div>
                       <p className="text-[12px] text-slate-500 font-medium mt-2 leading-relaxed">
-                        Escalating notices sent automatically to overdue tenants.
+                        Escalating notices sent automatically to overdue tenants. Leave empty to disable overdue escalations.
                       </p>
                     </div>
                   </div>
@@ -390,16 +521,32 @@ export default function Settings() {
                 </>
               )}
 
-              <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleSavePolicies} disabled={updateOrg.isPending}>
-                {updateOrg.isPending ? 'Saving...' : 'Save Policies'}
-              </Button>
+              {policyErrors.length > 0 && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  {policyErrors[0]}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90"
+                  onClick={handleSavePolicies}
+                  disabled={updateOrg.isPending || !hasUnsavedPolicyChanges || policyErrors.length > 0}
+                >
+                  {updateOrg.isPending ? 'Saving...' : hasUnsavedPolicyChanges ? 'Save Policies' : 'Policies Saved'}
+                </Button>
+                <Button type="button" variant="outline" className="rounded-xl font-semibold" onClick={resetPolicies} disabled={updateOrg.isPending}>
+                  <RotateCcw className="mr-2 h-4 w-4" /> Reset to defaults
+                </Button>
+                {hasUnsavedPolicyChanges && <span className="text-xs font-bold text-amber-700">Unsaved changes</span>}
+              </div>
             </CardContent>
           </Card>
 
           <Card className="border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-white overflow-hidden">
             <CardHeader className="bg-white border-b border-border/40 pb-4 pt-6 px-6">
-              <CardTitle className="text-base font-bold text-bizrent-navy">Organisation Notifications</CardTitle>
-              <CardDescription className="text-[12px] font-medium">Broadcast alerts affecting the whole organisation.</CardDescription>
+              <CardTitle className="text-base font-bold text-bizrent-navy">My Notification Preferences</CardTitle>
+              <CardDescription className="text-[12px] font-medium">These switches are personal to your account, not organisation-wide policy.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5 pt-6 px-6 pb-6">
               <div className="flex items-center justify-between gap-4">
@@ -416,22 +563,6 @@ export default function Settings() {
                   <p className="text-[12px] font-medium text-slate-500 mt-0.5">Alert when grace period expires</p>
                 </div>
                 <Switch checked={notifPrefs?.overdue_invoices ?? true} onCheckedChange={v => { updateNotifPrefs.mutate({ overdue_invoices: v }); toast.success("Saved"); }} disabled={updateNotifPrefs.isPending} />
-              </div>
-              <Separator className="bg-border/50" />
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-bold text-sm text-bizrent-navy">Receipt Available</p>
-                  <p className="text-[12px] font-medium text-slate-500 mt-0.5">Notify accountants when approved receipts are ready</p>
-                </div>
-                <Switch checked={true} disabled />
-              </div>
-              <Separator className="bg-border/50" />
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-bold text-sm text-bizrent-navy">Subscription Expiring</p>
-                  <p className="text-[12px] font-medium text-slate-500 mt-0.5">Alert 7 days before trial or plan expiration</p>
-                </div>
-                <Switch checked={true} disabled />
               </div>
             </CardContent>
           </Card>
