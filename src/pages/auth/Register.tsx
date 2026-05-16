@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 
 function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
@@ -25,7 +26,7 @@ function getPasswordStrength(pw: string): { score: number; label: string; color:
 }
 
 export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', organisation: '', password: '', confirm: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', organisation: '', country: 'RW', password: '', confirm: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, string>>>({});
@@ -65,6 +66,7 @@ export default function Register() {
             full_name: form.name,
             phone: form.phone || null,
             organisation_name: form.organisation, // Passed to DB trigger
+            country_code: form.country,
           },
         },
       });
@@ -128,6 +130,19 @@ export default function Register() {
               <Label>{t('auth.orgName')} <span className="text-red-500">*</span></Label>
               <Input placeholder="East Africa Homes Ltd" value={form.organisation} onChange={update('organisation')} aria-invalid={!!fieldErrors.organisation} />
               {fieldErrors.organisation && <p className="text-xs text-red-500 mt-1">{fieldErrors.organisation}</p>}
+            </div>
+            <div className="space-y-1">
+              <Label>{t('fields.country')} <span className="text-red-500">*</span></Label>
+              <Select value={form.country} onValueChange={country => setForm(f => ({ ...f, country }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('legacy.selectCountry')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="RW">Rwanda</SelectItem>
+                  <SelectItem value="KE">Kenya</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">{t('legacy.countryHelpsSetTimezone')}</p>
             </div>
             <div className="space-y-1">
               <Label>{t('auth.password')} <span className="text-red-500">*</span></Label>
