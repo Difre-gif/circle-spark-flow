@@ -41,7 +41,12 @@ export function WorkspaceSwitcher({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="w-full h-12 px-2 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white text-white shadow-sm transition-all flex items-center gap-3 outline-none"
+          className={cn(
+            "h-12 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white text-white shadow-sm transition-all flex items-center outline-none",
+            isCollapsed
+              ? "mx-auto w-12 justify-center px-0"
+              : "w-full gap-3 px-2"
+          )}
           aria-label="Switch workspace"
         >
           <div className="h-8 w-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-sm">

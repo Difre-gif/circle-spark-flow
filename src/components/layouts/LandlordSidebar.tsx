@@ -86,7 +86,7 @@ export function LandlordSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r-0 bg-bizrent-navy text-white transition-all duration-300">
       {/* 1. Header: Branding & Org Switcher */}
-      <SidebarHeader className="pt-8 pb-6 px-4">
+      <SidebarHeader className={cn("pt-8 pb-6 transition-all duration-300", isCollapsed ? "px-3" : "px-4")}>
         <div className={cn("px-2 mb-8 transition-all duration-300", isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto")}>
           <BizRentLogo variant="full" size="md" theme="dark" className="text-white" />
         </div>
@@ -146,8 +146,8 @@ export function LandlordSidebar() {
       </SidebarHeader>
 
       {/* 2. Primary Navigation */}
-      <SidebarContent className="px-2">
-        <SidebarMenu className="gap-1 mt-2">
+      <SidebarContent className={cn("transition-all duration-300", isCollapsed ? "px-3" : "px-2")}>
+        <SidebarMenu className={cn("mt-2", isCollapsed ? "gap-3" : "gap-1")}>
           {navigationItems.map((item) => {
             // Updated logic to ensure top-level match doesn't falsely trigger for sub-routes if it's the exact Dashboard route
             const isActive = location.pathname === item.url || (item.url !== '/landlord' && location.pathname.startsWith(item.url));
@@ -160,10 +160,18 @@ export function LandlordSidebar() {
                   tooltip={item.title}
                   className={cn(
                     "relative w-full py-6 transition-all rounded-2xl group",
+                    isCollapsed && "group-data-[collapsible=icon]:!size-12 group-data-[collapsible=icon]:!p-0",
                     isActive ? "bg-bizrent-blue/20 text-white" : "text-white/70 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  <NavLink to={item.url} end={item.url === '/landlord'} className="flex items-center gap-3 w-full h-full px-4">
+                  <NavLink
+                    to={item.url}
+                    end={item.url === '/landlord'}
+                    className={cn(
+                      "flex items-center w-full h-full",
+                      isCollapsed ? "justify-center px-0" : "gap-3 px-4"
+                    )}
+                  >
                     <item.icon className={cn("h-5 w-5 shrink-0 transition-transform group-hover:scale-110", isActive ? "text-bizrent-blue" : "text-white/60 group-hover:text-white")} strokeWidth={isActive ? 2.5 : 1.5} />
                     {!isCollapsed && <span className="text-sm font-bold tracking-tight">{item.title}</span>}
                     
@@ -183,7 +191,12 @@ export function LandlordSidebar() {
                     )}
                     
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-bizrent-blue rounded-r-full shadow-[0_0_12px_rgba(30,64,175,0.4)]" />
+                      <div className={cn(
+                        "absolute top-1/2 -translate-y-1/2 bg-bizrent-blue shadow-[0_0_12px_rgba(30,64,175,0.4)]",
+                        isCollapsed
+                          ? "left-[-0.75rem] h-7 w-1 rounded-r-full"
+                          : "left-0 h-8 w-1 rounded-r-full"
+                      )} />
                     )}
                   </NavLink>
                 </SidebarMenuButton>
@@ -194,11 +207,14 @@ export function LandlordSidebar() {
       </SidebarContent>
 
       {/* 3. Footer: User Anchor */}
-      <SidebarFooter className="p-4 border-t border-white/10 bg-black/10">
+      <SidebarFooter className={cn("border-t border-white/10 bg-black/10 transition-all duration-300", isCollapsed ? "p-3" : "p-4")}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className={cn("flex items-center gap-3 w-full cursor-pointer hover:bg-white/10 p-2 rounded-xl transition-colors", isCollapsed && "justify-center p-0")}>
-              <div className="h-10 w-10 rounded-2xl bg-white text-bizrent-navy flex items-center justify-center font-bold shrink-0 shadow-lg shadow-black/20 relative group transition-transform hover:scale-105 active:scale-95">
+            <div className={cn("flex items-center gap-3 w-full cursor-pointer hover:bg-white/10 p-2 rounded-xl transition-colors", isCollapsed && "justify-center p-0 hover:bg-transparent")}>
+              <div className={cn(
+                "rounded-2xl bg-white text-bizrent-navy flex items-center justify-center font-bold shrink-0 shadow-lg shadow-black/20 relative group transition-transform hover:scale-105 active:scale-95",
+                isCollapsed ? "h-12 w-12" : "h-10 w-10"
+              )}>
                 {getInitials(user?.name)}
                 <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-green-500 border-[3px] border-bizrent-navy rounded-full transition-transform group-hover:scale-110" />
               </div>
