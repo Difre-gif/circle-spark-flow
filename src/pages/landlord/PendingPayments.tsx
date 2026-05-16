@@ -112,8 +112,7 @@ export default function PendingPayments() {
           <div className="flex-1 pr-8">
             <h3 className="font-bold text-bizrent-navy dark:text-white text-sm mb-1">{t('legacy.howMtnMobileMoneyMomoPaymentsWork')}</h3>
             <p className="text-sm text-muted-foreground">
-              BizRent uses MoMo to process tenant payments. Tenants send funds to your Merchant Code, then enter the Transaction ID here. 
-              Always verify the amount and Transaction ID in your MoMo app before approving a payment below.
+              {t('legacy.momoPaymentGuidance')}
             </p>
             <Button variant="link" className="p-0 h-auto font-bold text-bizrent-navy dark:text-white text-xs mt-2" onClick={() => console.log('Help Article')}>
               {t('legacy.readFullGuide')} <ChevronRight className="h-3 w-3 ml-1" />

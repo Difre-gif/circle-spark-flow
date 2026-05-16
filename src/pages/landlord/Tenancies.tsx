@@ -26,15 +26,15 @@ export default function Tenancies() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(tenancies ?? []).map(t => (
-                <TableRow key={t.id}>
-                  <TableCell className="font-medium">{(t.tenant as any)?.full_name ?? '—'}</TableCell>
-                  <TableCell>{(t.unit as any)?.unit_number ?? '—'}</TableCell>
-                  <TableCell>{(t.unit as any)?.property?.name ?? '—'}</TableCell>
-                  <TableCell className="text-sm">{formatDate(t.start_date)}</TableCell>
-                  <TableCell className="font-mono">{formatRWF(t.agreed_rent)}</TableCell>
-                  <TableCell className="font-mono">{formatRWF(t.deposit_amount)}</TableCell>
-                  <TableCell><StatusBadge status={t.status} /></TableCell>
+              {(tenancies ?? []).map(tenancy => (
+                <TableRow key={tenancy.id}>
+                  <TableCell className="font-medium">{(tenancy.tenant as any)?.full_name ?? '—'}</TableCell>
+                  <TableCell>{(tenancy.unit as any)?.unit_number ?? '—'}</TableCell>
+                  <TableCell>{(tenancy.unit as any)?.property?.name ?? '—'}</TableCell>
+                  <TableCell className="text-sm">{formatDate(tenancy.start_date)}</TableCell>
+                  <TableCell className="font-mono">{formatRWF(tenancy.agreed_rent)}</TableCell>
+                  <TableCell className="font-mono">{formatRWF(tenancy.deposit_amount)}</TableCell>
+                  <TableCell><StatusBadge status={tenancy.status} /></TableCell>
                 </TableRow>
               ))}
               {(!tenancies || tenancies.length === 0) && <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">{t('legacy.noTenanciesFound')}</TableCell></TableRow>}

@@ -221,7 +221,7 @@ export default function Units() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="font-semibold text-bizrent-navy dark:text-white">Monthly Rent (RWF)</Label>
+              <Label className="font-semibold text-bizrent-navy dark:text-white">{t('legacy.monthlyRentRwf')}</Label>
               <Input type="number" placeholder="e.g. 300000" value={form.monthly_rent || ''} onChange={e => setForm(f => ({ ...f, monthly_rent: Number(e.target.value) }))} className="focus-visible:ring-bizrent-blue/20 font-mono" />
             </div>
           </div>
@@ -263,7 +263,7 @@ export default function Units() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="font-semibold text-bizrent-navy dark:text-white">Monthly Rent (RWF)</Label>
+                <Label className="font-semibold text-bizrent-navy dark:text-white">{t('legacy.monthlyRentRwf')}</Label>
                 <Input type="number" value={editTarget.monthly_rent || ''} onChange={e => setEditTarget(t => t ? { ...t, monthly_rent: Number(e.target.value) } : t)} className="focus-visible:ring-bizrent-blue/20 font-mono" />
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function Units() {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-bizrent-navy dark:text-white">{t('legacy.deleteUnit')}</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground mt-1">
-              {t('legacy.areYouSureYouWantToDelete')} <strong>{deleteTarget?.name}</strong>? This action cannot be undone.
+              {t('legacy.areYouSureYouWantToDelete')} <strong>{deleteTarget?.name}</strong>? {t('legacy.thisActionCannotBeUndone')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 mt-2">

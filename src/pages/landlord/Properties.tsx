@@ -267,7 +267,7 @@ export default function Properties() {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-bizrent-navy dark:text-white">{t('legacy.removeProperty')}</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground mt-1">
-              {t('legacy.areYouSureYouWantToRemove')} <strong>{deleteTarget?.name}</strong>? It will be hidden from your portfolio but data will be retained.
+              {t('legacy.areYouSureYouWantToRemove')} <strong>{deleteTarget?.name}</strong>? {t('legacy.hiddenFromYourPortfolioButDataWillBeRetained')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 mt-2">

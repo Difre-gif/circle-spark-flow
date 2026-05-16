@@ -100,7 +100,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
 
           <div className="space-y-2">
             <Label htmlFor="unit" className="text-sm font-bold text-bizrent-navy dark:text-white ml-1 flex items-center gap-1.5">
-              <Home className="h-3.5 w-3.5" /> Assign to Unit (Optional)
+              <Home className="h-3.5 w-3.5" /> {t('legacy.assignToUnitOptional')}
             </Label>
             <Select value={unitId} onValueChange={value => {
               setUnitId(value);
@@ -151,7 +151,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
               </div>
               {cyclePreview && (
                 <p className="text-xs font-semibold text-bizrent-navy dark:text-white">
-                  First monthly cycle: <span className="text-bizrent-blue">{cyclePreview.label}</span>
+                  {t('legacy.firstMonthlyCycle', { label: cyclePreview.label })}
                 </p>
               )}
             </div>

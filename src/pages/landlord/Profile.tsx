@@ -299,10 +299,10 @@ export default function Profile() {
           <Separator />
 
           <div>
-            <h3 className="font-bold text-bizrent-navy dark:text-white mb-1 text-sm">Two-Factor Authentication (2FA)</h3>
+            <h3 className="font-bold text-bizrent-navy dark:text-white mb-1 text-sm">{t('legacy.twoFactorAuthentication2fa')}</h3>
             <p className="text-[12px] text-muted-foreground mb-4">{t('legacy.addAnExtraLayerOfSecurityToYourAccount')}</p>
             <Button variant="outline" className="rounded-xl font-semibold h-10 border-border/60" disabled>
-              <Smartphone className="h-4 w-4 mr-2" /> Enable 2FA (Coming Soon)
+              <Smartphone className="h-4 w-4 mr-2" /> {t('legacy.enable2faComingSoon')}
             </Button>
           </div>
         </CardContent>

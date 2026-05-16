@@ -43,8 +43,8 @@ export default function Tenants() {
 
   const availableUnits = (units ?? []).filter(u => u.status === 'VACANT');
 
-  const filtered = (tenants ?? []).filter(t => {
-    const user = t.user as any;
+  const filtered = (tenants ?? []).filter(tenant => {
+    const user = tenant.user as any;
     return user?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
            user?.email?.toLowerCase().includes(search.toLowerCase());
   });
@@ -62,9 +62,9 @@ export default function Tenants() {
           </p>
           <h1 className="page-title text-3xl font-extrabold text-bizrent-navy dark:text-white tracking-tight">{t('legacy.tenantsDirectory')}</h1>
           <p className="page-description font-medium text-muted-foreground">
-            {tenants?.length === 0 
-              ? "No tenants yet — add someone to your workspace"
-              : `Manage your ${tenants?.length} active tenant${tenants?.length === 1 ? '' : 's'}`}
+            {tenants?.length === 0
+              ? t('legacy.noTenantsYetAddSomeoneToYourWorkspace')
+              : t('legacy.manageYourActiveTenants', { count: tenants?.length ?? 0 })}
           </p>
         </div>
         <Button 
@@ -83,7 +83,7 @@ export default function Tenants() {
           <div className="flex items-center max-w-sm relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-bizrent-blue" />
             <Input 
-              placeholder="Search by name or email..." 
+              placeholder={t('legacy.searchByNameOrEmail')}
               value={search} 
               onChange={e => setSearch(e.target.value)} 
               className="pl-11 h-11 rounded-xl bg-card border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20/20 text-sm font-medium transition-all" 
@@ -103,10 +103,10 @@ export default function Tenants() {
                     </tr>
                   </thead>
                   <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
-                    {filtered.map(t => {
-                      const user = t.user as any;
+                    {filtered.map(tenant => {
+                      const user = tenant.user as any;
                       return (
-                        <tr key={t.user_id} className="transition-all hover:bg-card border-b border-border/10 group">
+                        <tr key={tenant.user_id} className="transition-all hover:bg-card border-b border-border/10 group">
                           <td className="px-8 py-5">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-xl bg-bizrent-blue/10 text-bizrent-blue flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-all">
@@ -121,7 +121,7 @@ export default function Tenants() {
                               <span className="text-xs font-bold text-bizrent-slate">{user?.phone ?? '—'}</span>
                             </div>
                           </td>
-                          <td className="px-8 py-5 text-muted-foreground text-xs font-bold">{formatDate(t.created_at)}</td>
+                          <td className="px-8 py-5 text-muted-foreground text-xs font-bold">{formatDate(tenant.created_at)}</td>
                           <td className="px-8 py-5 text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -201,7 +201,7 @@ export default function Tenants() {
                         </div>
                         <div className="flex items-center gap-1.5 text-xxs font-semibold text-muted-foreground">
                           <Mail className="h-3 w-3" />
-                          Invited {formatDate(inv.created_at)}
+                          {t('legacy.invitedOn', { date: formatDate(inv.created_at) })}
                         </div>
                         <div className="absolute right-2 top-2 bottom-2 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                           <Tooltip>
@@ -265,7 +265,7 @@ export default function Tenants() {
               disabled={removeTenant.isPending}
             >
               {removeTenant.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {removeTenant.isPending ? 'Removing...' : 'Remove Tenant'}
+              {removeTenant.isPending ? t('legacy.removing') : t('legacy.removeTenant')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -336,7 +336,7 @@ export default function Tenants() {
                 {editTenantTarget?.unit_id && (
                   <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-muted-foreground ml-1">Agreed Monthly Rent (RWF)</Label>
+                      <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.agreedMonthlyRentRwf')}</Label>
                       <Input 
                         type="number"
                         placeholder="Agreed rent" 
@@ -412,7 +412,7 @@ export default function Tenants() {
                       <p className="text-xxs text-muted-foreground leading-tight ml-1 mt-1">{t('legacy.theCycleEndIsDerivedAsTheDayBeforeTheNextCycleStarts')}</p>
                       {editTenantTarget?.start_date && editTenantTarget?.period_anchor_day && getCyclePreview(editTenantTarget.start_date, editTenantTarget.period_anchor_day) && (
                         <p className="text-xs font-bold text-bizrent-blue ml-1 mt-2">
-                          First cycle: {getCyclePreview(editTenantTarget.start_date, editTenantTarget.period_anchor_day)?.label}
+                          {t('legacy.firstCycle', { label: getCyclePreview(editTenantTarget.start_date, editTenantTarget.period_anchor_day)?.label })}
                         </p>
                       )}
                     </div>
@@ -454,7 +454,7 @@ export default function Tenants() {
               disabled={updateTenant.isPending || createTenancy.isPending || !editTenantTarget?.name.trim()}
             >
               {(updateTenant.isPending || createTenancy.isPending) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {(updateTenant.isPending || createTenancy.isPending) ? 'Updating...' : 'Save Profile'}
+              {(updateTenant.isPending || createTenancy.isPending) ? t('legacy.updating') : t('legacy.saveProfile')}
             </Button>
           </DialogFooter>
         </DialogContent>
