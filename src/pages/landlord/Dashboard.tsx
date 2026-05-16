@@ -23,6 +23,9 @@ export default function LandlordDashboard() {
   const { data: overdueInvoices } = useInvoices({ status: 'OVERDUE' });
   const { data: invitations } = useInvitations();
   const { data: allInvoices } = useInvoices();
+  const overdueInvoiceCount = overdueInvoices?.length ?? 0;
+  const hasOutstandingBalance = (stats?.outstanding ?? 0) > 0;
+  const hasOverdueInvoices = overdueInvoiceCount > 0;
 
   // Granular loading per widget instead of a global blocker
   // const isLoading = statsLoading || paymentsLoading || occLoading;
@@ -185,13 +188,18 @@ export default function LandlordDashboard() {
                 </h2>
               )}
 
-              {!statsLoading && (stats?.outstanding ?? 0) > 0 ? (
+              {!statsLoading && hasOverdueInvoices ? (
                 <p className="text-xs font-bold text-bizrent-red mt-3 bg-bizrent-red/10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-bizrent-red opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-bizrent-red"></span>
                   </span>
-                  Overdue Rent
+                  {overdueInvoiceCount} Overdue Invoice{overdueInvoiceCount !== 1 ? 's' : ''}
+                </p>
+              ) : !statsLoading && hasOutstandingBalance ? (
+                <p className="text-xs font-bold text-amber-700 mt-3 bg-amber-100 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
+                  <span className="inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  Outstanding Balance
                 </p>
               ) : !statsLoading ? (
                 <p className="text-xs font-bold text-bizrent-emerald mt-3 bg-bizrent-emerald/10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
@@ -203,8 +211,8 @@ export default function LandlordDashboard() {
                 <Button 
                   className="w-full rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-sm disabled:opacity-50"
                   onClick={() => setReminderOpen(true)}
-                  disabled={!overdueInvoices || overdueInvoices.length === 0}
-                  title={(!overdueInvoices || overdueInvoices.length === 0) ? "No tenants with outstanding balances" : undefined}
+                  disabled={!hasOverdueInvoices}
+                  title={!hasOverdueInvoices ? "No overdue invoices to remind" : undefined}
                 >
                   <Send className="mr-2 h-4 w-4" /> Send Reminders
                 </Button>
