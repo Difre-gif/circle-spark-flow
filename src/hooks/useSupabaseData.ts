@@ -614,7 +614,7 @@ export function useReceipts(tenantUserId?: string) {
     queryFn: async () => {
       let q = supabase
         .from('receipts')
-        .select('*, invoice:invoices!receipts_invoice_id_fkey(invoice_number, billing_period_start, amount_due), tenant:users!receipts_tenant_user_id_fkey(full_name), unit:invoices!receipts_invoice_id_fkey(unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
+        .select('*, invoice:invoices!receipts_invoice_id_fkey(invoice_number, billing_period_start, billing_period_end, amount_due), payment:payments!receipts_payment_id_fkey(amount, payment_method, transaction_id), tenant:users!receipts_tenant_user_id_fkey(full_name), unit:invoices!receipts_invoice_id_fkey(unit:units!invoices_unit_id_fkey(unit_number, property:properties!units_property_id_fkey(name)))')
         .order('generated_at', { ascending: false });
       if (orgId) q = q.eq('org_id', orgId);
       if (tenantUserId) q = q.eq('tenant_user_id', tenantUserId);

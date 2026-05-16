@@ -3,18 +3,20 @@ import { Loader2, Download, Search, FileCheck, Filter, CalendarIcon, ChevronRigh
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useReceipts, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { useOrganisation, useReceipts, formatRWF, formatDate } from '@/hooks/useSupabaseData';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { downloadReceiptPdf } from '@/lib/receiptPdf';
 
 export default function Receipts() {
   const [search, setSearch] = useState('');
   const [dateRange, setDateRange] = useState<Date | undefined>(undefined);
   const { data: receipts, isLoading } = useReceipts();
+  const { data: organisation } = useOrganisation();
 
   const filtered = (receipts ?? []).filter(r => {
     const matchesSearch = r.receipt_number.toLowerCase().includes(search.toLowerCase()) ||
@@ -137,7 +139,7 @@ export default function Receipts() {
                       {(r.tenant as any)?.full_name ?? '—'}
                     </td>
                     <td className="px-4 py-5 text-right font-extrabold text-bizrent-navy font-mono">
-                      {formatRWF((r.invoice as any)?.amount_paid ?? 0)}
+                      {formatRWF((r.payment as any)?.amount ?? 0)}
                     </td>
                     <td className="px-4 py-5 text-center">
                       <StatusBadge status="PAID" />
@@ -146,7 +148,12 @@ export default function Receipts() {
                       {formatDate(r.generated_at)}
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-bizrent-navy hover:text-white transition-colors">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-lg hover:bg-bizrent-navy hover:text-white transition-colors"
+                        onClick={() => downloadReceiptPdf(r as any, organisation?.name)}
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
                     </td>

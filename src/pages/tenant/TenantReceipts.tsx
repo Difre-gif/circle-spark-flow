@@ -3,11 +3,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useReceipts, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { useOrganisation, useReceipts, formatDate } from '@/hooks/useSupabaseData';
+import { downloadReceiptPdf } from '@/lib/receiptPdf';
 
 export default function TenantReceipts() {
   const { user } = useAuth();
   const { data: receipts, isLoading } = useReceipts(user?.id);
+  const { data: organisation } = useOrganisation();
 
   if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
@@ -24,7 +26,11 @@ export default function TenantReceipts() {
                   <TableCell className="font-extrabold text-bizrent-navy font-mono">BR-2026-{r.receipt_number.split("-").pop()}</TableCell>
                   <TableCell>{(r.invoice as any)?.invoice_number ?? '—'}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{formatDate(r.generated_at)}</TableCell>
-                  <TableCell><Button size="sm" variant="outline"><Download className="mr-1 h-3 w-3" /> PDF</Button></TableCell>
+                  <TableCell>
+                    <Button size="sm" variant="outline" onClick={() => downloadReceiptPdf(r as any, organisation?.name)}>
+                      <Download className="mr-1 h-3 w-3" /> PDF
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
               {(!receipts || receipts.length === 0) && <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No receipts yet</TableCell></TableRow>}
