@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -17,6 +18,7 @@ interface PlatformSetting {
 }
 
 export default function GlobalConfig() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<PlatformSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -68,20 +70,20 @@ export default function GlobalConfig() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
           <Settings className="text-indigo-600" size={32} />
-          Global Platform Configuration
+          {t('legacy.globalPlatformConfiguration')}
         </h1>
-        <p className="text-slate-500 font-medium italic">Platform-wide feature flags and operational controls — changes take effect immediately.</p>
+        <p className="text-muted-foreground font-medium italic">{t('legacy.platformWideFeatureFlagsAndOperationalControlsChangesTakeEffectImmedia')}</p>
       </div>
 
       <Card className="border-none shadow-md rounded-[2.5rem] overflow-hidden">
         <CardHeader className="bg-slate-900 p-8 pb-6">
           <CardTitle className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
             <div className="h-4 w-1 bg-indigo-400 rounded-full" />
-            System Controls
+            {t('legacy.systemControls')}
           </CardTitle>
-          <CardDescription className="text-slate-400 font-medium italic">All changes are logged in the Sovereign Audit Trail.</CardDescription>
+          <CardDescription className="text-muted-foreground font-medium italic">{t('legacy.allChangesAreLoggedInTheSovereignAuditTrail')}</CardDescription>
         </CardHeader>
         <CardContent className="p-8">
           {loading ? (
@@ -98,19 +100,19 @@ export default function GlobalConfig() {
                 return (
                   <div
                     key={setting.id}
-                    className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl border transition-all ${isDanger ? 'border-amber-200 bg-amber-50/30' : 'border-slate-100 bg-white'} shadow-sm`}
+                    className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl border transition-all ${isDanger ? 'border-amber-200 bg-amber-50/30' : 'border-border bg-white'} shadow-sm`}
                   >
                     <div className="flex flex-col gap-1.5 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-black text-slate-900 font-mono text-sm">{setting.key}</span>
+                        <span className="font-black text-foreground font-mono text-sm">{setting.key}</span>
                         {isDanger && (
                           <Badge className="bg-amber-500 text-white border-none text-xxxs uppercase font-black px-1.5 py-0.5 rounded-md tracking-tighter gap-1">
-                            <AlertTriangle size={8} /> High Impact
+                            <AlertTriangle size={8} /> {t('legacy.highImpact')}
                           </Badge>
                         )}
-                        <Badge variant="outline" className="text-slate-400 border-slate-100 text-xxxs uppercase tracking-widest font-black">{setting.type}</Badge>
+                        <Badge variant="outline" className="text-muted-foreground border-border text-xxxs uppercase tracking-widest font-black">{setting.type}</Badge>
                       </div>
-                      <p className="text-slate-500 text-xs font-medium">{setting.description}</p>
+                      <p className="text-muted-foreground text-xs font-medium">{setting.description}</p>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -118,7 +120,7 @@ export default function GlobalConfig() {
                         <button
                           onClick={() => toggleBoolean(setting)}
                           disabled={saving === setting.key}
-                          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}`}
+                          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-muted-foreground'}`}
                         >
                           {saving === setting.key ? (
                             <Loader2 size={16} className="animate-spin" />
@@ -135,7 +137,7 @@ export default function GlobalConfig() {
                             type="number"
                             value={currentVal}
                             onChange={(e) => setEdited(prev => ({ ...prev, [setting.key]: e.target.value }))}
-                            className="w-28 h-10 rounded-xl border-slate-200 text-center font-bold text-lg"
+                            className="w-28 h-10 rounded-xl border-border text-center font-bold text-lg"
                           />
                           <Button
                             size="sm"

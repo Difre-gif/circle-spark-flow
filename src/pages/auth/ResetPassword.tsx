@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BizRentLogo } from '@/components/BizRentLogo';
@@ -9,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -62,8 +64,8 @@ export default function ResetPassword() {
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center"><BizRentLogo size="lg" className="text-primary" /></div>
           <div>
-            <CardTitle className="text-2xl">Set new password</CardTitle>
-            <CardDescription>Enter your new password below</CardDescription>
+            <CardTitle className="text-2xl">{t('legacy.setNewPassword')}</CardTitle>
+            <CardDescription>{t('legacy.enterNewPasswordBelow')}</CardDescription>
           </div>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -73,8 +75,8 @@ export default function ResetPassword() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <div className="space-y-2"><Label>New Password</Label><Input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required /></div>
-            <div className="space-y-2"><Label>Confirm Password</Label><Input type="password" placeholder="••••••••" value={confirm} onChange={e => setConfirm(e.target.value)} required /></div>
+            <div className="space-y-2"><Label>{t('legacy.newPassword')}</Label><Input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required /></div>
+            <div className="space-y-2"><Label>{t('legacy.confirmPassword')}</Label><Input type="password" placeholder="••••••••" value={confirm} onChange={e => setConfirm(e.target.value)} required /></div>
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" disabled={loading}>

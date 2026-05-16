@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, Users, Shield, Plus, Trash2, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,7 @@ function InlineRentEdit({ unit, updateUnit }: { unit: any, updateUnit: any }) {
   }
   
   return (
-    <div className="flex items-center gap-2 group cursor-pointer hover:bg-slate-50 p-1.5 -ml-1.5 rounded-lg transition-colors w-fit" onClick={() => setIsEditing(true)}>
+    <div className="flex items-center gap-2 group cursor-pointer hover:bg-muted/40 p-1.5 -ml-1.5 rounded-lg transition-colors w-fit" onClick={() => setIsEditing(true)}>
       <span className="font-bold text-bizrent-slate font-mono font-bold">{formatRWF(unit.monthly_rent)}</span>
       <Edit2 className="h-3.5 w-3.5 text-bizrent-blue opacity-0 group-hover:opacity-100 transition-opacity" />
     </div>
@@ -40,6 +41,7 @@ function InlineRentEdit({ unit, updateUnit }: { unit: any, updateUnit: any }) {
 }
 
 export default function PropertyDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, orgRole, isSuperAdmin } = useAuth();
@@ -55,8 +57,8 @@ export default function PropertyDetail() {
   const [selectedMgr, setSelectedMgr] = useState<string>('');
   const updateUnit = useUpdateUnit();
 
-  if (propLoading || unitsLoading || mgrLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-bizrent-navy" /></div>;
-  if (!property) return <div className="text-center py-12 text-muted-foreground">Property not found</div>;
+  if (propLoading || unitsLoading || mgrLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-bizrent-navy dark:text-white" /></div>;
+  if (!property) return <div className="text-center py-12 text-muted-foreground">{t('legacy.propertyNotFound')}</div>;
 
   const occupiedCount = units?.filter(u => u.status === 'OCCUPIED').length ?? 0;
   const totalCount = units?.length ?? 0;
@@ -68,13 +70,13 @@ export default function PropertyDetail() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between gap-4 bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] border border-slate-100">
+      <div className="flex items-center justify-between gap-4 bg-card p-6 rounded-[2rem] shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] border border-border">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full bg-slate-50 hover:bg-slate-100 shrink-0" onClick={() => navigate('/landlord/properties')}>
-            <ArrowLeft className="h-5 w-5 text-bizrent-navy" />
+          <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full bg-muted/40 hover:bg-muted shrink-0" onClick={() => navigate('/landlord/properties')}>
+            <ArrowLeft className="h-5 w-5 text-bizrent-navy dark:text-white" />
           </Button>
           <div>
-            <h1 className="text-2xl font-extrabold text-bizrent-navy">{property.name}</h1>
+            <h1 className="text-2xl font-extrabold text-bizrent-navy dark:text-white">{property.name}</h1>
             <p className="text-sm text-muted-foreground font-medium flex items-center gap-2 mt-1">
               <span>{property.address_line1}, {property.district}, {property.city}</span>
               <span className="h-1 w-1 rounded-full bg-slate-300"></span>
@@ -88,13 +90,13 @@ export default function PropertyDetail() {
       <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
         <Card className="rounded-[2rem] border-0 shadow-sm bg-indigo-50/50">
           <CardContent className="p-6 flex flex-col justify-center h-full">
-            <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Total Units</p>
+            <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">{t('legacy.totalUnits')}</p>
             <p className="text-4xl font-extrabold text-indigo-950">{totalCount}</p>
           </CardContent>
         </Card>
         <Card className="rounded-[2rem] border-0 shadow-sm bg-emerald-50/50">
           <CardContent className="p-6 flex flex-col justify-center h-full">
-            <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-1">Occupied</p>
+            <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-1">{t('legacy.occupied')}</p>
             <div className="flex items-baseline gap-2">
               <p className="text-4xl font-extrabold text-emerald-900">{occupiedCount}</p>
               <p className="text-sm font-semibold text-emerald-600/70">/ {totalCount}</p>
@@ -103,7 +105,7 @@ export default function PropertyDetail() {
         </Card>
         <Card className="rounded-[2rem] border-0 shadow-sm bg-blue-50/50">
           <CardContent className="p-6 flex flex-col justify-center h-full">
-            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Occupancy Rate</p>
+            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">{t('legacy.occupancyRate')}</p>
             <div className="flex items-baseline gap-1">
               <p className="text-4xl font-extrabold text-bizrent-blue">{totalCount > 0 ? Math.round((occupiedCount / totalCount) * 100) : 0}</p>
               <p className="text-xl font-bold text-bizrent-blue/50">%</p>
@@ -113,26 +115,26 @@ export default function PropertyDetail() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="xl:col-span-2 rounded-[2rem] border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden">
+        <Card className="xl:col-span-2 rounded-[2rem] border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card overflow-hidden">
           <CardHeader className="px-8 pt-8 pb-4">
-            <CardTitle className="text-lg font-bold text-bizrent-navy">Units</CardTitle>
+            <CardTitle className="text-lg font-bold text-bizrent-navy dark:text-white">{t('legacy.units')}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50 hover:bg-white border-b border-border/40">
-                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground px-8 py-4">Unit</TableHead>
-                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground py-4">Type</TableHead>
-                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground py-4">Monthly Rent</TableHead>
-                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground px-8 py-4 text-right">Status</TableHead>
+                  <TableRow className="bg-muted/40 hover:bg-card border-b border-border/40">
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground px-8 py-4">{t('legacy.unit')}</TableHead>
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground py-4">{t('legacy.type')}</TableHead>
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground py-4">{t('legacy.monthlyRent')}</TableHead>
+                    <TableHead className="font-bold text-xxs uppercase tracking-widest text-muted-foreground px-8 py-4 text-right">{t('legacy.status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {(units ?? []).map(u => (
                     <TableRow key={u.id} className="border-b border-border/20 transition-colors hover:bg-muted/20">
                       <TableCell className="px-8 py-4">
-                        <div className="font-bold text-bizrent-navy">{u.unit_number}</div>
+                        <div className="font-bold text-bizrent-navy dark:text-white">{u.unit_number}</div>
                         {u.floor && <div className="text-xxs font-semibold text-muted-foreground">Floor {u.floor}</div>}
                       </TableCell>
                       <TableCell className="font-medium text-muted-foreground text-xs">{u.unit_type}</TableCell>
@@ -144,7 +146,7 @@ export default function PropertyDetail() {
                   ))}
                   {(!units || units.length === 0) && (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12 text-muted-foreground font-medium">No units found for this property</TableCell>
+                      <TableCell colSpan={4} className="text-center py-12 text-muted-foreground font-medium">{t('legacy.noUnitsFoundForThisProperty')}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -154,14 +156,14 @@ export default function PropertyDetail() {
         </Card>
 
         {/* Assigned Property Managers Section */}
-        <Card className="rounded-[2rem] border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
+        <Card className="rounded-[2rem] border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
           <CardHeader className="px-6 pt-6 pb-2">
-            <CardTitle className="text-md font-bold text-bizrent-navy flex items-center gap-2">
+            <CardTitle className="text-md font-bold text-bizrent-navy dark:text-white flex items-center gap-2">
               <Shield className="h-4 w-4 text-bizrent-blue" />
-              Property Managers
+              {t('legacy.propertyManagers')}
             </CardTitle>
             <CardDescription className="text-xs font-medium text-muted-foreground mt-1">
-              Staff with isolated access to this building.
+              {t('legacy.staffWithIsolatedAccessToThisBuilding')}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
@@ -170,13 +172,13 @@ export default function PropertyDetail() {
                 {managers!.map(mgr => {
                   const u = mgr.user as any;
                   return (
-                    <div key={mgr.user_id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-border/50 group">
+                    <div key={mgr.user_id} className="flex items-center justify-between p-3 rounded-xl bg-muted/40 border border-border/50 group">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-full bg-bizrent-blue/10 text-bizrent-blue flex items-center justify-center font-bold text-xs">
                           {u?.full_name?.charAt(0) || 'M'}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-bizrent-navy leading-none">{u?.full_name}</p>
+                          <p className="text-xs font-bold text-bizrent-navy dark:text-white leading-none">{u?.full_name}</p>
                           <p className="text-xxs font-medium text-muted-foreground mt-0.5">{u?.email}</p>
                         </div>
                       </div>
@@ -196,10 +198,10 @@ export default function PropertyDetail() {
                 })}
               </div>
             ) : (
-              <div className="text-center py-6 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
+              <div className="text-center py-6 px-4 bg-muted/40 border border-dashed border-border rounded-xl">
                 <Users className="h-6 w-6 text-slate-300 mx-auto mb-2" />
-                <p className="text-xs font-bold text-slate-500">No managers assigned</p>
-                <p className="text-xxs text-slate-400 mt-1">Owners can see everything.</p>
+                <p className="text-xs font-bold text-muted-foreground">{t('legacy.noManagersAssigned')}</p>
+                <p className="text-xxs text-muted-foreground mt-1">{t('legacy.ownersCanSeeEverything')}</p>
               </div>
             )}
 
@@ -211,7 +213,7 @@ export default function PropertyDetail() {
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
                     {eligibleTeam.length === 0 ? (
-                      <SelectItem value="none" disabled className="text-xs font-medium">No available managers</SelectItem>
+                      <SelectItem value="none" disabled className="text-xs font-medium">{t('legacy.noAvailableManagers')}</SelectItem>
                     ) : (
                       eligibleTeam.map(team => {
                         const u = team.user as any;

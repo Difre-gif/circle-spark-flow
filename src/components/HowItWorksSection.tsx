@@ -14,7 +14,7 @@ interface StepCardProps {
 const StepCard: React.FC<StepCardProps> = ({ stepNumber, icon: Icon, iconColor, title, description, staggerDelay }) => {
   return (
     <motion.div
-      className="relative bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100/50"
+      className="relative bg-card rounded-2xl p-8 text-center shadow-sm border border-gray-100/50"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -58,7 +58,7 @@ const HowItWorksSection: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-24 bg-white">
+    <section id="how-it-works" className="py-24 bg-card">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Section Header */}
         <motion.div
@@ -118,7 +118,7 @@ const HowItWorksSection: React.FC = () => {
 
           {/* Phone 1: Tenant submit */}
           <div className="relative w-64 h-auto rounded-3xl shadow-xl bg-gray-800 p-1.5 transform rotate-3 z-10">
-            <div className="w-full h-full bg-white rounded-2xl p-6 text-left flex flex-col justify-between">
+            <div className="w-full h-full bg-card rounded-2xl p-6 text-left flex flex-col justify-between">
               <div>
                 <div className="text-gray-900 font-bold text-lg mb-4">Pay Rent — April 2024</div>
                 <p className="text-xs text-gray-500 mb-1">MoMo Transaction ID</p>
@@ -134,7 +134,7 @@ const HowItWorksSection: React.FC = () => {
 
           {/* Phone 2: Landlord verify */}
           <div className="relative w-64 h-auto rounded-3xl shadow-xl bg-gray-800 p-1.5 transform -rotate-3 z-20 mt-8 lg:mt-0">
-            <div className="w-full h-full bg-white rounded-2xl p-6 text-left flex flex-col justify-between text-gray-900">
+            <div className="w-full h-full bg-card rounded-2xl p-6 text-left flex flex-col justify-between text-gray-900">
               <div>
                 <div className="font-bold text-lg mb-4">Verify Payment — Mutoni C.</div>
                 <div className="mb-3">
@@ -163,7 +163,7 @@ const HowItWorksSection: React.FC = () => {
 
           {/* Phone 3: Tenant receipt */}
           <div className="relative w-64 h-auto rounded-3xl shadow-xl bg-gray-800 p-1.5 transform rotate-3 z-10 mt-16 lg:mt-0">
-            <div className="w-full h-full bg-white rounded-2xl p-6 text-left flex flex-col justify-between">
+            <div className="w-full h-full bg-card rounded-2xl p-6 text-left flex flex-col justify-between">
               <div>
                 <div className="bg-[#00C853] text-white text-center py-2 rounded-t-xl font-bold text-sm -mx-6 -mt-6 mb-4">Payment Receipt</div>
                 <div className="flex justify-between items-center mb-2">

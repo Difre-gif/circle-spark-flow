@@ -43,7 +43,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ tier, price, units, features,
 
       <a
         href={ctaLink}
-        className={`w-full text-center py-3 rounded-full font-semibold transition-colors duration-300 ${isPopular ? 'bg-[#00C853] text-white hover:bg-green-600' : 'bg-gray-100 text-bizrent-navy hover:bg-gray-200 border border-gray-300'}`}
+        className={`w-full text-center py-3 rounded-full font-semibold transition-colors duration-300 ${isPopular ? 'bg-[#00C853] text-white hover:bg-green-600' : 'bg-gray-100 text-bizrent-navy dark:text-white hover:bg-gray-200 border border-gray-300'}`}
       >
         {ctaText}
       </a>

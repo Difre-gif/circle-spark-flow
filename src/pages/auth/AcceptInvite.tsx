@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Building2, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
@@ -20,6 +21,7 @@ interface InvitationDetails {
 }
 
 export default function AcceptInvite() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token');
@@ -227,9 +229,9 @@ export default function AcceptInvite() {
         <Card className="w-full max-w-md text-center">
           <CardContent className="py-12 space-y-4">
             <div className="text-4xl">🔗</div>
-            <h2 className="text-xl font-bold">Invalid Invitation</h2>
+            <h2 className="text-xl font-bold">{t('legacy.invalidInvitation')}</h2>
             <p className="text-muted-foreground text-sm">{fetchError}</p>
-            <Button onClick={() => navigate('/login')} variant="outline">Go to Login</Button>
+            <Button onClick={() => navigate('/login')} variant="outline">{t('legacy.goToLogin')}</Button>
           </CardContent>
         </Card>
       </div>
@@ -242,9 +244,9 @@ export default function AcceptInvite() {
         <Card className="w-full max-w-md text-center">
           <CardContent className="py-12 space-y-4">
             <CheckCircle2 className="h-12 w-12 mx-auto text-emerald-500" />
-            <h2 className="text-xl font-bold">Check your email</h2>
+            <h2 className="text-xl font-bold">{t('legacy.checkYourEmail')}</h2>
             <p className="text-muted-foreground text-sm">
-              We've sent a confirmation link to <strong>{invitation?.email}</strong>.
+              {t('legacy.weVeSentAConfirmationLinkTo')} <strong>{invitation?.email}</strong>.
               Click it to confirm your account — you'll be automatically signed in and linked to <strong>{invitation?.org_name}</strong>.
             </p>
           </CardContent>
@@ -262,7 +264,7 @@ export default function AcceptInvite() {
             <div>
               <CardTitle className="text-2xl">Join {invitation?.org_name}</CardTitle>
               <CardDescription>
-                You are currently signed in as <strong>{invitation?.email}</strong>
+                {t('legacy.youAreCurrentlySignedInAs')} <strong>{invitation?.email}</strong>
               </CardDescription>
             </div>
           </CardHeader>
@@ -273,13 +275,13 @@ export default function AcceptInvite() {
               </Alert>
             )}
             <p className="text-sm text-muted-foreground">
-              You've been invited to join <strong>{invitation?.org_name}</strong> as a {invitation?.role.toLowerCase()}.
+              {t('legacy.youVeBeenInvitedToJoin')} <strong>{invitation?.org_name}</strong> as a {invitation?.role.toLowerCase()}.
               {invitation?.unit_info && ` You will be linked to ${invitation.unit_info}.`}
             </p>
           </CardContent>
           <CardFooter>
             <Button onClick={handleJoinExisting} className="w-full" disabled={loading}>
-              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Joining...</> : 'Accept Invitation & Join'}
+              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('legacy.joining')}</> : 'Accept Invitation & Join'}
             </Button>
           </CardFooter>
         </Card>
@@ -295,7 +297,7 @@ export default function AcceptInvite() {
           <div className="flex items-center justify-center gap-2 bg-muted rounded-xl px-4 py-3">
             <Building2 className="h-5 w-5 text-muted-foreground" />
             <div className="text-left">
-              <p className="text-xs font-semibold text-muted-foreground">You've been invited to</p>
+              <p className="text-xs font-semibold text-muted-foreground">{t('legacy.youVeBeenInvitedTo')}</p>
               <p className="font-bold text-sm">{invitation?.org_name}</p>
               {invitation?.unit_info && <p className="text-xs text-muted-foreground">{invitation.unit_info}</p>}
             </div>
@@ -306,8 +308,8 @@ export default function AcceptInvite() {
             </CardTitle>
             <CardDescription>
               {invitation?.user_exists 
-                ? <>Sign in as <strong>{invitation?.email}</strong></>
-                : <>Creating account for <strong>{invitation?.email}</strong></>
+                ? <>{t('legacy.signInAs')} <strong>{invitation?.email}</strong></>
+                : <>{t('legacy.creatingAccountFor')} <strong>{invitation?.email}</strong></>
               }
             </CardDescription>
           </div>
@@ -322,14 +324,14 @@ export default function AcceptInvite() {
             
             {/* Read-only email field */}
             <div className="space-y-1">
-              <Label>Email</Label>
+              <Label>{t('legacy.email')}</Label>
               <Input value={invitation?.email || ''} readOnly className="bg-muted text-muted-foreground" />
             </div>
 
             {!invitation?.user_exists && (
               <>
                 <div className="space-y-1">
-                  <Label>Full Name <span className="text-red-500">*</span></Label>
+                  <Label>{t('legacy.fullName')} <span className="text-red-500">*</span></Label>
                   <Input
                     placeholder="Jean-Pierre Habimana"
                     value={name}
@@ -340,7 +342,7 @@ export default function AcceptInvite() {
                 </div>
                 
                 <div className="space-y-1">
-                  <Label>Username <span className="text-red-500">*</span></Label>
+                  <Label>{t('legacy.username')} <span className="text-red-500">*</span></Label>
                   <div className="relative">
                     <Input
                       placeholder="jp_habimana"
@@ -361,7 +363,7 @@ export default function AcceptInvite() {
                   </div>
                   {errors.username && <p className="text-xs text-red-500">{errors.username}</p>}
                   {!errors.username && usernameAvailable === true && (
-                    <p className="text-xs text-emerald-500">Username is available</p>
+                    <p className="text-xs text-emerald-500">{t('legacy.usernameIsAvailable')}</p>
                   )}
                 </div>
               </>
@@ -369,10 +371,10 @@ export default function AcceptInvite() {
 
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <Label>Password <span className="text-red-500">*</span></Label>
+                <Label>{t('legacy.password')} <span className="text-red-500">*</span></Label>
                 {invitation?.user_exists && (
                   <button type="button" onClick={() => navigate('/forgot-password')} className="text-xs text-primary hover:underline">
-                    Forgot password?
+                    {t('legacy.forgotPassword')}
                   </button>
                 )}
               </div>
@@ -396,7 +398,7 @@ export default function AcceptInvite() {
 
             {!invitation?.user_exists && (
               <div className="space-y-1">
-                <Label>Confirm Password <span className="text-red-500">*</span></Label>
+                <Label>{t('legacy.confirmPassword')} <span className="text-red-500">*</span></Label>
                 <div className="relative">
                   <Input
                     type={showConfirm ? 'text' : 'password'}
@@ -426,7 +428,7 @@ export default function AcceptInvite() {
             </Button>
             {!invitation?.user_exists && (
               <p className="text-xs text-center text-muted-foreground">
-                By creating an account, you agree to join <strong>{invitation?.org_name}</strong>.
+                {t('legacy.byCreatingAnAccountYouAgreeToJoin')} <strong>{invitation?.org_name}</strong>.
               </p>
             )}
           </div>

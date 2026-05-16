@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -31,6 +32,7 @@ const PAYMENT_METHODS = [
 ];
 
 export default function TenantInvoiceDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: invoice, isLoading } = useInvoice(id);
@@ -102,7 +104,7 @@ export default function TenantInvoiceDetail() {
   if (!invoice) {
     return (
       <div className="text-center py-12 text-[#64748B]">
-        That page doesn't exist. If you followed a link, it may have expired.
+        {t('legacy.thatPageDoesnTExistIfYouFollowedALinkItMayHaveExpired')}
       </div>
     );
   }
@@ -130,43 +132,43 @@ export default function TenantInvoiceDetail() {
       </div>
 
       {/* Invoice summary */}
-      <Card className="border border-[#E2E8F0] rounded-[8px] shadow-card bg-white">
+      <Card className="border border-[#E2E8F0] rounded-[8px] shadow-card bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-[#1E3A8A]">Invoice Details</CardTitle>
+          <CardTitle className="text-base font-semibold text-[#1E3A8A]">{t('legacy.invoiceDetails')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-[#64748B]">Property</span>
+            <span className="text-[#64748B]">{t('legacy.property')}</span>
             <span className="font-medium text-[#0F172A]">{(invoice.unit as any)?.property?.name ?? '—'}</span>
           </div>
           <Separator />
           <div className="flex justify-between text-sm">
-            <span className="text-[#64748B]">Unit</span>
+            <span className="text-[#64748B]">{t('legacy.unit')}</span>
             <span className="font-medium text-[#0F172A]">{(invoice.unit as any)?.unit_number ?? '—'}</span>
           </div>
           <Separator />
           <div className="flex justify-between text-sm">
-            <span className="text-[#64748B]">Period</span>
+            <span className="text-[#64748B]">{t('legacy.period')}</span>
             <span className="font-medium text-[#0F172A]">{invoice.period_label ?? formatDate(invoice.due_date)}</span>
           </div>
           <Separator />
           <div className="flex justify-between items-baseline">
-            <span className="text-[#64748B] text-sm">Amount Due</span>
+            <span className="text-[#64748B] text-sm">{t('legacy.amountDue')}</span>
             <span className="font-mono font-bold text-2xl text-[#1E3A8A]">{formatRWF(invoice.amount_due)}</span>
           </div>
           <Separator />
           <div className="flex justify-between text-sm">
-            <span className="text-[#64748B]">Paid</span>
+            <span className="text-[#64748B]">{t('legacy.paid')}</span>
             <span className="font-mono font-semibold text-[#10B981]">{formatRWF(invoice.amount_paid)}</span>
           </div>
           <Separator />
           <div className="flex justify-between items-baseline">
-            <span className="text-[#64748B] text-sm font-semibold">Balance</span>
+            <span className="text-[#64748B] text-sm font-semibold">{t('legacy.balance')}</span>
             <span className="font-mono font-bold text-xl text-[#1E3A8A]">{formatRWF(balance)}</span>
           </div>
           <Separator />
           <div className="flex justify-between text-sm">
-            <span className="text-[#64748B]">Due Date</span>
+            <span className="text-[#64748B]">{t('legacy.dueDate')}</span>
             <span className="font-medium text-[#0F172A]">{formatDate(invoice.due_date)}</span>
           </div>
         </CardContent>
@@ -174,11 +176,11 @@ export default function TenantInvoiceDetail() {
 
       {/* Payment form */}
       {canPay && (
-        <Card className="border-t-4 border-t-[#1D4ED8] border border-[#E2E8F0] rounded-[8px] shadow-card bg-white">
+        <Card className="border-t-4 border-t-[#1D4ED8] border border-[#E2E8F0] rounded-[8px] shadow-card bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold text-[#1E3A8A]">Submit Payment</CardTitle>
+            <CardTitle className="text-base font-semibold text-[#1E3A8A]">{t('legacy.submitPayment')}</CardTitle>
             <p className="text-sm text-[#64748B]">
-              Pay via Mobile Money, then enter your transaction details below.
+              {t('legacy.payViaMobileMoneyThenEnterYourTransactionDetailsBelow')}
             </p>
           </CardHeader>
           <CardContent>
@@ -187,7 +189,7 @@ export default function TenantInvoiceDetail() {
 
                 {/* Step 1 — Payment method */}
                 <div>
-                  <p className="text-sm font-semibold text-[#0F172A] mb-3">How did you pay?</p>
+                  <p className="text-sm font-semibold text-[#0F172A] mb-3">{t('legacy.howDidYouPay')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {PAYMENT_METHODS.map(({ value, label, description, icon: Icon }) => {
                       const isSelected = selectedMethod === value;
@@ -200,7 +202,7 @@ export default function TenantInvoiceDetail() {
                             'flex flex-col items-start gap-2 p-4 rounded-[8px] border-2 text-left transition-colors min-h-[80px]',
                             isSelected
                               ? 'border-[#1E3A8A] bg-[#EFF6FF]'
-                              : 'border-[#E2E8F0] bg-white hover:border-[#1D4ED8] hover:bg-[#F8FAFC]'
+                              : 'border-[#E2E8F0] bg-card hover:border-[#1D4ED8] hover:bg-[#F8FAFC]'
                           )}
                         >
                           <div className={cn(
@@ -240,7 +242,7 @@ export default function TenantInvoiceDetail() {
                       </FormControl>
                       {selectedMethod === 'MOMO' && (
                         <FormDescription className="text-xs text-[#64748B]">
-                          This is the code in your MoMo confirmation SMS (e.g., MP26040100001234). Tap your MoMo SMS and copy the code.
+                          {t('legacy.thisIsTheCodeInYourMomoConfirmationSmsEGMp26040100001234TapYourMomoSms')}
                         </FormDescription>
                       )}
                       <FormMessage />
@@ -282,7 +284,7 @@ export default function TenantInvoiceDetail() {
                   disabled={isSubmitting || !form.formState.isValid}
                 >
                   {isSubmitting ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('legacy.submitting')}</>
                   ) : (
                     'Submit Payment Proof'
                   )}

@@ -5,7 +5,7 @@ import { Check } from 'lucide-react';
 
 const HeroContentSection: React.FC = () => {
   return (
-    <section className="relative z-10 py-16 bg-white text-gray-900">
+    <section className="relative z-10 py-16 bg-card text-gray-900">
       <div className="max-w-4xl mx-auto px-4 text-center">
         {/* Eyebrow Label */}
         <motion.div
@@ -46,7 +46,7 @@ const HeroContentSection: React.FC = () => {
           </Link>
           <a
             href="#how"
-            className="px-8 py-3 rounded-full border border-gray-300 text-bizrent-navy text-lg font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors duration-300 flex items-center"
+            className="px-8 py-3 rounded-full border border-gray-300 text-bizrent-navy dark:text-white text-lg font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors duration-300 flex items-center"
           >
             See how it works ↓
           </a>

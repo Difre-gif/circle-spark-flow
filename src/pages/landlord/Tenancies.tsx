@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -5,6 +6,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { useTenancies, formatRWF, formatDate } from '@/hooks/useSupabaseData';
 
 export default function Tenancies() {
+  const { t } = useTranslation();
   const { data: tenancies, isLoading } = useTenancies();
 
   if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -12,7 +14,7 @@ export default function Tenancies() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Tenancies</h1>
+        <h1 className="text-2xl font-bold">{t('legacy.tenancies')}</h1>
         <p className="text-muted-foreground">{tenancies?.length ?? 0} lease agreements</p>
       </div>
       <Card>
@@ -20,7 +22,7 @@ export default function Tenancies() {
           <Table>
             <TableHeader>
               <TableRow className="bg-primary/5">
-                <TableHead>Tenant</TableHead><TableHead>Unit</TableHead><TableHead>Property</TableHead><TableHead>Start Date</TableHead><TableHead>Rent</TableHead><TableHead>Deposit</TableHead><TableHead>Status</TableHead>
+                <TableHead>{t('legacy.tenant')}</TableHead><TableHead>{t('legacy.unit')}</TableHead><TableHead>{t('legacy.property')}</TableHead><TableHead>{t('legacy.startDate')}</TableHead><TableHead>{t('legacy.rent')}</TableHead><TableHead>{t('legacy.deposit')}</TableHead><TableHead>{t('legacy.status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -35,7 +37,7 @@ export default function Tenancies() {
                   <TableCell><StatusBadge status={t.status} /></TableCell>
                 </TableRow>
               ))}
-              {(!tenancies || tenancies.length === 0) && <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No tenancies found</TableCell></TableRow>}
+              {(!tenancies || tenancies.length === 0) && <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">{t('legacy.noTenanciesFound')}</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>

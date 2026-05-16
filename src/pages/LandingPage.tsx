@@ -27,7 +27,7 @@ const SectionSkeleton = () => (
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="bg-[#0F172A]" style={{ fontFamily: 'Inter, Arial, sans-serif' }}>
+    <div className="bg-background text-foreground dark:bg-[#0F172A]" style={{ fontFamily: 'Inter, Arial, sans-serif' }}>
       {/* Navbar — always visible, above fold */}
       <Navbar />
 

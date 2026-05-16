@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from "react";
 import { 
   usePendingOrganisations, 
@@ -44,6 +45,7 @@ import { toast } from "sonner";
 import { SubscriptionOverrideModal } from "@/components/super-admin/SubscriptionOverrideModal";
 
 export default function SuperAdminOrganizations() {
+  const { t } = useTranslation();
   const { data: pending, isLoading: loadingPending } = usePendingOrganisations();
   const { data: all, isLoading: loadingAll } = useAllOrganisations();
   const { impersonate, impersonateUser } = useAuth();
@@ -117,24 +119,24 @@ export default function SuperAdminOrganizations() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'TRIAL':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Trial</Badge>;
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">{t('legacy.trial')}</Badge>;
       case 'ACTIVE':
-        return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">Active</Badge>;
+        return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">{t('legacy.active')}</Badge>;
       default:
-        return <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200">{status}</Badge>;
+        return <Badge variant="outline" className="bg-muted/40 text-foreground/80 border-border">{status}</Badge>;
     }
   };
 
   const getTierBadge = (tier: string) => {
     switch (tier) {
       case 'STARTER':
-        return <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-bold uppercase text-xxxs tracking-widest border-none">Starter</Badge>;
+        return <Badge variant="secondary" className="bg-muted text-foreground/80 font-bold uppercase text-xxxs tracking-widest border-none">{t('legacy.starter')}</Badge>;
       case 'GROWTH':
-        return <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase text-xxxs tracking-widest">Growth</Badge>;
+        return <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase text-xxxs tracking-widest">{t('legacy.growth')}</Badge>;
       case 'PRO':
-        return <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-100 font-bold uppercase text-xxxs tracking-widest">Pro</Badge>;
+        return <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-100 font-bold uppercase text-xxxs tracking-widest">{t('legacy.pro')}</Badge>;
       default:
-        return <Badge variant="outline" className="text-slate-400 border-slate-100 italic">{tier}</Badge>;
+        return <Badge variant="outline" className="text-muted-foreground border-border italic">{tier}</Badge>;
     }
   };
 
@@ -142,21 +144,21 @@ export default function SuperAdminOrganizations() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
             <Building2 className="text-indigo-600" size={32} />
-            Organization Registry
+            {t('legacy.organizationRegistry')}
           </h1>
-          <p className="text-slate-500 font-medium tracking-tight">Review signups, monitor subscription health, and manage platform tenants.</p>
+          <p className="text-muted-foreground font-medium tracking-tight">{t('legacy.reviewSignupsMonitorSubscriptionHealthAndManagePlatformTenants')}</p>
         </div>
-        <Button onClick={exportToCSV} variant="outline" className="h-11 rounded-xl font-bold gap-2 border-slate-200 shadow-sm active:scale-95 transition-all text-xs uppercase tracking-widest px-6">
+        <Button onClick={exportToCSV} variant="outline" className="h-11 rounded-xl font-bold gap-2 border-border shadow-sm active:scale-95 transition-all text-xs uppercase tracking-widest px-6">
           <Download size={18} />
-          Export to CSV
+          {t('legacy.exportToCsv')}
         </Button>
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-slate-100 p-1 rounded-2xl">
-          <TabsTrigger value="pending" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold uppercase text-xxs tracking-widest h-10">
+        <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-muted p-1 rounded-2xl">
+          <TabsTrigger value="pending" className="rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-sm font-bold uppercase text-xxs tracking-widest h-10">
             Activation Requests 
             {pending && pending.length > 0 && (
               <span className="ml-2 px-1.5 py-0.5 bg-amber-500 text-white text-xxs rounded-full font-bold">
@@ -164,17 +166,17 @@ export default function SuperAdminOrganizations() {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="all" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold uppercase text-xxs tracking-widest h-10">Total Directory</TabsTrigger>
+          <TabsTrigger value="all" className="rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-sm font-bold uppercase text-xxs tracking-widest h-10">{t('legacy.totalDirectory')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="mt-0">
           <Card className="border-none shadow-md overflow-hidden rounded-[2.5rem]">
-            <CardHeader className="bg-white border-b border-slate-50 p-8 pb-6">
-              <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+            <CardHeader className="bg-card border-b border-slate-50 p-8 pb-6">
+              <CardTitle className="text-xl font-black text-foreground uppercase tracking-widest flex items-center gap-2">
                 <div className="h-4 w-1 bg-amber-500 rounded-full" />
-                Requests Queue
+                {t('legacy.requestsQueue')}
               </CardTitle>
-              <CardDescription className="text-slate-500 font-medium italic">Pending co-founder authorization for platform launch.</CardDescription>
+              <CardDescription className="text-muted-foreground font-medium italic">{t('legacy.pendingCoFounderAuthorizationForPlatformLaunch')}</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
               {loadingPending ? (
@@ -183,18 +185,18 @@ export default function SuperAdminOrganizations() {
                 <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
                   <div className="p-4 bg-emerald-50 text-emerald-600 rounded-3xl animate-bounce"><CheckCircle2 size={40} /></div>
                   <div>
-                    <p className="font-bold text-slate-900 uppercase tracking-tight">Inbox Zero</p>
-                    <p className="text-sm text-slate-400 font-medium">No organizations are waiting for review.</p>
+                    <p className="font-bold text-foreground uppercase tracking-tight">{t('legacy.inboxZero')}</p>
+                    <p className="text-sm text-muted-foreground font-medium">{t('legacy.noOrganizationsAreWaitingForReview')}</p>
                   </div>
                 </div>
               ) : (
                 <Table>
                   <TableHeader className="bg-bizrent-light">
                     <TableRow className="hover:bg-transparent border-none">
-                      <TableHead className="px-8 font-bold uppercase text-xxs tracking-widest text-slate-400">Organization Identity</TableHead>
-                      <TableHead className="font-bold uppercase text-xxs tracking-widest text-slate-400">Contact Email</TableHead>
-                      <TableHead className="font-bold uppercase text-xxs tracking-widest text-slate-400">Registration</TableHead>
-                      <TableHead className="text-right px-8 font-bold uppercase text-xxs tracking-widest text-slate-400">Governance</TableHead>
+                      <TableHead className="px-8 font-bold uppercase text-xxs tracking-widest text-muted-foreground">{t('legacy.organizationIdentity')}</TableHead>
+                      <TableHead className="font-bold uppercase text-xxs tracking-widest text-muted-foreground">{t('legacy.contactEmail')}</TableHead>
+                      <TableHead className="font-bold uppercase text-xxs tracking-widest text-muted-foreground">{t('legacy.registration')}</TableHead>
+                      <TableHead className="text-right px-8 font-bold uppercase text-xxs tracking-widest text-muted-foreground">{t('legacy.governance')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -205,11 +207,11 @@ export default function SuperAdminOrganizations() {
                             <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-black text-xs">
                               {org.name.charAt(0).toUpperCase()}
                             </div>
-                            <span className="font-bold text-slate-900">{org.name}</span>
+                            <span className="font-bold text-foreground">{org.name}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-slate-500 font-medium">{org.email || "N/A"}</TableCell>
-                        <TableCell className="text-slate-400 text-xs font-bold uppercase tracking-tight">{formatDate(org.created_at)}</TableCell>
+                        <TableCell className="text-muted-foreground font-medium">{org.email || "N/A"}</TableCell>
+                        <TableCell className="text-muted-foreground text-xs font-bold uppercase tracking-tight">{formatDate(org.created_at)}</TableCell>
                         <TableCell className="text-right px-8">
                           <Button 
                             size="sm" 
@@ -232,10 +234,10 @@ export default function SuperAdminOrganizations() {
         <TabsContent value="all" className="mt-0 space-y-6">
           <div className="flex flex-wrap items-center gap-4">
             <div className="relative flex-1 min-w-[280px]">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search by name, email or slug..." 
-                className="pl-12 h-12 rounded-2xl border-slate-100 shadow-sm focus-visible:ring-indigo-500/20"
+                className="pl-12 h-12 rounded-2xl border-border shadow-sm focus-visible:ring-indigo-500/20"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -243,26 +245,26 @@ export default function SuperAdminOrganizations() {
             
             <div className="flex items-center gap-3">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[160px] h-12 rounded-2xl border-slate-100 font-bold text-xs uppercase tracking-widest text-slate-600">
-                  <SelectValue placeholder="Status" />
+                <SelectTrigger className="w-[160px] h-12 rounded-2xl border-border font-bold text-xs uppercase tracking-widest text-muted-foreground">
+                  <SelectValue placeholder={t('legacy.status')} />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl p-2 border-slate-100">
-                  <SelectItem value="ALL" className="rounded-lg font-bold">All Statuses</SelectItem>
-                  <SelectItem value="TRIAL" className="rounded-lg font-bold">In Trial</SelectItem>
-                  <SelectItem value="ACTIVE" className="rounded-lg font-bold">Active</SelectItem>
-                  <SelectItem value="INACTIVE" className="rounded-lg font-bold">Inactive</SelectItem>
+                <SelectContent className="rounded-xl p-2 border-border">
+                  <SelectItem value="ALL" className="rounded-lg font-bold">{t('legacy.allStatuses')}</SelectItem>
+                  <SelectItem value="TRIAL" className="rounded-lg font-bold">{t('legacy.inTrial')}</SelectItem>
+                  <SelectItem value="ACTIVE" className="rounded-lg font-bold">{t('legacy.active')}</SelectItem>
+                  <SelectItem value="INACTIVE" className="rounded-lg font-bold">{t('legacy.inactive')}</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={tierFilter} onValueChange={setTierFilter}>
-                <SelectTrigger className="w-[160px] h-12 rounded-2xl border-slate-100 font-bold text-xs uppercase tracking-widest text-slate-600">
+                <SelectTrigger className="w-[160px] h-12 rounded-2xl border-border font-bold text-xs uppercase tracking-widest text-muted-foreground">
                   <SelectValue placeholder="Tier" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl p-2 border-slate-100">
-                  <SelectItem value="ALL" className="rounded-lg font-bold">All Tiers</SelectItem>
-                  <SelectItem value="STARTER" className="rounded-lg font-bold">Starter</SelectItem>
-                  <SelectItem value="GROWTH" className="rounded-lg font-bold">Growth</SelectItem>
-                  <SelectItem value="PRO" className="rounded-lg font-bold">Pro</SelectItem>
+                <SelectContent className="rounded-xl p-2 border-border">
+                  <SelectItem value="ALL" className="rounded-lg font-bold">{t('legacy.allTiers')}</SelectItem>
+                  <SelectItem value="STARTER" className="rounded-lg font-bold">{t('legacy.starter')}</SelectItem>
+                  <SelectItem value="GROWTH" className="rounded-lg font-bold">{t('legacy.growth')}</SelectItem>
+                  <SelectItem value="PRO" className="rounded-lg font-bold">{t('legacy.pro')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -276,36 +278,36 @@ export default function SuperAdminOrganizations() {
                 <Table>
                   <TableHeader className="bg-slate-900">
                     <TableRow className="hover:bg-transparent border-none">
-                      <TableHead className="px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Organization Profile</TableHead>
-                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Status</TableHead>
-                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Tier</TableHead>
-                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">Contact Email</TableHead>
-                      <TableHead className="text-right px-8 font-black uppercase text-xxxs tracking-[0.2em] text-slate-400 py-6">God-Mode</TableHead>
+                      <TableHead className="px-8 font-black uppercase text-xxxs tracking-[0.2em] text-muted-foreground py-6">{t('legacy.organizationProfile')}</TableHead>
+                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-muted-foreground py-6">{t('legacy.status')}</TableHead>
+                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-muted-foreground py-6">{t('legacy.tier')}</TableHead>
+                      <TableHead className="font-black uppercase text-xxxs tracking-[0.2em] text-muted-foreground py-6">{t('legacy.contactEmail')}</TableHead>
+                      <TableHead className="text-right px-8 font-black uppercase text-xxxs tracking-[0.2em] text-muted-foreground py-6">{t('legacy.godMode')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredAll?.map((org) => (
-                      <TableRow key={org.id} className="hover:bg-slate-50 transition-colors border-slate-50 group">
+                      <TableRow key={org.id} className="hover:bg-muted/40 transition-colors border-slate-50 group">
                         <TableCell className="px-8 py-6">
                           <div className="flex items-center gap-4">
                             <div className="h-10 w-10 rounded-[14px] bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs shadow-inner group-hover:scale-110 transition-transform">
                               {org.name.charAt(0).toUpperCase()}
                             </div>
                             <div className="flex flex-col">
-                              <span className="font-black text-slate-900 tracking-tight">{org.name}</span>
-                              <span className="text-xxs text-slate-400 font-bold uppercase tracking-widest">{org.slug}</span>
+                              <span className="font-black text-foreground tracking-tight">{org.name}</span>
+                              <span className="text-xxs text-muted-foreground font-bold uppercase tracking-widest">{org.slug}</span>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(org.subscription_status)}</TableCell>
                         <TableCell>{getTierBadge(org.active_tier)}</TableCell>
-                        <TableCell className="text-slate-500 font-semibold text-sm">{org.email || "N/A"}</TableCell>
+                        <TableCell className="text-muted-foreground font-semibold text-sm">{org.email || "N/A"}</TableCell>
                         <TableCell className="text-right px-8">
                           <div className="flex justify-end gap-2">
                             <Button 
                               size="icon" 
                               variant="ghost" 
-                              className="h-10 w-10 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 active:scale-90 transition-all shadow-sm group-hover:shadow-md"
+                              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-amber-600 hover:bg-amber-50 active:scale-90 transition-all shadow-sm group-hover:shadow-md"
                               title="Override Subscription"
                               onClick={() => handleOpenOverride(org.id, org.name)}
                             >
@@ -314,7 +316,7 @@ export default function SuperAdminOrganizations() {
                             <Button 
                               size="icon" 
                               variant="ghost" 
-                              className="h-10 w-10 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 active:scale-90 transition-all shadow-sm group-hover:shadow-md"
+                              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 active:scale-90 transition-all shadow-sm group-hover:shadow-md"
                               title="Impersonate (Step-In)"
                               onClick={() => handleImpersonate(org.id)}
                             >
@@ -323,7 +325,7 @@ export default function SuperAdminOrganizations() {
                             <Button 
                               size="icon" 
                               variant="ghost" 
-                              className="h-10 w-10 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 active:scale-90 transition-all shadow-sm group-hover:shadow-md"
+                              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted active:scale-90 transition-all shadow-sm group-hover:shadow-md"
                               title="External Profile View"
                             >
                               <ExternalLink size={18} />

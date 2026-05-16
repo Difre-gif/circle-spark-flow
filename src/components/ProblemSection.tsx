@@ -13,7 +13,7 @@ interface ProblemCardProps {
 const ProblemCard: React.FC<ProblemCardProps> = ({ icon: Icon, iconColor, title, description, staggerDelay }) => {
   return (
     <motion.div
-      className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+      className="bg-card border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -102,7 +102,7 @@ const ProblemSection: React.FC = () => {
 
         {/* Testimonial Pull-quote */}
         <motion.div
-          className="bg-white border-l-4 border-[#00C853] p-8 text-left max-w-4xl mx-auto shadow-md rounded-lg"
+          className="bg-card border-l-4 border-[#00C853] p-8 text-left max-w-4xl mx-auto shadow-md rounded-lg"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}

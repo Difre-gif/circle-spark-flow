@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 
 const FinalCtaSection: React.FC = () => {
   return (
-    <section id="final-cta" className="relative py-24 bg-white overflow-hidden text-center">
+    <section id="final-cta" className="relative py-24 bg-card overflow-hidden text-center">
       {/* Hero Background Texture Placeholder */}
       <div className="absolute inset-0 opacity-8 pointer-events-none">
         {/* Abstract Kigali skyline silhouette + subtle green/gold particle points */}

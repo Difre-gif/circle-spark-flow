@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ interface InviteStaffModalProps {
 }
 
 export function InviteStaffModal({ isOpen, onClose }: InviteStaffModalProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'MANAGER' | 'ACCOUNTANT'>('MANAGER');
   
@@ -36,14 +38,14 @@ export function InviteStaffModal({ isOpen, onClose }: InviteStaffModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Invite Team Member</DialogTitle>
+          <DialogTitle>{t('legacy.inviteTeamMember')}</DialogTitle>
           <DialogDescription>
-            Send an invitation to a new staff member to join your organisation.
+            {t('legacy.sendAnInvitationToANewStaffMemberToJoinYourOrganisation')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email address <span className="text-red-500">*</span></Label>
+            <Label htmlFor="email">{t('legacy.emailAddress')} <span className="text-red-500">*</span></Label>
             <Input
               id="email"
               type="email"
@@ -54,7 +56,7 @@ export function InviteStaffModal({ isOpen, onClose }: InviteStaffModalProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="role">System Role <span className="text-red-500">*</span></Label>
+            <Label htmlFor="role">{t('legacy.systemRole')} <span className="text-red-500">*</span></Label>
             <Select
               value={role}
               onValueChange={(val: any) => setRole(val)}
@@ -64,18 +66,18 @@ export function InviteStaffModal({ isOpen, onClose }: InviteStaffModalProps) {
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="MANAGER">Manager</SelectItem>
-                <SelectItem value="ACCOUNTANT">Accountant</SelectItem>
+                <SelectItem value="MANAGER">{t('legacy.manager')}</SelectItem>
+                <SelectItem value="ACCOUNTANT">{t('legacy.accountant')}</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground mt-1">
-              Managers have operational access. Accountants have view-only property access but full billing access.
+              {t('legacy.managersHaveOperationalAccessAccountantsHaveViewOnlyPropertyAccessButF')}
             </p>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={inviteStaff.isPending}>
-            Cancel
+            {t('legacy.cancel')}
           </Button>
           <Button onClick={handleInvite} className="bg-bizrent-navy hover:bg-bizrent-navy/90" disabled={!email || inviteStaff.isPending}>
             {inviteStaff.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}

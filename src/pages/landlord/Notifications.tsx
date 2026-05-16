@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Bell, CreditCard, FileText, Users, Settings, Filter, CheckCheck, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,12 +17,13 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function Notifications() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: notifications, isLoading } = useNotifications();
   const markAllRead = useMarkAllNotificationsRead();
   const markRead = useMarkNotificationRead();
 
-  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy dark:text-white" /></div>;
 
   const unreadCount = (notifications ?? []).filter(n => !n.is_read).length;
 
@@ -43,16 +45,16 @@ export default function Notifications() {
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
-            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">System</span>
+            <span className="cursor-pointer hover:text-bizrent-navy dark:text-white transition-colors">{t('legacy.system')}</span>
             <ChevronRight className="h-3.5 w-3.5" />
-            <span className="text-bizrent-blue">Updates</span>
+            <span className="text-bizrent-blue">{t('legacy.updates')}</span>
           </p>
-          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">Notifications</h1>
+          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy dark:text-white tracking-tight">{t('legacy.notifications')}</h1>
           <p className="page-description font-medium text-muted-foreground">You have {unreadCount} unread alerts requiring your attention</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="rounded-xl border-border/60 font-semibold h-11">
-            <Filter className="mr-2 h-4 w-4" /> Filter
+            <Filter className="mr-2 h-4 w-4" /> {t('legacy.filter')}
           </Button>
           <Button 
             className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-semibold h-11 px-6 shadow-sm shadow-bizrent-navy/10 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
@@ -60,7 +62,7 @@ export default function Notifications() {
             disabled={markAllRead.isPending || unreadCount === 0}
           >
             <CheckCheck className="h-4 w-4" />
-            Mark all as read
+            {t('legacy.markAllAsRead')}
           </Button>
         </div>
       </div>
@@ -73,7 +75,7 @@ export default function Notifications() {
               key={n.id} 
               className={cn(
                 'group border-0 rounded-[2rem] shadow-sm transition-all hover:shadow-md hover:translate-x-1 cursor-pointer overflow-hidden',
-                !n.is_read ? 'bg-white ring-1 ring-bizrent-blue/20' : 'bg-muted/30 opacity-80'
+                !n.is_read ? 'bg-card ring-1 ring-bizrent-blue/20' : 'bg-muted/30 opacity-80'
               )} 
               onClick={() => handleClick(n)}
             >
@@ -84,14 +86,14 @@ export default function Notifications() {
                 
                 <div className={cn(
                   'rounded-2xl p-3 shrink-0 transition-all group-hover:scale-110', 
-                  !n.is_read ? 'bg-bizrent-blue/10 text-bizrent-blue' : 'bg-slate-200 text-slate-500'
+                  !n.is_read ? 'bg-bizrent-blue/10 text-bizrent-blue' : 'bg-slate-200 text-muted-foreground'
                 )}>
                   <Icon className="h-6 w-6" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start gap-2 mb-1">
-                    <p className={cn('text-base tracking-tight leading-tight', !n.is_read ? 'font-extrabold text-bizrent-navy' : 'font-bold text-muted-foreground')}>
+                    <p className={cn('text-base tracking-tight leading-tight', !n.is_read ? 'font-extrabold text-bizrent-navy dark:text-white' : 'font-bold text-muted-foreground')}>
                       {n.title}
                     </p>
                     <span className="text-xxs font-bold text-muted-foreground/60 whitespace-nowrap pt-1">
@@ -119,8 +121,8 @@ export default function Notifications() {
           <div className="py-24 text-center border-2 border-dashed border-muted rounded-[3rem] bg-muted/5">
             <div className="flex flex-col items-center justify-center">
               <Bell className="h-12 w-12 mb-4 text-muted-foreground/20" />
-              <p className="text-xl font-extrabold text-bizrent-navy">All caught up!</p>
-              <p className="text-sm font-medium text-muted-foreground mt-1">No new notifications at this time.</p>
+              <p className="text-xl font-extrabold text-bizrent-navy dark:text-white">{t('legacy.allCaughtUp')}</p>
+              <p className="text-sm font-medium text-muted-foreground mt-1">{t('legacy.noNewNotificationsAtThisTime')}</p>
             </div>
           </div>
         )}

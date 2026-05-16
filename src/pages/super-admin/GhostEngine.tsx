@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Ghost, Search, Shield, RefreshCw, Clock, Mail, AlertTriangle, KeyRound, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export default function GhostEngine() {
+  const { t } = useTranslation();
   const { impersonateUser } = useAuth();
   const { data: users, isLoading: usersLoading } = useGlobalUsers();
   const { data: logs, isLoading: logsLoading } = useGlobalAuditLogs();
@@ -68,28 +70,28 @@ export default function GhostEngine() {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Ghost className="h-5 w-5 text-emerald-400" />
-          <h1 className="text-2xl font-bold text-white">Ghost Engine</h1>
+          <h1 className="text-2xl font-bold text-white">{t('legacy.ghostEngine')}</h1>
         </div>
-        <p className="text-slate-400 text-sm">Inhabit any user account. Every action leaves an immutable audit trail.</p>
+        <p className="text-muted-foreground text-sm">{t('legacy.inhabitAnyUserAccountEveryActionLeavesAnImmutableAuditTrail')}</p>
       </div>
 
       <Alert className="border-amber-500/30 bg-amber-500/10">
         <AlertTriangle className="h-4 w-4 text-amber-400" />
         <AlertDescription className="text-amber-300 text-xs font-medium">
-          All ghost sessions are logged with your Super Admin ID. Sessions expire after 15 minutes. Every action taken during impersonation is tagged in audit_logs.
+          {t('legacy.allGhostSessionsAreLoggedWithYourSuperAdminIdSessionsExpireAfter15Minu')}
         </AlertDescription>
       </Alert>
 
       <Tabs defaultValue="console">
         <TabsList className="bg-slate-800 border border-slate-700">
-          <TabsTrigger value="console" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
-            <Ghost className="h-3.5 w-3.5 mr-1.5" /> Impersonation Console
+          <TabsTrigger value="console" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground">
+            <Ghost className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.impersonationConsole')}
           </TabsTrigger>
-          <TabsTrigger value="log" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
-            <Clock className="h-3.5 w-3.5 mr-1.5" /> Ghost Session Log
+          <TabsTrigger value="log" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground">
+            <Clock className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.ghostSessionLog')}
           </TabsTrigger>
-          <TabsTrigger value="tools" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
-            <KeyRound className="h-3.5 w-3.5 mr-1.5" /> Access Tools
+          <TabsTrigger value="tools" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground">
+            <KeyRound className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.accessTools')}
           </TabsTrigger>
         </TabsList>
 
@@ -98,12 +100,12 @@ export default function GhostEngine() {
           <Card className="bg-slate-800 border-slate-700">
             <CardHeader className="pb-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by email, name, or user ID…"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="pl-10 bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-emerald-500"
+                  className="pl-10 bg-slate-900 border-slate-600 text-white placeholder:text-muted-foreground focus-visible:ring-emerald-500"
                 />
               </div>
             </CardHeader>
@@ -111,10 +113,10 @@ export default function GhostEngine() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">User</th>
-                      <th className="text-left px-4 py-3">Orgs / Roles</th>
-                      <th className="text-center px-4 py-3">Actions</th>
+                    <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">{t('legacy.user')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.orgsRoles')}</th>
+                      <th className="text-center px-4 py-3">{t('legacy.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -136,15 +138,15 @@ export default function GhostEngine() {
                               </div>
                               <div>
                                 <p className="font-semibold text-white text-sm">{u.full_name ?? '—'}</p>
-                                <p className="text-slate-400 text-xs">{u.email}</p>
+                                <p className="text-muted-foreground text-xs">{u.email}</p>
                               </div>
                             </div>
                           </td>
                           <td className="px-4 py-4">
                             {isSuperAdmin ? (
-                              <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xxs">SUPER ADMIN</Badge>
+                              <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xxs">{t('legacy.superAdmin')}</Badge>
                             ) : roles.length === 0 ? (
-                              <span className="text-slate-500 text-xs italic">No roles</span>
+                              <span className="text-muted-foreground text-xs italic">{t('legacy.noRoles')}</span>
                             ) : (
                               <div className="flex flex-wrap gap-1">
                                 {roles.slice(0, 3).map((r: any, i: number) => (
@@ -164,7 +166,7 @@ export default function GhostEngine() {
                                 disabled={isSuperAdmin || roles.length === 0}
                                 onClick={() => handleGhost(u)}
                               >
-                                <Ghost className="h-3 w-3 mr-1" /> Ghost
+                                <Ghost className="h-3 w-3 mr-1" /> {t('legacy.ghost')}
                               </Button>
                               <Button
                                 size="sm"
@@ -172,7 +174,7 @@ export default function GhostEngine() {
                                 className="h-7 text-xs border-amber-500/40 text-amber-400 hover:bg-amber-500/10"
                                 onClick={() => setPwResetTarget({ id: u.id, email: u.email, name: u.full_name ?? u.email })}
                               >
-                                <KeyRound className="h-3 w-3 mr-1" /> Reset PW
+                                <KeyRound className="h-3 w-3 mr-1" /> {t('legacy.resetPw')}
                               </Button>
                             </div>
                           </td>
@@ -180,7 +182,7 @@ export default function GhostEngine() {
                       );
                     })}
                     {!usersLoading && filtered.length === 0 && (
-                      <tr><td colSpan={3} className="py-12 text-center text-slate-500 text-sm">No users match your search</td></tr>
+                      <tr><td colSpan={3} className="py-12 text-center text-muted-foreground text-sm">{t('legacy.noUsersMatchYourSearch')}</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -195,7 +197,7 @@ export default function GhostEngine() {
             <CardHeader>
               <CardTitle className="text-white text-base flex items-center gap-2">
                 <Shield className="h-4 w-4 text-emerald-400" />
-                Admin Action History
+                {t('legacy.adminActionHistory')}
                 <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xxs">{ghostLogs.length} entries</Badge>
               </CardTitle>
             </CardHeader>
@@ -203,11 +205,11 @@ export default function GhostEngine() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">Timestamp</th>
-                      <th className="text-left px-4 py-3">Actor</th>
-                      <th className="text-left px-4 py-3">Action</th>
-                      <th className="text-left px-4 py-3">Target Org</th>
+                    <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">{t('legacy.timestamp')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.actor')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.action')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.targetOrg')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -217,16 +219,16 @@ export default function GhostEngine() {
                       </tr>
                     )) : ghostLogs.slice(0, 50).map(log => (
                       <tr key={log.id} className="border-b border-slate-700/50 hover:bg-slate-700/20">
-                        <td className="px-6 py-3 text-slate-400 text-xs font-mono whitespace-nowrap">{formatDate(log.created_at)}</td>
+                        <td className="px-6 py-3 text-muted-foreground text-xs font-mono whitespace-nowrap">{formatDate(log.created_at)}</td>
                         <td className="px-4 py-3 text-white text-xs">{(log.actor as any)?.full_name ?? (log.actor as any)?.email ?? '—'}</td>
                         <td className="px-4 py-3">
                           <code className="text-xxs bg-slate-900/50 text-emerald-300 px-2 py-0.5 rounded">{log.action}</code>
                         </td>
-                        <td className="px-4 py-3 text-slate-400 text-xs">{(log.org as any)?.name ?? '—'}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-xs">{(log.org as any)?.name ?? '—'}</td>
                       </tr>
                     ))}
                     {!logsLoading && ghostLogs.length === 0 && (
-                      <tr><td colSpan={4} className="py-10 text-center text-slate-500 text-sm">No super admin actions recorded yet</td></tr>
+                      <tr><td colSpan={4} className="py-10 text-center text-muted-foreground text-sm">{t('legacy.noSuperAdminActionsRecordedYet')}</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -251,8 +253,8 @@ export default function GhostEngine() {
                   </div>
                   <div>
                     <p className="font-semibold text-white text-sm">{title}</p>
-                    <p className="text-slate-400 text-xs mt-1 leading-relaxed">{desc}</p>
-                    <Badge className="mt-2 bg-slate-700 text-slate-400 border-slate-600 text-xxxs">{tag}</Badge>
+                    <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{desc}</p>
+                    <Badge className="mt-2 bg-slate-700 text-muted-foreground border-slate-600 text-xxxs">{tag}</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -266,21 +268,21 @@ export default function GhostEngine() {
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <KeyRound className="h-4 w-4 text-amber-400" /> Force Password Reset
+              <KeyRound className="h-4 w-4 text-amber-400" /> {t('legacy.forcePasswordReset')}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              This will immediately send a password reset email to <strong className="text-white">{pwResetTarget?.email}</strong>.
+            <DialogDescription className="text-muted-foreground">
+              {t('legacy.thisWillImmediatelySendAPasswordResetEmailTo')} <strong className="text-white">{pwResetTarget?.email}</strong>.
               The user will receive a secure reset link valid for 1 hour.
             </DialogDescription>
           </DialogHeader>
           <Alert className="border-amber-500/30 bg-amber-500/10">
             <Mail className="h-4 w-4 text-amber-400" />
             <AlertDescription className="text-amber-300 text-xs">
-              An audit log entry will be written with action <code>SUPER_ADMIN_FORCED_PASSWORD_RESET</code>.
+              {t('legacy.anAuditLogEntryWillBeWrittenWithAction')} <code>{t('legacy.superAdminForcedPasswordReset')}</code>.
             </AlertDescription>
           </Alert>
           <DialogFooter className="gap-2">
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setPwResetTarget(null)}>Cancel</Button>
+            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setPwResetTarget(null)}>{t('legacy.cancel')}</Button>
             <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={handleForcePasswordReset} disabled={pwResetLoading}>
               {pwResetLoading ? 'Sending…' : 'Send Reset Email'}
             </Button>

@@ -42,7 +42,7 @@ export function WorkspaceSwitcher({
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-12 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white text-white shadow-sm transition-all flex items-center outline-none",
+            "h-12 rounded-2xl border border-white/10 bg-white/5 hover:bg-muted/10 hover:text-white text-white shadow-sm transition-all flex items-center outline-none",
             isCollapsed
               ? "mx-auto w-12 justify-center px-0"
               : "w-full gap-3 px-2"
@@ -73,8 +73,8 @@ export function WorkspaceSwitcher({
           <DropdownMenuItem
             key={ws.id}
             className={cn(
-              'py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5 mb-1',
-              ws.id === activeId ? 'font-bold text-bizrent-navy bg-slate-50/50' : 'font-medium text-muted-foreground'
+              'py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-muted/40 flex items-center gap-2.5 mb-1',
+              ws.id === activeId ? 'font-bold text-bizrent-navy dark:text-white bg-muted/50' : 'font-medium text-muted-foreground'
             )}
             onClick={() => ws.id !== activeId && onSwitch(ws.id)}
           >

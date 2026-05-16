@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Building2, Search, Home, RefreshCw, ToggleLeft, ToggleRight, MapPin, Users, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,6 +65,7 @@ const UNIT_STATUS_STYLES: Record<string, string> = {
 };
 
 export default function PropertyControl() {
+  const { t } = useTranslation();
   const [propSearch, setPropSearch] = useState('');
   const [unitSearch, setUnitSearch] = useState('');
   const [unitStatusTarget, setUnitStatusTarget] = useState<GlobalUnit | null>(null);
@@ -128,9 +130,9 @@ export default function PropertyControl() {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Building2 className="h-5 w-5 text-purple-400" />
-          <h1 className="text-2xl font-bold text-white">Property Control</h1>
+          <h1 className="text-2xl font-bold text-white">{t('legacy.propertyControl')}</h1>
         </div>
-        <p className="text-slate-400 text-sm">Global registry of all properties and units across every organisation.</p>
+        <p className="text-muted-foreground text-sm">{t('legacy.globalRegistryOfAllPropertiesAndUnitsAcrossEveryOrganisation')}</p>
       </div>
 
       {/* KPI Strip */}
@@ -145,7 +147,7 @@ export default function PropertyControl() {
         ].map(({ label, value, color }) => (
           <Card key={label} className="bg-slate-800 border-slate-700">
             <CardContent className="p-3">
-              <p className="text-slate-500 text-xxs uppercase tracking-wider mb-1">{label}</p>
+              <p className="text-muted-foreground text-xxs uppercase tracking-wider mb-1">{label}</p>
               {propsLoading || unitsLoading ? (
                 <Skeleton className="h-7 w-10 bg-slate-700" />
               ) : (
@@ -158,11 +160,11 @@ export default function PropertyControl() {
 
       <Tabs defaultValue="properties">
         <TabsList className="bg-slate-800 border border-slate-700">
-          <TabsTrigger value="properties" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-slate-400">
-            <Building2 className="h-3.5 w-3.5 mr-1.5" /> Properties
+          <TabsTrigger value="properties" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-muted-foreground">
+            <Building2 className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.properties')}
           </TabsTrigger>
-          <TabsTrigger value="units" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-slate-400">
-            <Home className="h-3.5 w-3.5 mr-1.5" /> Units
+          <TabsTrigger value="units" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-muted-foreground">
+            <Home className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.units')}
           </TabsTrigger>
         </TabsList>
 
@@ -172,15 +174,15 @@ export default function PropertyControl() {
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search by property name, org, or address…"
                     value={propSearch}
                     onChange={e => setPropSearch(e.target.value)}
-                    className="pl-10 bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-purple-500"
+                    className="pl-10 bg-slate-900 border-slate-600 text-white placeholder:text-muted-foreground focus-visible:ring-purple-500"
                   />
                 </div>
-                <Button variant="outline" size="sm" className="border-slate-600 text-slate-400 hover:bg-slate-700" onClick={() => refetchProps()}>
+                <Button variant="outline" size="sm" className="border-slate-600 text-muted-foreground hover:bg-slate-700" onClick={() => refetchProps()}>
                   <RefreshCw className="h-3.5 w-3.5" />
                 </Button>
               </div>
@@ -189,12 +191,12 @@ export default function PropertyControl() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">Property</th>
-                      <th className="text-left px-4 py-3">Organisation</th>
-                      <th className="text-left px-4 py-3">Type</th>
-                      <th className="text-center px-4 py-3">Units</th>
-                      <th className="text-center px-4 py-3">Status</th>
+                    <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">{t('legacy.property')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.organisation')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.type')}</th>
+                      <th className="text-center px-4 py-3">{t('legacy.units')}</th>
+                      <th className="text-center px-4 py-3">{t('legacy.status')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -213,7 +215,7 @@ export default function PropertyControl() {
                             </div>
                             <div>
                               <p className="text-white text-sm font-medium">{p.name}</p>
-                              <p className="text-slate-500 text-xs flex items-center gap-1">
+                              <p className="text-muted-foreground text-xs flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />{p.address}
                               </p>
                             </div>
@@ -228,15 +230,15 @@ export default function PropertyControl() {
                         </td>
                         <td className="px-4 py-4 text-center">
                           {p.is_active ? (
-                            <Badge className="text-xxs bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Active</Badge>
+                            <Badge className="text-xxs bg-emerald-500/20 text-emerald-400 border-emerald-500/30">{t('legacy.active')}</Badge>
                           ) : (
-                            <Badge className="text-xxs bg-slate-600/50 text-slate-400 border-slate-600">Inactive</Badge>
+                            <Badge className="text-xxs bg-slate-600/50 text-muted-foreground border-slate-600">{t('legacy.inactive')}</Badge>
                           )}
                         </td>
                       </tr>
                     ))}
                     {!propsLoading && filteredProps.length === 0 && (
-                      <tr><td colSpan={5} className="py-12 text-center text-slate-500 text-sm">No properties match your search</td></tr>
+                      <tr><td colSpan={5} className="py-12 text-center text-muted-foreground text-sm">{t('legacy.noPropertiesMatchYourSearch')}</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -251,15 +253,15 @@ export default function PropertyControl() {
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search by unit number, property, or org…"
                     value={unitSearch}
                     onChange={e => setUnitSearch(e.target.value)}
-                    className="pl-10 bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-purple-500"
+                    className="pl-10 bg-slate-900 border-slate-600 text-white placeholder:text-muted-foreground focus-visible:ring-purple-500"
                   />
                 </div>
-                <Button variant="outline" size="sm" className="border-slate-600 text-slate-400 hover:bg-slate-700" onClick={() => refetchUnits()}>
+                <Button variant="outline" size="sm" className="border-slate-600 text-muted-foreground hover:bg-slate-700" onClick={() => refetchUnits()}>
                   <RefreshCw className="h-3.5 w-3.5" />
                 </Button>
               </div>
@@ -268,13 +270,13 @@ export default function PropertyControl() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">Unit</th>
-                      <th className="text-left px-4 py-3">Property / Org</th>
-                      <th className="text-left px-4 py-3">Tenant</th>
+                    <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">{t('legacy.unit')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.propertyOrg')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.tenant')}</th>
                       <th className="text-right px-4 py-3">Rent (RWF)</th>
-                      <th className="text-center px-4 py-3">Status</th>
-                      <th className="text-center px-4 py-3">Override</th>
+                      <th className="text-center px-4 py-3">{t('legacy.status')}</th>
+                      <th className="text-center px-4 py-3">{t('legacy.override')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -293,29 +295,29 @@ export default function PropertyControl() {
                             </div>
                             <div>
                               <p className="text-white text-sm font-medium">{u.unit_number}</p>
-                              <p className="text-slate-500 text-xs">{u.unit_type}</p>
+                              <p className="text-muted-foreground text-xs">{u.unit_type}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-4">
                           <p className="text-slate-200 text-xs font-medium">{u.property_name}</p>
-                          <p className="text-slate-500 text-xs">{u.org_name}</p>
+                          <p className="text-muted-foreground text-xs">{u.org_name}</p>
                         </td>
                         <td className="px-4 py-4">
                           {u.tenant_name ? (
                             <div className="flex items-center gap-1.5">
-                              <Users className="h-3 w-3 text-slate-400" />
+                              <Users className="h-3 w-3 text-muted-foreground" />
                               <span className="text-slate-300 text-xs">{u.tenant_name}</span>
                             </div>
                           ) : (
-                            <span className="text-slate-600 text-xs italic">Vacant</span>
+                            <span className="text-muted-foreground text-xs italic">{t('legacy.vacant')}</span>
                           )}
                         </td>
                         <td className="px-4 py-4 text-right text-slate-200 text-xs font-mono">
                           {u.monthly_rent.toLocaleString()}
                         </td>
                         <td className="px-4 py-4 text-center">
-                          <Badge className={`text-xxs ${UNIT_STATUS_STYLES[u.status] ?? 'bg-slate-600/50 text-slate-400 border-slate-600'}`}>
+                          <Badge className={`text-xxs ${UNIT_STATUS_STYLES[u.status] ?? 'bg-slate-600/50 text-muted-foreground border-slate-600'}`}>
                             {u.status}
                           </Badge>
                         </td>
@@ -326,13 +328,13 @@ export default function PropertyControl() {
                             className="h-6 text-xxs border-purple-500/30 text-purple-400 hover:bg-purple-500/10 px-2"
                             onClick={() => { setUnitStatusTarget(u); setNewStatus(u.status); }}
                           >
-                            Override
+                            {t('legacy.override')}
                           </Button>
                         </td>
                       </tr>
                     ))}
                     {!unitsLoading && filteredUnits.length === 0 && (
-                      <tr><td colSpan={6} className="py-12 text-center text-slate-500 text-sm">No units match your search</td></tr>
+                      <tr><td colSpan={6} className="py-12 text-center text-muted-foreground text-sm">{t('legacy.noUnitsMatchYourSearch')}</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -347,16 +349,16 @@ export default function PropertyControl() {
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Home className="h-4 w-4 text-purple-400" /> Override Unit Status
+              <Home className="h-4 w-4 text-purple-400" /> {t('legacy.overrideUnitStatus')}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              Force-set the status of unit <strong className="text-white">{unitStatusTarget?.unit_number}</strong> in <strong className="text-white">{unitStatusTarget?.property_name}</strong>.
+            <DialogDescription className="text-muted-foreground">
+              {t('legacy.forceSetTheStatusOfUnit')} <strong className="text-white">{unitStatusTarget?.unit_number}</strong> {t('legacy.in')} <strong className="text-white">{unitStatusTarget?.property_name}</strong>.
               An audit log entry will be written.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
-              <p className="text-xs text-slate-400 mb-2">Current status: <Badge className={`ml-1 text-xxs ${UNIT_STATUS_STYLES[unitStatusTarget?.status ?? ''] ?? ''}`}>{unitStatusTarget?.status}</Badge></p>
+              <p className="text-xs text-muted-foreground mb-2">Current status: <Badge className={`ml-1 text-xxs ${UNIT_STATUS_STYLES[unitStatusTarget?.status ?? ''] ?? ''}`}>{unitStatusTarget?.status}</Badge></p>
               <Select value={newStatus} onValueChange={setNewStatus}>
                 <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
                   <SelectValue placeholder="Select new status" />
@@ -371,7 +373,7 @@ export default function PropertyControl() {
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => { setUnitStatusTarget(null); setNewStatus(''); }}>
-              Cancel
+              {t('legacy.cancel')}
             </Button>
             <Button
               className="bg-purple-600 hover:bg-purple-700 text-white"

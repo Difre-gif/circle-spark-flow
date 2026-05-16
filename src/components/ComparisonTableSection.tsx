@@ -85,7 +85,7 @@ const ComparisonTableSection: React.FC = () => {
   ];
 
   return (
-    <section id="comparison" className="py-24 bg-white">
+    <section id="comparison" className="py-24 bg-card">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Section Header */}
         <motion.div
@@ -122,7 +122,7 @@ const ComparisonTableSection: React.FC = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="bg-card divide-y divide-gray-100">
               {tableData.map((row, index) => (
                 <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#0D1B3E]">

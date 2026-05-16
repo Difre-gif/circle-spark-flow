@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, XCircle, Loader2 } from 'lucide-react';
@@ -12,6 +13,7 @@ import { usePayment, useApprovePayment, useRejectPayment, formatRWF, formatDate 
 import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: payment, isLoading } = usePayment(id);
@@ -36,7 +38,7 @@ export default function PaymentDetail() {
   }, [payment]);
 
   if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  if (!payment) return <div className="text-center py-12 text-muted-foreground">Payment not found</div>;
+  if (!payment) return <div className="text-center py-12 text-muted-foreground">{t('legacy.paymentNotFound')}</div>;
 
   const handleApprove = async () => {
     await approvePayment.mutateAsync(payment.id);
@@ -55,7 +57,7 @@ export default function PaymentDetail() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => navigate('/landlord/payments')}><ArrowLeft className="h-5 w-5" /></Button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold">Payment Review</h1>
+          <h1 className="text-2xl font-bold">{t('legacy.paymentReview')}</h1>
           <p className="text-muted-foreground">{payment.transaction_id ?? '—'}</p>
         </div>
         <StatusBadge status={payment.status} />
@@ -63,31 +65,31 @@ export default function PaymentDetail() {
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle>Payment Details</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('legacy.paymentDetails')}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between"><span className="text-muted-foreground">Tenant</span><span className="font-medium">{(payment.tenant as any)?.full_name ?? '—'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.tenant')}</span><span className="font-medium">{(payment.tenant as any)?.full_name ?? '—'}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Invoice</span><span className="text-primary font-medium">{(payment.invoice as any)?.invoice_number ?? '—'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.invoice')}</span><span className="text-primary font-medium">{(payment.invoice as any)?.invoice_number ?? '—'}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="text-xl font-bold text-bizrent-navy font-mono">{formatRWF(payment.amount)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.amount')}</span><span className="text-xl font-bold text-bizrent-navy dark:text-white font-mono">{formatRWF(payment.amount)}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Method</span><span>{payment.payment_method?.replace('_', ' ')}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.method')}</span><span>{payment.payment_method?.replace('_', ' ')}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Transaction ID</span><span className="font-mono">{payment.transaction_id ?? '—'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.transactionId')}</span><span className="font-mono">{payment.transaction_id ?? '—'}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">Submitted</span><span>{formatDate(payment.submitted_at)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.submitted')}</span><span>{formatDate(payment.submitted_at)}</span></div>
             {payment.reviewed_at && <>
               <Separator />
-              <div className="flex justify-between"><span className="text-muted-foreground">Reviewed</span><span>{formatDate(payment.reviewed_at)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.reviewed')}</span><span>{formatDate(payment.reviewed_at)}</span></div>
             </>}
             {payment.reviewer && <>
               <Separator />
-              <div className="flex justify-between"><span className="text-muted-foreground">Reviewed By</span><span>{(payment.reviewer as any)?.full_name ?? '—'}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.reviewedBy')}</span><span>{(payment.reviewer as any)?.full_name ?? '—'}</span></div>
             </>}
             {payment.rejection_reason && <>
               <Separator />
               <div>
-                <p className="text-muted-foreground text-sm mb-1">Rejection Reason</p>
+                <p className="text-muted-foreground text-sm mb-1">{t('legacy.rejectionReason')}</p>
                 <p className="text-sm bg-destructive/10 text-destructive rounded-md p-3">{payment.rejection_reason}</p>
               </div>
             </>}
@@ -95,15 +97,15 @@ export default function PaymentDetail() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Payment Proof</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('legacy.paymentProof')}</CardTitle></CardHeader>
           <CardContent>
             {proofUrl ? (
               <img src={proofUrl} alt="Payment proof" className="rounded-lg border max-h-96 w-full object-contain" />
             ) : (
               <div className="aspect-[3/4] rounded-lg bg-muted flex items-center justify-center border-2 border-dashed border-border">
                 <div className="text-center text-muted-foreground">
-                  <p className="text-sm">No screenshot uploaded</p>
-                  <p className="text-xs mt-1">Proof image will appear here</p>
+                  <p className="text-sm">{t('legacy.noScreenshotUploaded')}</p>
+                  <p className="text-xs mt-1">{t('legacy.proofImageWillAppearHere')}</p>
                 </div>
               </div>
             )}
@@ -114,7 +116,7 @@ export default function PaymentDetail() {
       {payment.status === 'PENDING' && (
         <div className="flex gap-3 justify-end">
           <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive/10" onClick={() => setRejectOpen(true)}>
-            <XCircle className="mr-2 h-4 w-4" /> Reject Payment
+            <XCircle className="mr-2 h-4 w-4" /> {t('legacy.rejectPayment')}
           </Button>
           <Button className="bg-bizrent-emerald hover:bg-bizrent-emerald/90" onClick={handleApprove} disabled={approvePayment.isPending}>
             <CheckCircle className="mr-2 h-4 w-4" /> {approvePayment.isPending ? 'Approving...' : 'Approve Payment'}
@@ -124,13 +126,13 @@ export default function PaymentDetail() {
 
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Reject Payment</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t('legacy.rejectPayment')}</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">Please provide a reason for rejecting this payment. The tenant will be notified.</p>
-            <div className="space-y-2"><Label>Reason</Label><Textarea placeholder="e.g. Transaction ID does not match MoMo records" value={reason} onChange={e => setReason(e.target.value)} /></div>
+            <p className="text-sm text-muted-foreground">{t('legacy.pleaseProvideAReasonForRejectingThisPaymentTheTenantWillBeNotified')}</p>
+            <div className="space-y-2"><Label>{t('legacy.reason')}</Label><Textarea placeholder="e.g. Transaction ID does not match MoMo records" value={reason} onChange={e => setReason(e.target.value)} /></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setRejectOpen(false)}>{t('legacy.cancel')}</Button>
             <Button variant="destructive" onClick={handleReject} disabled={rejectPayment.isPending || !reason.trim()}>
               {rejectPayment.isPending ? 'Rejecting...' : 'Reject'}
             </Button>

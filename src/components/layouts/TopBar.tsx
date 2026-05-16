@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import { Bell, Search, LogOut, Menu, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTranslation } from 'react-i18next';
 
 export function TopBar() {
   const { user, logout } = useAuth();
@@ -80,7 +80,7 @@ export function TopBar() {
           </TooltipContent>
         </Tooltip>
         <div className="md:hidden flex items-center gap-3">
-          <BizRentLogo variant="icon" size="sm" className="text-bizrent-navy" />
+          <BizRentLogo variant="icon" size="sm" className="text-bizrent-navy dark:text-white" />
         </div>
       </div>
 
@@ -94,7 +94,7 @@ export function TopBar() {
         
         {/* Search - Visible on Desktop */}
         <div className="relative hidden md:block w-72 group">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-bizrent-navy" />
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-bizrent-navy dark:text-white" />
           <Input 
             ref={searchInputRef}
             placeholder={t('ui.searchPlaceholder')} 
@@ -131,7 +131,7 @@ export function TopBar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl p-2">
               <div className="px-3 py-2">
-                <p className="text-sm font-bold text-bizrent-navy">{user?.name}</p>
+                <p className="text-sm font-bold text-bizrent-navy dark:text-white">{user?.name}</p>
                 <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               </div>
               <DropdownMenuSeparator />

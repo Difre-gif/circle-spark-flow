@@ -43,7 +43,7 @@ function StatusBadge({ status }: { status: PaymentStatus }) {
 // ─── Metric Card ─────────────────────────────────────────────────────────────
 function MetricCard({ icon: Icon, label, value, color, sub }: { icon: any; label: string; value: string | number; color: string; sub?: string }) {
   return (
-    <div className="bg-white rounded-[8px] border border-[#E2E8F0] p-3 shadow-card">
+    <div className="bg-card rounded-[8px] border border-[#E2E8F0] p-3 shadow-card">
       <div className="flex items-center gap-2 mb-2">
         <div className="p-1.5 rounded-[6px]" style={{ background: color + '18' }}>
           <Icon className="h-3.5 w-3.5" style={{ color }} />
@@ -78,7 +78,7 @@ function PaymentCard({
       key={payment.id}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-[8px] border border-[#E2E8F0] p-3 shadow-card"
+      className="bg-card rounded-[8px] border border-[#E2E8F0] p-3 shadow-card"
     >
       <div className="flex items-start justify-between mb-2">
         <div>

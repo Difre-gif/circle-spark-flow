@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
@@ -10,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -46,8 +48,8 @@ export default function Login() {
             <BizRentLogo size="lg" className="text-primary" />
           </div>
           <div>
-            <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>East Africa's MoMo-First Property Management</CardDescription>
+            <CardTitle className="text-2xl">{t('legacy.welcomeBack')}</CardTitle>
+            <CardDescription>{t('legacy.eastAfricaSMomoFirstPropertyManagement')}</CardDescription>
           </div>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -58,11 +60,11 @@ export default function Login() {
               </Alert>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('legacy.email')}</Label>
               <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('legacy.password')}</Label>
               <div className="relative">
                 <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required className="pr-10" />
                 <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
@@ -71,7 +73,7 @@ export default function Login() {
               </div>
             </div>
             <div className="text-right">
-              <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
+              <Link to="/forgot-password" className="text-sm text-primary hover:underline">{t('legacy.forgotPassword')}</Link>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3">
@@ -79,7 +81,7 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Don't have an account? <Link to="/register" className="text-primary hover:underline">Sign up</Link>
+              {t('legacy.donTHaveAnAccount')} <Link to="/register" className="text-primary hover:underline">{t('legacy.signUp')}</Link>
             </p>
           </CardFooter>
         </form>

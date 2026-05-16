@@ -160,7 +160,7 @@ export default function SocialProofSection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0 bg-white rounded-[8px] border border-[#E2E8F0] p-8 shadow-elevated flex flex-col justify-between"
+                    className="absolute inset-0 bg-card rounded-[8px] border border-[#E2E8F0] p-8 shadow-elevated flex flex-col justify-between"
                   >
                     {/* Quote mark */}
                     <div

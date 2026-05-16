@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BizRentLogo } from '@/components/BizRentLogo';
@@ -10,6 +11,7 @@ import { CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,15 +38,15 @@ export default function ForgotPassword() {
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center"><BizRentLogo size="lg" className="text-primary" /></div>
           <div>
-            <CardTitle className="text-2xl">Reset your password</CardTitle>
-            <CardDescription>We'll send you a link to reset your password</CardDescription>
+            <CardTitle className="text-2xl">{t('legacy.resetYourPassword')}</CardTitle>
+            <CardDescription>{t('legacy.resetLinkDescription')}</CardDescription>
           </div>
         </CardHeader>
         {sent ? (
           <CardContent className="text-center space-y-4 pb-8">
             <CheckCircle className="mx-auto h-12 w-12 text-bizrent-emerald" />
-            <p className="text-sm text-muted-foreground">If an account exists for <strong>{email}</strong>, you'll receive a password reset link shortly.</p>
-            <Link to="/login" className="text-sm text-primary hover:underline">Back to login</Link>
+            <p className="text-sm text-muted-foreground">{t('legacy.ifAnAccountExistsFor')} <strong>{email}</strong>, you'll receive a password reset link shortly.</p>
+            <Link to="/login" className="text-sm text-primary hover:underline">{t('legacy.backToLogin')}</Link>
           </CardContent>
         ) : (
           <form onSubmit={handleSubmit}>
@@ -54,13 +56,13 @@ export default function ForgotPassword() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              <div className="space-y-2"><Label>Email</Label><Input type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required /></div>
+              <div className="space-y-2"><Label>{t('legacy.email')}</Label><Input type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required /></div>
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </Button>
-              <Link to="/login" className="text-sm text-muted-foreground hover:underline">Back to login</Link>
+              <Link to="/login" className="text-sm text-muted-foreground hover:underline">{t('legacy.backToLogin')}</Link>
             </CardFooter>
           </form>
         )}

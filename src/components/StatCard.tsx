@@ -18,7 +18,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className 
         <div className="flex items-center justify-between">
           <div className="space-y-1.5">
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{title}</p>
-            <p className="text-3xl font-bold text-bizrent-navy">{value}</p>
+            <p className="text-3xl font-bold text-bizrent-navy dark:text-white">{value}</p>
             {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
             {trend && (
               <p className={cn('text-sm font-medium flex items-center mt-2', trend.positive ? 'text-bizrent-emerald' : 'text-bizrent-red')}>
@@ -30,7 +30,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className 
             )}
           </div>
           <div className="rounded-xl bg-bizrent-navy/5 p-4 ring-1 ring-bizrent-navy/10">
-            <Icon className="h-7 w-7 text-bizrent-navy" />
+            <Icon className="h-7 w-7 text-bizrent-navy dark:text-white" />
           </div>
         </div>
       </CardContent>

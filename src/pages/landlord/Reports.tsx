@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import { Loader2, Download, Calendar, ChevronRight, BarChart2, Activity, Home, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +26,7 @@ function getMonthOptions() {
 }
 
 export default function Reports() {
+  const { t } = useTranslation();
   const [monthFilter, setMonthFilter] = useState('all');
   const { data: occupancy, isLoading: occLoading } = useOccupancySummary();
   const { data: aging, isLoading: agingLoading } = useOverdueAgingReport();
@@ -71,12 +73,12 @@ export default function Reports() {
       <div className="page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
-            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Analytics</span>
+            <span className="cursor-pointer hover:text-bizrent-navy dark:text-white transition-colors">{t('legacy.analytics')}</span>
             <ChevronRight className="h-3.5 w-3.5" />
-            <span className="text-bizrent-blue">Reports</span>
+            <span className="text-bizrent-blue">{t('legacy.reports')}</span>
           </p>
-          <h1 className="page-title text-2xl font-bold">Reports</h1>
-          <p className="page-description text-muted-foreground mt-1">Financial and occupancy analytics</p>
+          <h1 className="page-title text-2xl font-bold">{t('legacy.reports')}</h1>
+          <p className="page-description text-muted-foreground mt-1">{t('legacy.financialAndOccupancyAnalytics')}</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -91,42 +93,42 @@ export default function Reports() {
             </Select>
           </div>
           <Button variant="outline" className="rounded-xl font-semibold" onClick={() => window.print()}>
-            <Download className="mr-2 h-4 w-4" /> Export
+            <Download className="mr-2 h-4 w-4" /> {t('legacy.export')}
           </Button>
         </div>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-6">
-        <StatCard title="Total Collected (6mo)" value={formatRWF(kpis.totalCollected)} icon={BarChart2} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
-        <StatCard title="Total Outstanding" value={formatRWF(kpis.totalOutstanding)} icon={Activity} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
-        <StatCard title="Avg Portfolio Occupancy" value={`${kpis.avgOccupancy}%`} icon={Home} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white" />
+        <StatCard title="Total Collected (6mo)" value={formatRWF(kpis.totalCollected)} icon={BarChart2} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card" />
+        <StatCard title="Total Outstanding" value={formatRWF(kpis.totalOutstanding)} icon={Activity} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card" />
+        <StatCard title="Avg Portfolio Occupancy" value={`${kpis.avgOccupancy}%`} icon={Home} className="rounded-2xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card" />
       </div>
 
       <Tabs defaultValue="collections" className="space-y-6">
         <TabsList className="bg-transparent border-b border-border/40 w-full justify-start h-auto p-0 rounded-none overflow-x-auto flex-nowrap">
           <TabsTrigger 
             value="collections" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy transition-all"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy dark:text-white transition-all"
           >
-            Collections
+            {t('legacy.collections')}
           </TabsTrigger>
           <TabsTrigger 
             value="aging" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy transition-all"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy dark:text-white transition-all"
           >
-            Aging Report
+            {t('legacy.agingReport')}
           </TabsTrigger>
           <TabsTrigger 
             value="occupancy" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy transition-all"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy dark:text-white transition-all"
           >
-            Occupancy
+            {t('legacy.occupancy')}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="collections" className="space-y-4 mt-0 animate-in fade-in slide-in-from-bottom-2">
           <Card>
-            <CardHeader><CardTitle>Monthly Collections vs Outstanding</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('legacy.monthlyCollectionsVsOutstanding')}</CardTitle></CardHeader>
             <CardContent>
               {collectionData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -144,15 +146,15 @@ export default function Reports() {
                   <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
                     <BarChart2 className="h-8 w-8 text-muted-foreground/50" />
                   </div>
-                  <p className="font-bold text-bizrent-navy text-lg">No collection data yet</p>
+                  <p className="font-bold text-bizrent-navy dark:text-white text-lg">{t('legacy.noCollectionDataYet')}</p>
                   <p className="text-sm mt-2 text-muted-foreground font-medium max-w-sm mb-6">
-                    Your collection data will appear here once tenants start making payments against their invoices.
+                    {t('legacy.yourCollectionDataWillAppearHereOnceTenantsStartMakingPaymentsAgainstT')}
                   </p>
                   <Button 
                     className="rounded-xl font-bold px-6 bg-bizrent-navy hover:bg-bizrent-navy/90 text-white shadow-lg shadow-bizrent-navy/10"
                     onClick={() => window.location.href = '/landlord/tenants'}
                   >
-                    Invite your first tenant
+                    {t('legacy.inviteYourFirstTenant')}
                   </Button>
                 </div>
               )}
@@ -162,10 +164,10 @@ export default function Reports() {
 
         <TabsContent value="aging" className="space-y-4 mt-0 animate-in fade-in slide-in-from-bottom-2">
           <Card>
-            <CardHeader><CardTitle>Aging Buckets</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('legacy.agingBuckets')}</CardTitle></CardHeader>
             <CardContent className="p-0">
               <Table>
-                <TableHeader><TableRow className="bg-primary/5"><TableHead>Bucket</TableHead><TableHead>Invoices</TableHead><TableHead>Total Amount</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow className="bg-primary/5"><TableHead>{t('legacy.bucket')}</TableHead><TableHead>{t('legacy.invoices')}</TableHead><TableHead>{t('legacy.totalAmount')}</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {agingBuckets.map(b => (
                     <TableRow key={b.bucket}>
@@ -176,12 +178,12 @@ export default function Reports() {
                   ))}
                   {agingBuckets.length > 0 && (
                     <TableRow className="bg-muted/50 font-bold">
-                      <TableCell>Total Outstanding</TableCell>
+                      <TableCell>{t('legacy.totalOutstanding')}</TableCell>
                       <TableCell>{agingBuckets.reduce((a, b) => a + b.count, 0)}</TableCell>
                       <TableCell className="font-mono">{formatRWF(agingBuckets.reduce((a, b) => a + b.amount, 0))}</TableCell>
                     </TableRow>
                   )}
-                  {agingBuckets.length === 0 && <TableRow><TableCell colSpan={3} className="text-center py-8 text-muted-foreground">No overdue invoices</TableCell></TableRow>}
+                  {agingBuckets.length === 0 && <TableRow><TableCell colSpan={3} className="text-center py-8 text-muted-foreground">{t('legacy.noOverdueInvoices')}</TableCell></TableRow>}
                 </TableBody>
               </Table>
             </CardContent>
@@ -190,10 +192,10 @@ export default function Reports() {
 
         <TabsContent value="occupancy" className="space-y-4 mt-0 animate-in fade-in slide-in-from-bottom-2">
           <Card>
-            <CardHeader><CardTitle>Property Occupancy</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('legacy.propertyOccupancy')}</CardTitle></CardHeader>
             <CardContent className="p-0">
               <Table>
-                <TableHeader><TableRow className="bg-primary/5"><TableHead>Property</TableHead><TableHead>Total Units</TableHead><TableHead>Occupied</TableHead><TableHead>Vacant</TableHead><TableHead>Rate</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow className="bg-primary/5"><TableHead>{t('legacy.property')}</TableHead><TableHead>{t('legacy.totalUnits')}</TableHead><TableHead>{t('legacy.occupied')}</TableHead><TableHead>{t('legacy.vacant')}</TableHead><TableHead>{t('legacy.rate')}</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {(occupancy ?? []).map(p => (
                     <TableRow key={p.property_id}>
@@ -204,7 +206,7 @@ export default function Reports() {
                       <TableCell className="font-semibold">{p.occupancy_rate_pct ?? 0}%</TableCell>
                     </TableRow>
                   ))}
-                  {(!occupancy || occupancy.length === 0) && <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No property data</TableCell></TableRow>}
+                  {(!occupancy || occupancy.length === 0) && <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">{t('legacy.noPropertyData')}</TableCell></TableRow>}
                 </TableBody>
               </Table>
             </CardContent>

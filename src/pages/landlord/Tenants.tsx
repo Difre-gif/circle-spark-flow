@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Loader2, Search, UserPlus, Mail, Clock, Send, Activity, Trash2, RotateCw, ChevronRight, MoreVertical, Edit2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { getCyclePreview } from '@/lib/billingCycles';
 
 export default function Tenants() {
+  const { t } = useTranslation();
   const [inviteOpen, setInviteOpen] = useState(false);
   const { data: tenants, isLoading } = useTenants();
   const { data: invitations, isLoading: invLoading } = useInvitations();
@@ -47,18 +49,18 @@ export default function Tenants() {
            user?.email?.toLowerCase().includes(search.toLowerCase());
   });
 
-  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-10 w-10 animate-spin text-bizrent-navy dark:text-white" /></div>;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
-            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Management</span>
+            <span className="cursor-pointer hover:text-bizrent-navy dark:text-white transition-colors">{t('legacy.management')}</span>
             <ChevronRight className="h-3.5 w-3.5" />
-            <span className="text-bizrent-blue">Tenants Directory</span>
+            <span className="text-bizrent-blue">{t('legacy.tenantsDirectory')}</span>
           </p>
-          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">Tenants Directory</h1>
+          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy dark:text-white tracking-tight">{t('legacy.tenantsDirectory')}</h1>
           <p className="page-description font-medium text-muted-foreground">
             {tenants?.length === 0 
               ? "No tenants yet — add someone to your workspace"
@@ -70,7 +72,7 @@ export default function Tenants() {
           className="rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-bold h-12 px-6 shadow-lg shadow-bizrent-navy/10 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
         >
           <UserPlus className="h-4 w-4" />
-          Invite New Tenant
+          {t('legacy.inviteNewTenant')}
         </Button>
       </div>
 
@@ -84,33 +86,33 @@ export default function Tenants() {
               placeholder="Search by name or email..." 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
-              className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20/20 text-sm font-medium transition-all" 
+              className="pl-11 h-11 rounded-xl bg-card border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20/20 text-sm font-medium transition-all" 
             />
           </div>
 
-          <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
+          <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
-                      <th className="text-left px-8 py-4 whitespace-nowrap">Name</th>
-                      <th className="text-left px-4 py-4">Contact Info</th>
-                      <th className="text-left px-8 py-4">Joined Date</th>
-                      <th className="text-right px-8 py-4">Actions</th>
+                      <th className="text-left px-8 py-4 whitespace-nowrap">{t('legacy.name')}</th>
+                      <th className="text-left px-4 py-4">{t('legacy.contactInfo')}</th>
+                      <th className="text-left px-8 py-4">{t('legacy.joinedDate')}</th>
+                      <th className="text-right px-8 py-4">{t('legacy.actions')}</th>
                     </tr>
                   </thead>
-                  <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
+                  <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
                     {filtered.map(t => {
                       const user = t.user as any;
                       return (
-                        <tr key={t.user_id} className="transition-all hover:bg-white border-b border-border/10 group">
+                        <tr key={t.user_id} className="transition-all hover:bg-card border-b border-border/10 group">
                           <td className="px-8 py-5">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-xl bg-bizrent-blue/10 text-bizrent-blue flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-all">
                                 {user?.full_name?.charAt(0) || 'U'}
                               </div>
-                              <span className="font-extrabold text-bizrent-navy">{user?.full_name ?? '—'}</span>
+                              <span className="font-extrabold text-bizrent-navy dark:text-white">{user?.full_name ?? '—'}</span>
                             </div>
                           </td>
                           <td className="px-4 py-5">
@@ -129,16 +131,16 @@ export default function Tenants() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-border/40">
                                 <DropdownMenuItem 
-                                  className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 hover:text-bizrent-blue transition-colors"
+                                  className="gap-2 cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-muted/40 hover:text-bizrent-blue transition-colors"
                                   onClick={() => setEditTenantTarget({ id: user?.id, name: user?.full_name || '', phone: user?.phone || '' })}
                                 >
-                                  <Edit2 className="h-4 w-4" /> Edit Profile
+                                  <Edit2 className="h-4 w-4" /> {t('legacy.editProfile')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
                                   className="gap-2 cursor-pointer py-2 px-3 text-bizrent-red font-medium rounded-lg hover:bg-red-50 hover:text-bizrent-red transition-colors"
                                   onClick={() => setDeleteTenantTarget({ id: user?.id, name: user?.full_name })}
                                 >
-                                  <Trash2 className="h-4 w-4" /> Remove
+                                  <Trash2 className="h-4 w-4" /> {t('legacy.remove')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -151,8 +153,8 @@ export default function Tenants() {
                         <td colSpan={4} className="py-20 text-center text-muted-foreground">
                           <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
                             <Activity className="h-10 w-10 mb-2 opacity-10" />
-                            <p className="font-bold text-bizrent-navy">No active tenants found</p>
-                            <p className="text-xs font-medium mt-1">Try adjusting your search criteria.</p>
+                            <p className="font-bold text-bizrent-navy dark:text-white">{t('legacy.noActiveTenantsFound')}</p>
+                            <p className="text-xs font-medium mt-1">{t('legacy.tryAdjustingYourSearchCriteria')}</p>
                           </div>
                         </td>
                       </tr>
@@ -166,11 +168,11 @@ export default function Tenants() {
 
         {/* Sidebar: Pending Invitations */}
         <div className="xl:col-span-4">
-          <Card className="border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white sticky top-6 overflow-hidden">
+          <Card className="border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card sticky top-6 overflow-hidden">
             <CardHeader className="pt-7 px-8 pb-4">
-              <CardTitle className="text-lg font-extrabold text-bizrent-navy flex items-center gap-2">
+              <CardTitle className="text-lg font-extrabold text-bizrent-navy dark:text-white flex items-center gap-2">
                 <Clock className="h-5 w-5 text-[#F59E0B]" />
-                Pending Invites
+                {t('legacy.pendingInvites')}
               </CardTitle>
             </CardHeader>
             <CardContent className="px-8 pb-8 pt-2">
@@ -189,13 +191,13 @@ export default function Tenants() {
                         <div className="flex justify-between items-start pr-12">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className="text-sm font-bold text-bizrent-navy truncate max-w-[140px] cursor-help">{inv.email}</span>
+                              <span className="text-sm font-bold text-bizrent-navy dark:text-white truncate max-w-[140px] cursor-help">{inv.email}</span>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>{inv.email}</p>
                             </TooltipContent>
                           </Tooltip>
-                          <span className="text-xxxs font-extrabold bg-[#F59E0B]/20 text-[#92400E] px-2 py-0.5 rounded-full uppercase tracking-tighter">Sent</span>
+                          <span className="text-xxxs font-extrabold bg-[#F59E0B]/20 text-[#92400E] px-2 py-0.5 rounded-full uppercase tracking-tighter">{t('legacy.sent')}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-xxs font-semibold text-muted-foreground">
                           <Mail className="h-3 w-3" />
@@ -208,7 +210,7 @@ export default function Tenants() {
                                 <RotateCw className={cn("h-3 w-3", resendInvite.isPending && resendInvite.variables?.id === inv.id ? "animate-spin" : "")} />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="left"><p className="text-xs">Resend Invite</p></TooltipContent>
+                            <TooltipContent side="left"><p className="text-xs">{t('legacy.resendInvite')}</p></TooltipContent>
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -216,14 +218,14 @@ export default function Tenants() {
                                 <Trash2 className="h-3 w-3" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="left"><p className="text-xs">Cancel Invite</p></TooltipContent>
+                            <TooltipContent side="left"><p className="text-xs">{t('legacy.cancelInvite')}</p></TooltipContent>
                           </Tooltip>
                         </div>
                       </div>
                     ))}
                     {(invitations ?? []).length === 0 && (
-                      <div className="text-center py-10 px-4 border-2 border-dashed border-muted rounded-[2rem] bg-slate-50">
-                        <p className="text-xs font-bold text-muted-foreground/60 italic leading-relaxed">Your invitation list <br/> is currently empty</p>
+                      <div className="text-center py-10 px-4 border-2 border-dashed border-muted rounded-[2rem] bg-muted/40">
+                        <p className="text-xs font-bold text-muted-foreground/60 italic leading-relaxed">{t('legacy.yourInvitationList')} <br/> {t('legacy.isCurrentlyEmpty')}</p>
                       </div>
                     )}
                   </>
@@ -242,14 +244,14 @@ export default function Tenants() {
             <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
               <Trash2 className="h-6 w-6 text-red-600" />
             </div>
-            <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Remove Tenant?</DialogTitle>
+            <DialogTitle className="text-xl font-extrabold text-bizrent-navy dark:text-white">{t('legacy.removeTenant')}</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground font-medium">
-              Are you sure you want to remove <strong>{deleteTenantTarget?.name}</strong> from your workspace? They will no longer be able to submit payments or view invoices for your properties.
+              {t('legacy.areYouSureYouWantToRemove')} <strong>{deleteTenantTarget?.name}</strong> {t('legacy.fromYourWorkspaceTheyWillNoLongerBeAbleToSubmitPaymentsOrViewInvoicesF')}
             </DialogDescription>
           </div>
           <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col sm:flex-row">
             <Button variant="outline" className="rounded-xl font-bold h-11 sm:flex-1" onClick={() => setDeleteTenantTarget(null)}>
-              Cancel
+              {t('legacy.cancel')}
             </Button>
             <Button 
               variant="destructive" 
@@ -272,29 +274,29 @@ export default function Tenants() {
       <Dialog open={!!editTenantTarget} onOpenChange={open => { if (!open) setEditTenantTarget(null); }}>
         <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-extrabold text-bizrent-navy">Edit Tenant Profile</DialogTitle>
+            <DialogTitle className="text-2xl font-extrabold text-bizrent-navy dark:text-white">{t('legacy.editTenantProfile')}</DialogTitle>
             <DialogDescription className="font-medium text-sm mt-1 text-muted-foreground">
-              Update the contact details for this tenant.
+              {t('legacy.updateTheContactDetailsForThisTenant')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-6 space-y-5">
             <div className="space-y-2">
-              <Label className="font-bold text-bizrent-navy px-1 text-xs uppercase tracking-widest opacity-70">Personal Info</Label>
-              <div className="space-y-4 p-4 bg-bizrent-light rounded-2xl border border-slate-100">
+              <Label className="font-bold text-bizrent-navy dark:text-white px-1 text-xs uppercase tracking-widest opacity-70">{t('legacy.personalInfo')}</Label>
+              <div className="space-y-4 p-4 bg-bizrent-light rounded-2xl border border-border">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-500 ml-1">Full Name</Label>
+                  <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.fullName')}</Label>
                   <Input 
                     placeholder="John Doe" 
-                    className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20"
+                    className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20"
                     value={editTenantTarget?.name || ''}
                     onChange={e => setEditTenantTarget(prev => prev ? { ...prev, name: e.target.value } : null)}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-500 ml-1">Phone Number</Label>
+                  <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.phoneNumber')}</Label>
                   <Input 
                     placeholder="+250 7XX XXX XXX" 
-                    className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20"
+                    className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20"
                     value={editTenantTarget?.phone || ''}
                     onChange={e => setEditTenantTarget(prev => prev ? { ...prev, phone: e.target.value } : null)}
                   />
@@ -303,10 +305,10 @@ export default function Tenants() {
             </div>
 
             <div className="space-y-2">
-              <Label className="font-bold text-bizrent-navy px-1 text-xs uppercase tracking-widest opacity-70">Unit Assignment</Label>
+              <Label className="font-bold text-bizrent-navy dark:text-white px-1 text-xs uppercase tracking-widest opacity-70">{t('legacy.unitAssignment')}</Label>
               <div className="p-4 bg-blue-50/30 rounded-2xl border border-blue-100/50 space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-500 ml-1">Move into Unit</Label>
+                  <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.moveIntoUnit')}</Label>
                   <Select 
                     value={editTenantTarget?.unit_id || "none"} 
                     onValueChange={val => {
@@ -314,11 +316,11 @@ export default function Tenants() {
                       setEditTenantTarget(prev => prev ? { ...prev, unit_id: val === "none" ? undefined : val, rent: unit?.monthly_rent } : null);
                     }}
                   >
-                    <SelectTrigger className="h-11 rounded-xl bg-white border-border/60">
+                    <SelectTrigger className="h-11 rounded-xl bg-card border-border/60">
                       <SelectValue placeholder="Select a vacant unit" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
-                      <SelectItem value="none" className="text-slate-400 font-medium">No unit assigned</SelectItem>
+                      <SelectItem value="none" className="text-muted-foreground font-medium">{t('legacy.noUnitAssigned')}</SelectItem>
                       {availableUnits.map(u => (
                         <SelectItem key={u.id} value={u.id} className="font-bold">
                           {u.properties?.name} — {u.unit_number} ({u.unit_type})
@@ -326,19 +328,19 @@ export default function Tenants() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xxs font-semibold text-slate-400 mt-1 ml-1">
-                    Only vacant units are shown here.
+                  <p className="text-xxs font-semibold text-muted-foreground mt-1 ml-1">
+                    {t('legacy.onlyVacantUnitsAreShownHere')}
                   </p>
                 </div>
 
                 {editTenantTarget?.unit_id && (
                   <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-500 ml-1">Agreed Monthly Rent (RWF)</Label>
+                      <Label className="text-xs font-bold text-muted-foreground ml-1">Agreed Monthly Rent (RWF)</Label>
                       <Input 
                         type="number"
                         placeholder="Agreed rent" 
-                        className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
+                        className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20 font-bold"
                         value={editTenantTarget?.rent || ''}
                         onChange={e => setEditTenantTarget(prev => prev ? { ...prev, rent: Number(e.target.value) } : null)}
                       />
@@ -346,40 +348,40 @@ export default function Tenants() {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-bold text-slate-500 ml-1">Security Deposit</Label>
+                        <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.securityDeposit')}</Label>
                         <Input 
                           type="number"
                           placeholder="e.g. 50000" 
-                          className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
+                          className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20 font-bold"
                           value={editTenantTarget?.security_deposit_total || ''}
                           onChange={e => setEditTenantTarget(prev => prev ? { ...prev, security_deposit_total: Number(e.target.value) } : null)}
                         />
                       </div>
                       
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-bold text-slate-500 ml-1">Billing Freq.</Label>
+                        <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.billingFreq')}</Label>
                         <Select 
                           value={editTenantTarget?.billing_frequency || 'MONTHLY'} 
                           onValueChange={val => setEditTenantTarget(prev => prev ? { ...prev, billing_frequency: val as any } : null)}
                         >
-                          <SelectTrigger className="h-11 rounded-xl bg-white border-border/60 font-bold">
+                          <SelectTrigger className="h-11 rounded-xl bg-card border-border/60 font-bold">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="rounded-xl">
-                            <SelectItem value="WEEKLY" className="font-bold">Weekly</SelectItem>
-                            <SelectItem value="MONTHLY" className="font-bold">Monthly</SelectItem>
-                            <SelectItem value="QUARTERLY" className="font-bold">Quarterly</SelectItem>
-                            <SelectItem value="ANNUAL" className="font-bold">Annual</SelectItem>
+                            <SelectItem value="WEEKLY" className="font-bold">{t('legacy.weekly')}</SelectItem>
+                            <SelectItem value="MONTHLY" className="font-bold">{t('legacy.monthly')}</SelectItem>
+                            <SelectItem value="QUARTERLY" className="font-bold">{t('legacy.quarterly')}</SelectItem>
+                            <SelectItem value="ANNUAL" className="font-bold">{t('legacy.annual')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                     
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-500 ml-1">Move-in / tenancy start date</Label>
+                      <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.moveInTenancyStartDate')}</Label>
                       <Input
                         type="date"
-                        className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
+                        className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20 font-bold"
                         value={editTenantTarget?.start_date || new Date().toISOString().split('T')[0]}
                         onChange={e => setEditTenantTarget(prev => prev ? {
                           ...prev,
@@ -390,24 +392,24 @@ export default function Tenants() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-500 ml-1 flex items-center justify-between">
-                        <span>Rent cycle starts on day</span>
-                        <span className="text-xxxs uppercase tracking-widest text-bizrent-blue bg-bizrent-blue/10 px-2 py-0.5 rounded-full">Override</span>
+                      <Label className="text-xs font-bold text-muted-foreground ml-1 flex items-center justify-between">
+                        <span>{t('legacy.rentCycleStartsOnDay')}</span>
+                        <span className="text-xxxs uppercase tracking-widest text-bizrent-blue bg-bizrent-blue/10 px-2 py-0.5 rounded-full">{t('legacy.override')}</span>
                       </Label>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs font-medium text-slate-400">Day</span>
+                        <span className="text-xs font-medium text-muted-foreground">{t('legacy.day')}</span>
                         <Input 
                           type="number"
                           min="1"
                           max="31"
                           placeholder="1" 
-                          className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold w-20 text-center"
+                          className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20 font-bold w-20 text-center"
                           value={editTenantTarget?.period_anchor_day || ''}
                           onChange={e => setEditTenantTarget(prev => prev ? { ...prev, period_anchor_day: Number(e.target.value) } : null)}
                         />
-                        <span className="text-xs font-medium text-slate-400">of the month</span>
+                        <span className="text-xs font-medium text-muted-foreground">{t('legacy.ofTheMonth')}</span>
                       </div>
-                      <p className="text-xxs text-slate-400 leading-tight ml-1 mt-1">The cycle end is derived as the day before the next cycle starts.</p>
+                      <p className="text-xxs text-muted-foreground leading-tight ml-1 mt-1">{t('legacy.theCycleEndIsDerivedAsTheDayBeforeTheNextCycleStarts')}</p>
                       {editTenantTarget?.start_date && editTenantTarget?.period_anchor_day && getCyclePreview(editTenantTarget.start_date, editTenantTarget.period_anchor_day) && (
                         <p className="text-xs font-bold text-bizrent-blue ml-1 mt-2">
                           First cycle: {getCyclePreview(editTenantTarget.start_date, editTenantTarget.period_anchor_day)?.label}
@@ -420,7 +422,7 @@ export default function Tenants() {
             </div>
           </div>
           <DialogFooter className="gap-3">
-            <Button variant="ghost" className="rounded-xl font-bold" onClick={() => setEditTenantTarget(null)}>Cancel</Button>
+            <Button variant="ghost" className="rounded-xl font-bold" onClick={() => setEditTenantTarget(null)}>{t('legacy.cancel')}</Button>
             <Button 
               className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-bold h-12 px-8 shadow-lg shadow-bizrent-navy/10"
               onClick={async () => {

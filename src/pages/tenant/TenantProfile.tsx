@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import { toast } from 'sonner';
 import { useNotificationPrefs, useUpdateNotificationPrefs } from '@/hooks/useSupabaseData';
 
 export default function TenantProfile() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: notifPrefs } = useNotificationPrefs();
   const updateNotifPrefs = useUpdateNotificationPrefs();
@@ -49,23 +51,23 @@ export default function TenantProfile() {
 
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-bold">My Profile</h1><p className="text-muted-foreground">Manage your personal information</p></div>
+      <div><h1 className="text-2xl font-bold">{t('legacy.myProfileTitle')}</h1><p className="text-muted-foreground">{t('legacy.managePersonalInformation')}</p></div>
 
       <Card>
-        <CardHeader><CardTitle>Personal Information</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('legacy.personalInformation')}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2"><Label>Full Name</Label><Input defaultValue={user?.name ?? ''} /></div>
-          <div className="space-y-2"><Label>Email</Label><Input defaultValue={user?.email ?? ''} /></div>
-          <div className="space-y-2"><Label>Phone</Label><Input defaultValue={user?.phone ?? ''} /></div>
-          <Button>Save Changes</Button>
+          <div className="space-y-2"><Label>{t('legacy.fullName')}</Label><Input defaultValue={user?.name ?? ''} /></div>
+          <div className="space-y-2"><Label>{t('legacy.email')}</Label><Input defaultValue={user?.email ?? ''} /></div>
+          <div className="space-y-2"><Label>{t('legacy.phone')}</Label><Input defaultValue={user?.phone ?? ''} /></div>
+          <Button>{t('legacy.saveChanges')}</Button>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Change Password</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('legacy.changePassword')}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Current Password <span className="text-red-500">*</span></Label>
+            <Label>{t('legacy.currentPassword')} <span className="text-red-500">*</span></Label>
             <div className="relative">
               <Input type={showCurrent ? 'text' : 'password'} placeholder="••••••••" value={pwForm.current} onChange={e => { setPwForm(f => ({ ...f, current: e.target.value })); setPwErrors(fe => ({ ...fe, current: undefined })); }} className="pr-10" />
               <button type="button" onClick={() => setShowCurrent(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
@@ -75,7 +77,7 @@ export default function TenantProfile() {
             {pwErrors.current && <p className="text-xs text-red-500">{pwErrors.current}</p>}
           </div>
           <div className="space-y-2">
-            <Label>New Password <span className="text-red-500">*</span></Label>
+            <Label>{t('legacy.newPassword')} <span className="text-red-500">*</span></Label>
             <div className="relative">
               <Input type={showNext ? 'text' : 'password'} placeholder="••••••••" value={pwForm.next} onChange={e => { setPwForm(f => ({ ...f, next: e.target.value })); setPwErrors(fe => ({ ...fe, next: undefined })); }} className="pr-10" />
               <button type="button" onClick={() => setShowNext(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
@@ -85,7 +87,7 @@ export default function TenantProfile() {
             {pwErrors.next && <p className="text-xs text-red-500">{pwErrors.next}</p>}
           </div>
           <div className="space-y-2">
-            <Label>Confirm New Password <span className="text-red-500">*</span></Label>
+            <Label>{t('legacy.confirmNewPassword')} <span className="text-red-500">*</span></Label>
             <div className="relative">
               <Input type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={pwForm.confirm} onChange={e => { setPwForm(f => ({ ...f, confirm: e.target.value })); setPwErrors(fe => ({ ...fe, confirm: undefined })); }} className="pr-10" />
               <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
@@ -99,10 +101,10 @@ export default function TenantProfile() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Notification Preferences</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('legacy.notificationPreferences')}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div><p className="font-medium">Invoice Reminders</p><p className="text-sm text-muted-foreground">Get reminded before due dates</p></div>
+            <div><p className="font-medium">{t('legacy.invoiceReminders')}</p><p className="text-sm text-muted-foreground">{t('legacy.getRemindedBeforeDueDates')}</p></div>
             <Switch
               checked={notifPrefs?.invoice_reminders ?? true}
               onCheckedChange={v => updateNotifPrefs.mutate({ invoice_reminders: v })}
@@ -111,7 +113,7 @@ export default function TenantProfile() {
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <div><p className="font-medium">Payment Status</p><p className="text-sm text-muted-foreground">Updates when payments are approved/rejected</p></div>
+            <div><p className="font-medium">{t('legacy.paymentStatus')}</p><p className="text-sm text-muted-foreground">{t('legacy.paymentStatusUpdates')}</p></div>
             <Switch
               checked={notifPrefs?.payment_status ?? true}
               onCheckedChange={v => updateNotifPrefs.mutate({ payment_status: v })}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
 import { Loader2, Eye, EyeOff, Shield, Smartphone, User, CheckCircle2, Mail, Phone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +28,7 @@ function roleLabel(role: string | undefined) {
 }
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const updateProfile = useUpdateUserProfile();
 
@@ -128,16 +130,16 @@ export default function Profile() {
       </Card>
 
       {/* ── Personal information ── */}
-      <Card className="border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-white overflow-hidden">
-        <CardHeader className="bg-white border-b border-border/40 pb-4 pt-6 px-6">
-          <CardTitle className="text-base font-bold text-bizrent-navy flex items-center gap-2">
-            <User className="h-4 w-4 text-bizrent-blue" /> Personal Information
+      <Card className="border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-card overflow-hidden">
+        <CardHeader className="bg-card border-b border-border/40 pb-4 pt-6 px-6">
+          <CardTitle className="text-base font-bold text-bizrent-navy dark:text-white flex items-center gap-2">
+            <User className="h-4 w-4 text-bizrent-blue" /> {t('legacy.personalInformation')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-6 px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
-              <Label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Full Name</Label>
+              <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t('legacy.fullName')}</Label>
               <Input
                 className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20"
                 value={form.name}
@@ -146,8 +148,8 @@ export default function Profile() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <Mail className="h-3 w-3" /> Email Address
+              <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Mail className="h-3 w-3" /> {t('legacy.emailAddress')}
               </Label>
               <div className="relative">
                 <Input
@@ -155,15 +157,15 @@ export default function Profile() {
                   value={user?.email ?? ''}
                   disabled
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   <CheckCircle2 className="h-3.5 w-3.5" />
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">Contact support to change your email.</p>
+              <p className="text-[11px] text-muted-foreground font-medium">{t('legacy.contactSupportToChangeYourEmail')}</p>
             </div>
             <div className="space-y-2">
-              <Label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <Phone className="h-3 w-3" /> Phone
+              <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Phone className="h-3 w-3" /> {t('legacy.phone')}
               </Label>
               <Input
                 className="h-10 rounded-xl border-border/60 focus-visible:ring-bizrent-blue/20"
@@ -186,27 +188,27 @@ export default function Profile() {
               onClick={handleSaveProfile}
               disabled={updateProfile.isPending || !isDirty || profileErrors.length > 0}
             >
-              {updateProfile.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : isDirty ? 'Save Changes' : 'Saved'}
+              {updateProfile.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('legacy.saving')}</> : isDirty ? 'Save Changes' : 'Saved'}
             </Button>
             {isDirty && (
-              <span className="text-xs font-bold text-amber-700">Unsaved changes</span>
+              <span className="text-xs font-bold text-amber-700">{t('legacy.unsavedChanges')}</span>
             )}
           </div>
         </CardContent>
       </Card>
 
       {/* ── Security ── */}
-      <Card className="border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-white overflow-hidden">
-        <CardHeader className="bg-white border-b border-border/40 pb-4 pt-6 px-6">
-          <CardTitle className="text-base font-bold text-bizrent-navy flex items-center gap-2">
-            <Shield className="h-4 w-4 text-bizrent-blue" /> Security & Password
+      <Card className="border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-card overflow-hidden">
+        <CardHeader className="bg-card border-b border-border/40 pb-4 pt-6 px-6">
+          <CardTitle className="text-base font-bold text-bizrent-navy dark:text-white flex items-center gap-2">
+            <Shield className="h-4 w-4 text-bizrent-blue" /> {t('legacy.securityPassword')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-8 pt-6 px-6">
           <div className="space-y-5 max-w-md">
             {/* Current password */}
             <div className="space-y-1.5">
-              <Label htmlFor="current-pw" className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Current Password</Label>
+              <Label htmlFor="current-pw" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t('legacy.currentPassword')}</Label>
               <div className="relative">
                 <Input
                   id="current-pw"
@@ -225,7 +227,7 @@ export default function Profile() {
 
             {/* New password */}
             <div className="space-y-1.5">
-              <Label htmlFor="new-pw" className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">New Password</Label>
+              <Label htmlFor="new-pw" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t('legacy.newPassword')}</Label>
               <div className="relative">
                 <Input
                   id="new-pw"
@@ -242,7 +244,7 @@ export default function Profile() {
 
               {pwForm.next && (
                 <div className="pt-2 space-y-2">
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex gap-0.5">
+                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden flex gap-0.5">
                     {[25, 50, 75, 100].map(threshold => (
                       <div
                         key={threshold}
@@ -260,7 +262,7 @@ export default function Profile() {
                       { label: 'One uppercase letter', met: !!pwForm.next.match(/[A-Z]/) },
                       { label: 'One number', met: !!pwForm.next.match(/[0-9]/) },
                     ].map(({ label, met }) => (
-                      <span key={label} className={`text-[12px] flex items-center gap-1.5 ${met ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <span key={label} className={`text-[12px] flex items-center gap-1.5 ${met ? 'text-emerald-600' : 'text-muted-foreground'}`}>
                         <div className={`h-1.5 w-1.5 rounded-full ${met ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                         {label}
                       </span>
@@ -273,7 +275,7 @@ export default function Profile() {
 
             {/* Confirm password */}
             <div className="space-y-1.5">
-              <Label htmlFor="confirm-pw" className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Confirm New Password</Label>
+              <Label htmlFor="confirm-pw" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t('legacy.confirmNewPassword')}</Label>
               <Input
                 id="confirm-pw"
                 type="password"
@@ -290,15 +292,15 @@ export default function Profile() {
               onClick={handleChangePassword}
               disabled={pwLoading}
             >
-              {pwLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Updating...</> : 'Update Password'}
+              {pwLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('legacy.updating')}</> : 'Update Password'}
             </Button>
           </div>
 
           <Separator />
 
           <div>
-            <h3 className="font-bold text-bizrent-navy mb-1 text-sm">Two-Factor Authentication (2FA)</h3>
-            <p className="text-[12px] text-slate-500 mb-4">Add an extra layer of security to your account.</p>
+            <h3 className="font-bold text-bizrent-navy dark:text-white mb-1 text-sm">Two-Factor Authentication (2FA)</h3>
+            <p className="text-[12px] text-muted-foreground mb-4">{t('legacy.addAnExtraLayerOfSecurityToYourAccount')}</p>
             <Button variant="outline" className="rounded-xl font-semibold h-10 border-border/60" disabled>
               <Smartphone className="h-4 w-4 mr-2" /> Enable 2FA (Coming Soon)
             </Button>
@@ -307,23 +309,23 @@ export default function Profile() {
       </Card>
 
       {/* ── Notification preferences ── */}
-      <Card className="border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-white overflow-hidden">
-        <CardHeader className="bg-white border-b border-border/40 pb-4 pt-6 px-6">
-          <CardTitle className="text-base font-bold text-bizrent-navy">Notification Preferences</CardTitle>
+      <Card className="border-0 rounded-[1.5rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow bg-card overflow-hidden">
+        <CardHeader className="bg-card border-b border-border/40 pb-4 pt-6 px-6">
+          <CardTitle className="text-base font-bold text-bizrent-navy dark:text-white">{t('legacy.notificationPreferences')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5 pt-6 px-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="font-bold text-sm text-bizrent-navy">Email Notifications</p>
-              <p className="text-[12px] font-medium text-slate-500 mt-0.5">Receive account updates and security alerts via email</p>
+              <p className="font-bold text-sm text-bizrent-navy dark:text-white">{t('legacy.emailNotifications')}</p>
+              <p className="text-[12px] font-medium text-muted-foreground mt-0.5">{t('legacy.receiveAccountUpdatesAndSecurityAlertsViaEmail')}</p>
             </div>
             <Switch defaultChecked />
           </div>
           <Separator className="bg-border/50" />
           <div className="flex items-center justify-between gap-4 opacity-60">
             <div>
-              <p className="font-bold text-sm text-bizrent-navy">SMS Alerts</p>
-              <p className="text-[12px] font-medium text-slate-500 mt-0.5">Requires a verified phone number — coming soon</p>
+              <p className="font-bold text-sm text-bizrent-navy dark:text-white">{t('legacy.smsAlerts')}</p>
+              <p className="text-[12px] font-medium text-muted-foreground mt-0.5">{t('legacy.requiresAVerifiedPhoneNumberComingSoon')}</p>
             </div>
             <Switch disabled />
           </div>

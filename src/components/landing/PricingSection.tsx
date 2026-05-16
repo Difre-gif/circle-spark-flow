@@ -45,7 +45,7 @@ const TIERS = [
     ],
     cta: 'Start free — 30 days',
     ctaTo: '/register',
-    ctaStyle: 'bg-white text-[#1E3A8A] hover:bg-[#F8FAFC]',
+    ctaStyle: 'bg-card text-[#1E3A8A] hover:bg-[#F8FAFC]',
   },
   {
     name: 'PRO',
@@ -146,7 +146,7 @@ export default function PricingSection() {
               <motion.div
                 animate={{ x: annual ? 20 : 2 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm"
+                className="absolute top-0.5 w-4 h-4 rounded-full bg-card shadow-sm"
               />
             </button>
             <span className={`text-sm font-medium px-2 ${annual ? 'text-[#10B981]' : 'text-white/60'}`}>

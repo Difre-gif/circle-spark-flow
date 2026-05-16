@@ -1,10 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { BizRentLogo } from '@/components/BizRentLogo';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Home, FileText, CreditCard, Receipt, User, LogOut, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from 'react-i18next';
 
 export function TenantLayout() {
   const { user, logout, isSuperAdmin } = useAuth();
@@ -56,7 +56,7 @@ export function TenantLayout() {
             onClick={() => navigate(item.url)}
             className={cn(
               'flex flex-col items-center gap-1 rounded-md px-3 py-1.5 text-xs transition-colors',
-              isActive(item.url) ? 'text-bizrent-navy font-bold' : 'text-muted-foreground'
+              isActive(item.url) ? 'text-bizrent-navy dark:text-white font-bold' : 'text-muted-foreground'
             )}
           >
             <item.icon className="h-5 w-5" />

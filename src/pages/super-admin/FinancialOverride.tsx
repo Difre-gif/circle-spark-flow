@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { DollarSign, CheckCircle, XCircle, Trash2, Pencil, AlertTriangle, Loader2, Search, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -77,6 +78,7 @@ function useBulkMarkOverdue() {
 }
 
 export default function FinancialOverride() {
+  const { t } = useTranslation();
   const { data: payments, isLoading: paymentsLoading } = useGlobalPendingPayments();
   const { data: overdueInvoices, isLoading: invoicesLoading } = useGlobalOverdueInvoices();
   const forceApprove = useForceApprove();
@@ -106,18 +108,18 @@ export default function FinancialOverride() {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <DollarSign className="h-5 w-5 text-emerald-400" />
-          <h1 className="text-2xl font-bold text-white">Financial Override</h1>
+          <h1 className="text-2xl font-bold text-white">{t('legacy.financialOverride')}</h1>
         </div>
-        <p className="text-slate-400 text-sm">MoMo Mastery — full ledger control across all organisations.</p>
+        <p className="text-muted-foreground text-sm">{t('legacy.momoMasteryFullLedgerControlAcrossAllOrganisations')}</p>
       </div>
 
       <Tabs defaultValue="queue">
         <TabsList className="bg-slate-800 border border-slate-700">
-          <TabsTrigger value="queue" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
+          <TabsTrigger value="queue" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground">
             Global Payment Queue {(payments?.length ?? 0) > 0 && <Badge className="ml-2 bg-red-500 text-white text-xxs px-1.5">{payments?.length}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="debt" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
-            Debt Control
+          <TabsTrigger value="debt" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground">
+            {t('legacy.debtControl')}
           </TabsTrigger>
         </TabsList>
 
@@ -125,11 +127,11 @@ export default function FinancialOverride() {
         <TabsContent value="queue" className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
             <div className="relative max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search tenant, invoice, TxID…" value={search} onChange={e => setSearch(e.target.value)}
-                className="pl-10 bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-emerald-500" />
+                className="pl-10 bg-slate-800 border-slate-600 text-white placeholder:text-muted-foreground focus-visible:ring-emerald-500" />
             </div>
-            <p className="text-slate-400 text-xs">{filteredPayments.length} pending across all orgs</p>
+            <p className="text-muted-foreground text-xs">{filteredPayments.length} pending across all orgs</p>
           </div>
 
           <Card className="bg-slate-800 border-slate-700">
@@ -137,13 +139,13 @@ export default function FinancialOverride() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">Tenant</th>
-                      <th className="text-left px-4 py-3">Invoice</th>
-                      <th className="text-left px-4 py-3">Amount</th>
-                      <th className="text-left px-4 py-3">TxID</th>
-                      <th className="text-left px-4 py-3">Submitted</th>
-                      <th className="text-center px-4 py-3">Actions</th>
+                    <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">{t('legacy.tenant')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.invoice')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.amount')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.txid')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.submitted')}</th>
+                      <th className="text-center px-4 py-3">{t('legacy.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -158,14 +160,14 @@ export default function FinancialOverride() {
                         <tr key={p.id} className="border-b border-slate-700/50 hover:bg-slate-700/20">
                           <td className="px-6 py-4">
                             <p className="text-white font-medium text-sm">{tenant?.full_name ?? '—'}</p>
-                            <p className="text-slate-400 text-xs">{tenant?.email ?? ''}</p>
+                            <p className="text-muted-foreground text-xs">{tenant?.email ?? ''}</p>
                           </td>
                           <td className="px-4 py-4 text-slate-300 text-xs font-mono">{inv?.invoice_number ?? '—'}</td>
                           <td className="px-4 py-4 font-bold text-white">{formatRWF(p.amount)}</td>
                           <td className="px-4 py-4">
                             <code className="text-xxs bg-slate-900 text-emerald-300 px-2 py-0.5 rounded">{p.transaction_id ?? '—'}</code>
                           </td>
-                          <td className="px-4 py-4 text-slate-400 text-xs whitespace-nowrap">{formatDate(p.submitted_at)}</td>
+                          <td className="px-4 py-4 text-muted-foreground text-xs whitespace-nowrap">{formatDate(p.submitted_at)}</td>
                           <td className="px-4 py-4">
                             <div className="flex items-center justify-center gap-2">
                               <Button size="sm" className="h-7 text-xs bg-emerald-600/80 hover:bg-emerald-600 text-white"
@@ -177,7 +179,7 @@ export default function FinancialOverride() {
                               <Button size="sm" variant="outline"
                                 className="h-7 text-xs border-red-500/40 text-red-400 hover:bg-red-500/10"
                                 onClick={() => { setRejectTarget({ id: p.id, tenant: tenant?.full_name ?? tenant?.email ?? 'tenant' }); setRejectReason(''); }}>
-                                <XCircle className="h-3 w-3 mr-1" /> Reject
+                                <XCircle className="h-3 w-3 mr-1" /> {t('legacy.reject')}
                               </Button>
                             </div>
                           </td>
@@ -187,7 +189,7 @@ export default function FinancialOverride() {
                     {!paymentsLoading && filteredPayments.length === 0 && (
                       <tr><td colSpan={6} className="py-16 text-center">
                         <CheckCircle className="h-8 w-8 mx-auto mb-2 text-emerald-500/40" />
-                        <p className="text-slate-500 text-sm">No pending payments across the platform</p>
+                        <p className="text-muted-foreground text-sm">{t('legacy.noPendingPaymentsAcrossThePlatform')}</p>
                       </td></tr>
                     )}
                   </tbody>
@@ -202,7 +204,7 @@ export default function FinancialOverride() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-white font-semibold">{overdueInvoices?.length ?? 0} overdue / partial invoices</p>
-              <p className="text-slate-400 text-xs">Cross-org — all organisations</p>
+              <p className="text-muted-foreground text-xs">{t('legacy.crossOrgAllOrganisations')}</p>
             </div>
             <Button size="sm" variant="outline" className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10 text-xs"
               onClick={() => bulkMarkOverdue.mutate()} disabled={bulkMarkOverdue.isPending}>
@@ -216,14 +218,14 @@ export default function FinancialOverride() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">Invoice</th>
-                      <th className="text-left px-4 py-3">Tenant</th>
-                      <th className="text-left px-4 py-3">Due</th>
-                      <th className="text-left px-4 py-3">Paid</th>
-                      <th className="text-left px-4 py-3">Balance</th>
-                      <th className="text-left px-4 py-3">Status</th>
-                      <th className="text-center px-4 py-3">Actions</th>
+                    <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">{t('legacy.invoice')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.tenant')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.due')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.paid')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.balance')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.status')}</th>
+                      <th className="text-center px-4 py-3">{t('legacy.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,12 +253,12 @@ export default function FinancialOverride() {
                               <Button size="sm" variant="outline"
                                 className="h-7 text-xxs border-slate-600 text-slate-300 hover:bg-slate-700"
                                 onClick={() => { setAdjustTarget(inv); setAdjustForm({ amountDue: String(inv.amount_due), amountPaid: String(inv.amount_paid) }); }}>
-                                <Pencil className="h-3 w-3 mr-1" /> Adjust
+                                <Pencil className="h-3 w-3 mr-1" /> {t('legacy.adjust')}
                               </Button>
                               <Button size="sm" variant="outline"
                                 className="h-7 text-xxs border-red-500/40 text-red-400 hover:bg-red-500/10"
                                 onClick={() => setWipeTarget({ id: inv.id, number: inv.invoice_number, balance })}>
-                                <Trash2 className="h-3 w-3 mr-1" /> Wipe
+                                <Trash2 className="h-3 w-3 mr-1" /> {t('legacy.wipe')}
                               </Button>
                             </div>
                           </td>
@@ -264,7 +266,7 @@ export default function FinancialOverride() {
                       );
                     })}
                     {!invoicesLoading && (overdueInvoices ?? []).length === 0 && (
-                      <tr><td colSpan={7} className="py-12 text-center text-slate-500 text-sm">No overdue or partial invoices platform-wide</td></tr>
+                      <tr><td colSpan={7} className="py-12 text-center text-muted-foreground text-sm">{t('legacy.noOverdueOrPartialInvoicesPlatformWide')}</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -279,20 +281,20 @@ export default function FinancialOverride() {
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-red-400" /> Force-Reject Payment
+              <XCircle className="h-4 w-4 text-red-400" /> {t('legacy.forceRejectPayment')}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              Rejecting payment from <strong className="text-white">{rejectTarget?.tenant}</strong>. A mandatory rejection reason is required.
+            <DialogDescription className="text-muted-foreground">
+              {t('legacy.rejectingPaymentFrom')} <strong className="text-white">{rejectTarget?.tenant}</strong>. A mandatory rejection reason is required.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            <Label className="text-slate-300 text-sm">Rejection Reason <span className="text-red-500">*</span></Label>
+            <Label className="text-slate-300 text-sm">{t('legacy.rejectionReason')} <span className="text-red-500">*</span></Label>
             <Textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)}
               placeholder="e.g. Transaction ID does not match MoMo records. Please resubmit with correct ID."
-              className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 resize-none h-20" />
+              className="bg-slate-900 border-slate-600 text-white placeholder:text-muted-foreground resize-none h-20" />
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setRejectTarget(null)}>Cancel</Button>
+            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setRejectTarget(null)}>{t('legacy.cancel')}</Button>
             <Button className="bg-red-600 hover:bg-red-700 text-white" disabled={!rejectReason.trim() || forceReject.isPending}
               onClick={() => { if (rejectTarget) forceReject.mutate({ paymentId: rejectTarget.id, reason: rejectReason }, { onSuccess: () => setRejectTarget(null) }); }}>
               {forceReject.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
@@ -309,16 +311,16 @@ export default function FinancialOverride() {
             <DialogTitle className="text-white flex items-center gap-2">
               <Trash2 className="h-4 w-4 text-red-400" /> Wipe Debt — {wipeTarget?.number}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              This will set <code className="text-white">amount_paid = amount_due</code> and mark this invoice as <strong className="text-white">PAID</strong>.
-              The outstanding balance of <strong className="text-emerald-400">{formatRWF(wipeTarget?.balance ?? 0)}</strong> will be zeroed. No payment record is created.
+            <DialogDescription className="text-muted-foreground">
+              {t('legacy.thisWillSet')} <code className="text-white">{t('legacy.amountPaidAmountDue')}</code> {t('legacy.andMarkThisInvoiceAs')} <strong className="text-white">{t('legacy.paid')}</strong>.
+              The outstanding balance of <strong className="text-emerald-400">{formatRWF(wipeTarget?.balance ?? 0)}</strong> {t('legacy.willBeZeroedNoPaymentRecordIsCreated')}
             </DialogDescription>
           </DialogHeader>
           <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-300">
             ⚠️ This action is irreversible and logged under your Super Admin ID.
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setWipeTarget(null)}>Cancel</Button>
+            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setWipeTarget(null)}>{t('legacy.cancel')}</Button>
             <Button className="bg-red-600 hover:bg-red-700 text-white" disabled={wipeDebt.isPending}
               onClick={() => { if (wipeTarget) wipeDebt.mutate(wipeTarget.id, { onSuccess: () => setWipeTarget(null) }); }}>
               {wipeDebt.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
@@ -335,7 +337,7 @@ export default function FinancialOverride() {
             <DialogTitle className="text-white flex items-center gap-2">
               <FileText className="h-4 w-4 text-amber-400" /> Adjust Balance — {adjustTarget?.invoice_number}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">Edit amount_due and amount_paid directly. Status is recalculated automatically.</DialogDescription>
+            <DialogDescription className="text-muted-foreground">{t('legacy.editAmountDueAndAmountPaidDirectlyStatusIsRecalculatedAutomatically')}</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
@@ -350,7 +352,7 @@ export default function FinancialOverride() {
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setAdjustTarget(null)}>Cancel</Button>
+            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setAdjustTarget(null)}>{t('legacy.cancel')}</Button>
             <Button className="bg-amber-600 hover:bg-amber-700 text-white" disabled={adjustBalance.isPending}
               onClick={() => { if (adjustTarget) adjustBalance.mutate({ invoiceId: adjustTarget.id, amountDue: Number(adjustForm.amountDue), amountPaid: Number(adjustForm.amountPaid) }, { onSuccess: () => setAdjustTarget(null) }); }}>
               {adjustBalance.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}

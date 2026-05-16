@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ArrowRightLeft, Send, Wallet, Activity, Download, Loader2, Search, Home, Copy, Eye, EyeOff, Building2, Users, FileText, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { toast } from 'sonner';
 
 export default function LandlordDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [reminderOpen, setReminderOpen] = useState(false);
@@ -70,7 +72,7 @@ export default function LandlordDashboard() {
     if (vacantUnits > 0) {
       // Assuming average rent is 150,000 for calculation if we don't have exact numbers
       const estLoss = vacantUnits * 150000;
-      return <span className="flex items-center gap-1.5"><Activity className="h-4 w-4 text-bizrent-red" /> You have <strong className="text-bizrent-navy">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong> losing approx {formatRWF(estLoss)}/month. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/units')}>List them now &rarr;</button></span>;
+      return <span className="flex items-center gap-1.5"><Activity className="h-4 w-4 text-bizrent-red" /> {t('legacy.youHave')} <strong className="text-bizrent-navy dark:text-white">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong> losing approx {formatRWF(estLoss)}/month. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/units')}>List them now &rarr;</button></span>;
     }
     if (invCount > 0) {
       return <span className="flex items-center gap-1.5"><Send className="h-4 w-4 text-bizrent-amber" /> {invCount} tenant{invCount > 1 ? 's' : ''} invited, awaiting sign-up. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/tenants')}>Review invites &rarr;</button></span>;
@@ -85,9 +87,9 @@ export default function LandlordDashboard() {
       <div className="page-header">
         <div>
           <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
-            <Home className="h-3.5 w-3.5" /> <span className="text-bizrent-blue">Home / Overview</span>
+            <Home className="h-3.5 w-3.5" /> <span className="text-bizrent-blue">{t('legacy.homeOverview')}</span>
           </p>
-          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">
+          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy dark:text-white tracking-tight">
             {org ? `Good morning, ${firstName}` : <span><Skeleton className="h-8 w-64 inline-block" /></span>}
           </h1>
           <div className="page-description font-medium text-muted-foreground mt-2 flex items-center gap-1">
@@ -110,7 +112,7 @@ export default function LandlordDashboard() {
             className="flex-shrink-0 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-[6px] h-9 px-4"
             onClick={() => navigate('/landlord/payments')}
           >
-            Review Now
+            {t('legacy.reviewNow')}
           </Button>
         </div>
       )}
@@ -129,7 +131,7 @@ export default function LandlordDashboard() {
             className="flex-shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm rounded-[6px] h-9 px-4"
             onClick={() => navigate('/landlord/reports')}
           >
-            View Overdue
+            {t('legacy.viewOverdue')}
           </Button>
         </div>
       )}
@@ -138,9 +140,9 @@ export default function LandlordDashboard() {
       {!occLoading && (!occupancy || occupancy.length === 0) && (
         <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] bg-bizrent-navy text-white overflow-hidden">
           <CardContent className="p-8">
-            <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Welcome to BizRent</p>
-            <h2 className="text-2xl font-extrabold mb-1">Set up your first property</h2>
-            <p className="text-sm opacity-80 mb-6 max-w-lg">You're all set! Follow these three steps to start collecting rent and managing tenants.</p>
+            <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-2">{t('legacy.welcomeToBizrent')}</p>
+            <h2 className="text-2xl font-extrabold mb-1">{t('legacy.setUpYourFirstProperty')}</h2>
+            <p className="text-sm opacity-80 mb-6 max-w-lg">{t('legacy.youReAllSetFollowTheseThreeStepsToStartCollectingRentAndManagingTenant')}</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 { icon: Building2, step: '1', title: 'Add a Property', desc: 'Register your building or commercial space.', href: '/landlord/properties' },
@@ -150,7 +152,7 @@ export default function LandlordDashboard() {
                 <button
                   key={step}
                   onClick={() => navigate(href)}
-                  className="text-left p-4 rounded-2xl bg-white/10 hover:bg-white/20 transition-colors flex flex-col gap-2"
+                  className="text-left p-4 rounded-2xl bg-white/10 hover:bg-muted/20 transition-colors flex flex-col gap-2"
                 >
                   <div className="flex items-center justify-between">
                     <div className="p-2 bg-white/20 rounded-xl"><Icon className="h-5 w-5" /></div>
@@ -171,19 +173,19 @@ export default function LandlordDashboard() {
         <div className="xl:col-span-4 flex flex-col gap-6">
           
           {/* Outstanding Balance Widget */}
-          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card overflow-hidden">
             <CardContent className="p-6 sm:p-8">
               <div className="flex justify-between items-start mb-4">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total Outstanding Rent</p>
-                <div className="bg-muted/50 px-3 py-1 rounded-full text-xs font-bold text-bizrent-navy flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-bizrent-red"></span> RWF
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('legacy.totalOutstandingRent')}</p>
+                <div className="bg-muted/50 px-3 py-1 rounded-full text-xs font-bold text-bizrent-navy dark:text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-bizrent-red"></span> {t('legacy.rwf')}
                 </div>
               </div>
               
               {statsLoading ? (
                 <Skeleton className="h-12 w-48 mb-2" />
               ) : (
-                <h2 className="text-4xl font-extrabold text-bizrent-navy tracking-tight font-mono">
+                <h2 className="text-4xl font-extrabold text-bizrent-navy dark:text-white tracking-tight font-mono">
                   {formatRWF(stats?.outstanding ?? 0)}
                 </h2>
               )}
@@ -199,11 +201,11 @@ export default function LandlordDashboard() {
               ) : !statsLoading && hasOutstandingBalance ? (
                 <p className="text-xs font-bold text-amber-700 mt-3 bg-amber-100 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
                   <span className="inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                  Outstanding Balance
+                  {t('legacy.outstandingBalance')}
                 </p>
               ) : !statsLoading ? (
                 <p className="text-xs font-bold text-bizrent-emerald mt-3 bg-bizrent-emerald/10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md">
-                   All Clear
+                   {t('legacy.allClear')}
                 </p>
               ) : null}
               
@@ -214,23 +216,23 @@ export default function LandlordDashboard() {
                   disabled={!hasOverdueInvoices}
                   title={!hasOverdueInvoices ? "No overdue invoices to remind" : undefined}
                 >
-                  <Send className="mr-2 h-4 w-4" /> Send Reminders
+                  <Send className="mr-2 h-4 w-4" /> {t('legacy.sendReminders')}
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full rounded-xl border-border/60 hover:bg-muted font-semibold h-12"
                   onClick={() => navigate('/landlord/payments')}
                 >
-                  <ArrowRightLeft className="mr-2 h-4 w-4" /> Collect Rent
+                  <ArrowRightLeft className="mr-2 h-4 w-4" /> {t('legacy.collectRent')}
                 </Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Top Properties / Wallets Widget */}
-          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
             <CardHeader className="pb-2 pt-6 px-6 flex flex-row justify-between items-center">
-              <CardTitle className="text-base font-bold text-bizrent-navy">Top Properties</CardTitle>
+              <CardTitle className="text-base font-bold text-bizrent-navy dark:text-white">{t('legacy.topProperties')}</CardTitle>
             </CardHeader>
             <CardContent className="px-6 pb-6 pt-2">
               <div className="space-y-3">
@@ -241,14 +243,14 @@ export default function LandlordDashboard() {
                 ) : (
                   <>
                     {(occupancy ?? []).slice(0, 3).map((prop, idx) => (
-                      <div key={prop.property_id} className="flex items-center justify-between p-3 rounded-xl border border-border/40 hover:bg-white transition-colors">
+                      <div key={prop.property_id} className="flex items-center justify-between p-3 rounded-xl border border-border/40 hover:bg-card transition-colors">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg
                             ${idx === 0 ? 'bg-bizrent-navy text-white' : idx === 1 ? 'bg-bizrent-emerald text-white' : 'bg-bizrent-blue text-white'}`}>
                             {prop.property_name?.charAt(0) || 'P'}
                           </div>
                           <div>
-                            <p className="font-bold text-sm text-bizrent-navy truncate max-w-[120px]">{prop.property_name}</p>
+                            <p className="font-bold text-sm text-bizrent-navy dark:text-white truncate max-w-[120px]">{prop.property_name}</p>
                             <p className="text-xs text-muted-foreground font-medium">{prop.occupied_units}/{prop.total_units} Occupied</p>
                           </div>
                         </div>
@@ -260,15 +262,15 @@ export default function LandlordDashboard() {
                             </>
                           ) : (
                             <>
-                              <p className="font-bold text-sm text-bizrent-navy font-mono">{prop.occupancy_rate_pct}%</p>
-                              <p className="text-xxs font-bold text-bizrent-emerald uppercase">Active</p>
+                              <p className="font-bold text-sm text-bizrent-navy dark:text-white font-mono">{prop.occupancy_rate_pct}%</p>
+                              <p className="text-xxs font-bold text-bizrent-emerald uppercase">{t('legacy.active')}</p>
                             </>
                           )}
                         </div>
                       </div>
                     ))}
                     {(!occupancy || occupancy.length === 0) && (
-                      <p className="text-sm text-center text-muted-foreground py-4">No properties tracked</p>
+                      <p className="text-sm text-center text-muted-foreground py-4">{t('legacy.noPropertiesTracked')}</p>
                     )}
                   </>
                 )}
@@ -277,25 +279,25 @@ export default function LandlordDashboard() {
           </Card>
 
           {/* MoMo Cards Widget */}
-          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card overflow-hidden">
             <CardHeader className="flex flex-row justify-between items-center pb-2 pt-6 px-6">
-              <CardTitle className="text-base font-bold text-bizrent-navy flex items-center gap-2">
-                <Wallet className="h-5 w-5" /> Payment Accounts
+              <CardTitle className="text-base font-bold text-bizrent-navy dark:text-white flex items-center gap-2">
+                <Wallet className="h-5 w-5" /> {t('legacy.paymentAccounts')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-2 space-y-4">
-              <div className="bg-bizrent-amber rounded-2xl p-5 shadow-sm relative overflow-hidden text-bizrent-navy">
+              <div className="bg-bizrent-amber rounded-2xl p-5 shadow-sm relative overflow-hidden text-bizrent-navy dark:text-white">
                 <div className="absolute -right-4 -top-4 opacity-10">
                   <div className="w-24 h-24 rounded-full border-4 border-bizrent-navy"></div>
                 </div>
                 <div className="flex justify-between items-center mb-6">
-                  <p className="text-xs font-bold opacity-80 uppercase tracking-widest">MTN Mobile Money</p>
+                  <p className="text-xs font-bold opacity-80 uppercase tracking-widest">{t('legacy.mtnMobileMoney')}</p>
                   <div className="flex items-center gap-2">
                     <Activity className="h-5 w-5 opacity-80" />
                     <span className="bg-black/10 rounded-full px-2 py-0.5 text-xxxs font-extrabold uppercase">🔒 Secure</span>
                   </div>
                 </div>
-                <p className="text-sm font-semibold opacity-90 mb-1">Merchant Code</p>
+                <p className="text-sm font-semibold opacity-90 mb-1">{t('legacy.merchantCode')}</p>
                 {org ? (
                   <div className="flex items-center gap-3">
                     <p className="text-3xl font-mono font-bold tracking-widest">{showMomo ? (org.momo_merchant_number || '000000') : '••••••'}</p>
@@ -316,7 +318,7 @@ export default function LandlordDashboard() {
                 )}
                 <div className="mt-4 flex justify-between items-end text-xs font-bold opacity-80">
                   <p>{org?.name || <Skeleton className="h-3 w-20" />}</p>
-                  <p className="px-2 py-1 bg-bizrent-navy text-white rounded-md text-xxs uppercase">Active</p>
+                  <p className="px-2 py-1 bg-bizrent-navy text-white rounded-md text-xxs uppercase">{t('legacy.active')}</p>
                 </div>
               </div>
             </CardContent>
@@ -332,11 +334,11 @@ export default function LandlordDashboard() {
             {/* 4 Colored Stats Grid */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-4">
               {/* Highlight Stat (Amber) */}
-              <div className="bg-bizrent-amber rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy relative overflow-hidden group">
+              <div className="bg-bizrent-amber rounded-3xl p-5 flex flex-col justify-center shadow-sm text-bizrent-navy dark:text-white relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
                   <Wallet className="w-16 h-16" />
                 </div>
-                <p className="text-xs font-bold opacity-80 mb-2 uppercase tracking-wide">Pending Payments</p>
+                <p className="text-xs font-bold opacity-80 mb-2 uppercase tracking-wide">{t('legacy.pendingPayments')}</p>
                 {statsLoading ? (
                   <Skeleton className="h-8 w-12 bg-bizrent-navy/20" />
                 ) : (
@@ -346,48 +348,48 @@ export default function LandlordDashboard() {
                 {(!statsLoading && (stats?.pendingPayments ?? 0) > 0) ? (
                   <p className="text-xxs font-bold mt-3 bg-bizrent-navy text-white self-start px-2.5 py-1 rounded-md uppercase flex items-center gap-1.5 shadow-md">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-card opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-card"></span>
                     </span>
-                    Review Now
+                    {t('legacy.reviewNow')}
                   </p>
                 ) : !statsLoading ? (
                   <p className="text-xxs font-bold mt-3 bg-bizrent-navy/10 self-start px-2.5 py-1 rounded-md uppercase">
-                    Caught up
+                    {t('legacy.caughtUp')}
                   </p>
                 ) : null}
               </div>
               
               {/* White Stat 1 */}
-              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
-                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Collection Rate</p>
+              <div className="bg-card rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
+                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">{t('legacy.collectionRate')}</p>
                 {statsLoading ? (
                   <Skeleton className="h-8 w-16" />
                 ) : (
-                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-mono">{stats?.collectionRate ?? 0}%</h3>
+                  <h3 className="text-3xl font-extrabold text-bizrent-navy dark:text-white font-mono">{stats?.collectionRate ?? 0}%</h3>
                 )}
                 {!statsLoading && (stats?.collectionRate ?? 0) === 0 ? (
                   <p className="text-xxs font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
-                    Needs Action
+                    {t('legacy.needsAction')}
                   </p>
                 ) : !statsLoading && (stats?.collectionRate ?? 0) < 60 ? (
                   <p className="text-xxs font-bold mt-3 text-bizrent-amber flex items-center bg-bizrent-amber/10 self-start px-2.5 py-1 rounded-md uppercase">
-                    Below Target
+                    {t('legacy.belowTarget')}
                   </p>
                 ) : !statsLoading ? (
                   <p className="text-xxs font-bold mt-3 text-bizrent-emerald flex items-center bg-bizrent-emerald/10 self-start px-2.5 py-1 rounded-md uppercase">
-                    On Track
+                    {t('legacy.onTrack')}
                   </p>
                 ) : null}
               </div>
 
               {/* White Stat 2 */}
-              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
-                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Occupied Units</p>
+              <div className="bg-card rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
+                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">{t('legacy.occupiedUnits')}</p>
                 {statsLoading ? (
                   <Skeleton className="h-8 w-16" />
                 ) : (
-                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-mono">{stats?.occupiedUnits ?? 0}</h3>
+                  <h3 className="text-3xl font-extrabold text-bizrent-navy dark:text-white font-mono">{stats?.occupiedUnits ?? 0}</h3>
                 )}
                 <p className="text-xxs font-bold mt-3 text-bizrent-blue flex items-center bg-bizrent-blue/10 self-start px-2.5 py-1 rounded-md uppercase">
                   out of {stats?.totalUnits ?? 0}
@@ -395,29 +397,29 @@ export default function LandlordDashboard() {
               </div>
 
               {/* White Stat 3 */}
-              <div className="bg-white rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
-                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Vacant Units</p>
+              <div className="bg-card rounded-3xl p-5 flex flex-col justify-center border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)]">
+                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">{t('legacy.vacantUnits')}</p>
                 {statsLoading ? (
                   <Skeleton className="h-8 w-16" />
                 ) : (
-                  <h3 className="text-3xl font-extrabold text-bizrent-navy font-mono">{stats?.vacantUnits ?? 0}</h3>
+                  <h3 className="text-3xl font-extrabold text-bizrent-navy dark:text-white font-mono">{stats?.vacantUnits ?? 0}</h3>
                 )}
                 <p className="text-xxs font-bold mt-3 text-bizrent-red flex items-center bg-bizrent-red/10 self-start px-2.5 py-1 rounded-md uppercase">
-                  Lost Revenue
+                  {t('legacy.lostRevenue')}
                 </p>
               </div>
             </div>
 
             {/* Collections Chart */}
-            <Card className="lg:col-span-3 rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
+            <Card className="lg:col-span-3 rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
               <CardHeader className="pb-0 pt-6 px-6">
-                <CardTitle className="text-base font-bold text-bizrent-navy">Revenue Overview</CardTitle>
-                <p className="text-xs text-muted-foreground font-medium">View your collections over the last 6 months</p>
+                <CardTitle className="text-base font-bold text-bizrent-navy dark:text-white">{t('legacy.revenueOverview')}</CardTitle>
+                <p className="text-xs text-muted-foreground font-medium">{t('legacy.viewYourCollectionsOverTheLast6Months')}</p>
               </CardHeader>
               <CardContent className="px-6 pt-6 pb-2">
                 <div className="flex justify-end gap-4 mb-4 text-xs font-bold">
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-emerald"></span> Collected</div>
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-amber"></span> Outstanding</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-emerald"></span> {t('legacy.collected')}</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-bizrent-amber"></span> {t('legacy.outstanding')}</div>
                 </div>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -437,9 +439,9 @@ export default function LandlordDashboard() {
           </div>
 
           {/* Recent Activities Table */}
-          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white flex-1">
+          <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card flex-1">
             <CardHeader className="flex flex-row justify-between items-center pb-4 pt-6 px-8 border-b border-border/40">
-              <CardTitle className="text-base font-bold text-bizrent-navy">Recent Activities</CardTitle>
+              <CardTitle className="text-base font-bold text-bizrent-navy dark:text-white">{t('legacy.recentActivities')}</CardTitle>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -453,14 +455,14 @@ export default function LandlordDashboard() {
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="bg-muted/20 text-muted-foreground font-semibold border-b border-border/40">
-                      <th scope="col" className="text-left px-8 py-4 whitespace-nowrap min-w-[150px]">Transaction ID</th>
-                      <th scope="col" className="text-left px-4 py-4 min-w-[150px]">Tenant</th>
-                      <th scope="col" className="text-left px-4 py-4 text-right min-w-[120px]">Amount</th>
-                      <th scope="col" className="text-left px-4 py-4 text-center min-w-[120px]">Status</th>
-                      <th scope="col" className="text-left px-8 py-4 min-w-[120px]">Date</th>
+                      <th scope="col" className="text-left px-8 py-4 whitespace-nowrap min-w-[150px]">{t('legacy.transactionId')}</th>
+                      <th scope="col" className="text-left px-4 py-4 min-w-[150px]">{t('legacy.tenant')}</th>
+                      <th scope="col" className="text-left px-4 py-4 text-right min-w-[120px]">{t('legacy.amount')}</th>
+                      <th scope="col" className="text-left px-4 py-4 text-center min-w-[120px]">{t('legacy.status')}</th>
+                      <th scope="col" className="text-left px-8 py-4 min-w-[120px]">{t('legacy.date')}</th>
                     </tr>
                   </thead>
-                  <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
+                  <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
                     {paymentsLoading ? (
                       Array.from({ length: 5 }).map((_, i) => (
                         <tr key={i} className="border-b border-border/20">
@@ -474,13 +476,13 @@ export default function LandlordDashboard() {
                     ) : (
                       <>
                         {(recentPayments ?? []).slice(0, 6).map((p, idx) => (
-                          <tr key={p.id} className="border-b border-border/20 hover:bg-white transition-colors group">
+                          <tr key={p.id} className="border-b border-border/20 hover:bg-card transition-colors group">
                             <td className="px-8 py-4">
-                              <code className="font-mono text-xs font-bold bg-muted/50 px-2 py-1 rounded-md text-bizrent-navy group-hover:bg-white transition-colors">
+                              <code className="font-mono text-xs font-bold bg-muted/50 px-2 py-1 rounded-md text-bizrent-navy dark:text-white group-hover:bg-card transition-colors">
                                 {p.transaction_id || `TXN_${idx}00${idx}`}
                               </code>
                             </td>
-                            <td className="px-4 py-4 font-bold text-bizrent-navy whitespace-nowrap">
+                            <td className="px-4 py-4 font-bold text-bizrent-navy dark:text-white whitespace-nowrap">
                               {(p.tenant as any)?.full_name ?? '—'}
                             </td>
                             <td className="px-4 py-4 font-semibold text-bizrent-slate whitespace-nowrap text-right font-mono">
@@ -499,7 +501,7 @@ export default function LandlordDashboard() {
                             <td colSpan={5} className="py-16 text-center text-muted-foreground">
                               <div className="flex flex-col items-center justify-center">
                                 <Activity className="h-8 w-8 mb-2 opacity-20" />
-                                <p className="font-medium text-bizrent-navy">No recent activities found</p>
+                                <p className="font-medium text-bizrent-navy dark:text-white">{t('legacy.noRecentActivitiesFound')}</p>
                               </div>
                             </td>
                           </tr>
@@ -516,7 +518,7 @@ export default function LandlordDashboard() {
       <Dialog open={reminderOpen} onOpenChange={setReminderOpen}>
         <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-extrabold text-bizrent-navy">Rent Reminders</DialogTitle>
+            <DialogTitle className="text-xl font-extrabold text-bizrent-navy dark:text-white">{t('legacy.rentReminders')}</DialogTitle>
             <DialogDescription className="font-medium">
               We found {(overdueInvoices ?? []).length} overdue invoices that need follow-up.
             </DialogDescription>
@@ -526,7 +528,7 @@ export default function LandlordDashboard() {
             {(overdueInvoices ?? []).map(inv => (
               <div key={inv.id} className="p-3 rounded-xl border border-border/50 bg-muted/20 flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-bizrent-navy">{(inv.tenant as any)?.full_name}</p>
+                  <p className="text-xs font-bold text-bizrent-navy dark:text-white">{(inv.tenant as any)?.full_name}</p>
                   <p className="text-xxs text-muted-foreground font-medium">{inv.invoice_number} · Overdue {formatDate(inv.due_date)}</p>
                 </div>
                 <p className="text-sm font-extrabold text-bizrent-red">{formatRWF(inv.amount_due - (inv.amount_paid ?? 0))}</p>
@@ -535,15 +537,15 @@ export default function LandlordDashboard() {
             {(overdueInvoices ?? []).length === 0 && (
               <div className="text-center py-8">
                 <Activity className="h-8 w-8 mx-auto mb-2 opacity-20 text-bizrent-emerald" />
-                <p className="text-sm font-bold text-bizrent-navy">Zero Overdue Invoices!</p>
-                <p className="text-xs text-muted-foreground">Everyone is paid up or waiting on due dates.</p>
+                <p className="text-sm font-bold text-bizrent-navy dark:text-white">{t('legacy.zeroOverdueInvoices')}</p>
+                <p className="text-xs text-muted-foreground">{t('legacy.everyoneIsPaidUpOrWaitingOnDueDates')}</p>
               </div>
             )}
           </div>
 
           <DialogFooter className="sm:justify-between py-2 border-t mt-4 gap-3">
             <Button variant="ghost" className="rounded-xl font-bold text-xs" onClick={() => setReminderOpen(false)}>
-              Discard
+              {t('legacy.discard')}
             </Button>
             <Button 
               className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-bold px-6 h-11"
@@ -553,7 +555,7 @@ export default function LandlordDashboard() {
                 setReminderOpen(false);
               }}
             >
-              <Send className="h-4 w-4 mr-2" /> Send All Reminders
+              <Send className="h-4 w-4 mr-2" /> {t('legacy.sendAllReminders')}
             </Button>
           </DialogFooter>
         </DialogContent>

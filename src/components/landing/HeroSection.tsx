@@ -526,7 +526,7 @@ export default function HeroSection() {
             </Link>
             <a
               href="#how-it-works"
-              className="inline-flex items-center justify-center gap-2 rounded-[8px] border border-white/25 text-white/80 hover:text-white hover:bg-white/8 font-semibold text-base px-7 py-4 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 rounded-[8px] border border-white/25 text-white/80 hover:text-white hover:bg-muted/8 font-semibold text-base px-7 py-4 transition-all duration-200"
               style={{ fontFamily: 'Inter, Arial, sans-serif', fontWeight: 600, minHeight: '52px' }}
               onClick={(e) => {
                 e.preventDefault();

@@ -34,7 +34,7 @@ const NavigationBar: React.FC = () => {
 
   return (
     <motion.nav
-      className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-xl bg-white/80 border-b border-gray-100/50' : 'bg-transparent'}`}
+      className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-xl bg-card/80 border-b border-gray-100/50' : 'bg-transparent'}`}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.2 }}

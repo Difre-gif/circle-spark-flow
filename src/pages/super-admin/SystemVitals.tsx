@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Globe, Megaphone, Flag, Loader2, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,6 +71,7 @@ function usePlatformStats() {
 }
 
 export default function SystemVitals() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { user } = useAuth();
   const { data: announcements, isLoading: annLoading } = useAnnouncements();
@@ -126,9 +128,9 @@ export default function SystemVitals() {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Globe className="h-5 w-5 text-emerald-400" />
-          <h1 className="text-2xl font-bold text-white">System Vitals</h1>
+          <h1 className="text-2xl font-bold text-white">{t('legacy.systemVitals')}</h1>
         </div>
-        <p className="text-slate-400 text-sm">Platform-wide KPIs, announcement bar, and feature flag console.</p>
+        <p className="text-muted-foreground text-sm">{t('legacy.platformWideKpisAnnouncementBarAndFeatureFlagConsole')}</p>
       </div>
 
       {/* KPI Grid */}
@@ -147,9 +149,9 @@ export default function SystemVitals() {
         ].map(({ label, value, sub, color }) => (
           <Card key={label} className="bg-slate-800 border-slate-700">
             <CardContent className="p-5">
-              <p className="text-slate-400 text-xs font-semibold uppercase tracking-wide mb-2">{label}</p>
+              <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide mb-2">{label}</p>
               <p className={`text-2xl font-extrabold ${color} font-tabular-nums`}>{value}</p>
-              <p className="text-slate-500 text-xs mt-1">{sub}</p>
+              <p className="text-muted-foreground text-xs mt-1">{sub}</p>
             </CardContent>
           </Card>
         ))}
@@ -157,20 +159,20 @@ export default function SystemVitals() {
 
       <Tabs defaultValue="announcements">
         <TabsList className="bg-slate-800 border border-slate-700">
-          <TabsTrigger value="announcements" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
-            <Megaphone className="h-3.5 w-3.5 mr-1.5" /> Announcement Bar
+          <TabsTrigger value="announcements" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground">
+            <Megaphone className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.announcementBar')}
           </TabsTrigger>
-          <TabsTrigger value="flags" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400">
-            <Flag className="h-3.5 w-3.5 mr-1.5" /> Feature Flags
+          <TabsTrigger value="flags" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground">
+            <Flag className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.featureFlags')}
           </TabsTrigger>
         </TabsList>
 
         {/* ─── Announcements ─── */}
         <TabsContent value="announcements" className="mt-4 space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-slate-400 text-sm">Active banners shown at the top of landlord and tenant portals.</p>
+            <p className="text-muted-foreground text-sm">{t('legacy.activeBannersShownAtTheTopOfLandlordAndTenantPortals')}</p>
             <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs" onClick={() => setAnnDialogOpen(true)}>
-              <Plus className="h-3.5 w-3.5 mr-1.5" /> New Announcement
+              <Plus className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.newAnnouncement')}
             </Button>
           </div>
 
@@ -179,7 +181,7 @@ export default function SystemVitals() {
               <Card key={i} className="bg-slate-800 border-slate-700"><CardContent className="p-4"><div className="h-10 bg-slate-700 rounded animate-pulse" /></CardContent></Card>
             )) : (announcements ?? []).length === 0 ? (
               <Card className="bg-slate-800 border-slate-700">
-                <CardContent className="py-10 text-center text-slate-500 text-sm">No active announcements</CardContent>
+                <CardContent className="py-10 text-center text-muted-foreground text-sm">{t('legacy.noActiveAnnouncements')}</CardContent>
               </Card>
             ) : (announcements ?? []).map(ann => {
               const typeColor = ann.type === 'CRITICAL' ? 'bg-red-500/20 text-red-300 border-red-500/30'
@@ -192,15 +194,15 @@ export default function SystemVitals() {
                       <div className="flex items-center gap-2 mb-1">
                         <Badge className={`text-xxs ${typeColor}`}>{ann.type}</Badge>
                         <Badge className="bg-slate-700 text-slate-300 border-slate-600 text-xxs">{ann.audience}</Badge>
-                        {ann.is_active && <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xxs">LIVE</Badge>}
+                        {ann.is_active && <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xxs">{t('legacy.live')}</Badge>}
                       </div>
                       <p className="text-white text-sm">{ann.message}</p>
-                      <p className="text-slate-500 text-xs mt-1">
+                      <p className="text-muted-foreground text-xs mt-1">
                         Created {formatDate(ann.created_at)}
                         {ann.active_until && ` · Expires ${formatDate(ann.active_until)}`}
                       </p>
                     </div>
-                    <Button size="icon" variant="ghost" className="text-slate-500 hover:text-red-400 hover:bg-red-500/10 h-7 w-7"
+                    <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10 h-7 w-7"
                       onClick={() => deleteAnnouncement.mutate(ann.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
@@ -215,8 +217,8 @@ export default function SystemVitals() {
         <TabsContent value="flags" className="mt-4">
           <Card className="bg-slate-800 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white text-sm font-semibold">Platform Feature Toggles</CardTitle>
-              <p className="text-slate-400 text-xs">Changes take effect immediately. Flags are cached for 30 seconds.</p>
+              <CardTitle className="text-white text-sm font-semibold">{t('legacy.platformFeatureToggles')}</CardTitle>
+              <p className="text-muted-foreground text-xs">{t('legacy.changesTakeEffectImmediatelyFlagsAreCachedFor30Seconds')}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               {flagsLoading ? Array.from({ length: 6 }).map((_, i) => (
@@ -228,11 +230,11 @@ export default function SystemVitals() {
                 <div key={flag.id} className="flex items-center justify-between py-3 border-b border-slate-700/50 last:border-0">
                   <div>
                     <p className="text-white text-sm font-medium font-mono">{flag.flag_key}</p>
-                    <p className="text-slate-400 text-xs mt-0.5">{flag.description ?? 'No description'}</p>
-                    {flag.updated_at && <p className="text-slate-600 text-xxs mt-0.5">Last updated {formatDate(flag.updated_at)}</p>}
+                    <p className="text-muted-foreground text-xs mt-0.5">{flag.description ?? 'No description'}</p>
+                    {flag.updated_at && <p className="text-muted-foreground text-xxs mt-0.5">Last updated {formatDate(flag.updated_at)}</p>}
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge className={`text-xxs ${flag.is_enabled ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>
+                    <Badge className={`text-xxs ${flag.is_enabled ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-700 text-muted-foreground border-slate-600'}`}>
                       {flag.is_enabled ? 'ON' : 'OFF'}
                     </Badge>
                     <Switch
@@ -254,40 +256,40 @@ export default function SystemVitals() {
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Megaphone className="h-4 w-4 text-emerald-400" /> New System Announcement
+              <Megaphone className="h-4 w-4 text-emerald-400" /> {t('legacy.newSystemAnnouncement')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1">
-              <Label className="text-slate-300 text-sm">Message <span className="text-red-500">*</span></Label>
+              <Label className="text-slate-300 text-sm">{t('legacy.message')} <span className="text-red-500">*</span></Label>
               <Textarea value={newAnn.message} onChange={e => setNewAnn(a => ({ ...a, message: e.target.value }))}
                 placeholder="e.g. Scheduled maintenance on 10 April 2026 from 02:00–04:00 UTC."
-                className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 resize-none h-20" />
+                className="bg-slate-900 border-slate-600 text-white placeholder:text-muted-foreground resize-none h-20" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label className="text-slate-300 text-sm">Type</Label>
+                <Label className="text-slate-300 text-sm">{t('legacy.type')}</Label>
                 <Select value={newAnn.type} onValueChange={v => setNewAnn(a => ({ ...a, type: v }))}>
                   <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 border-slate-600">
-                    <SelectItem value="INFO" className="text-white">Info</SelectItem>
-                    <SelectItem value="WARNING" className="text-amber-300">Warning</SelectItem>
-                    <SelectItem value="CRITICAL" className="text-red-300">Critical</SelectItem>
+                    <SelectItem value="INFO" className="text-white">{t('legacy.info')}</SelectItem>
+                    <SelectItem value="WARNING" className="text-amber-300">{t('legacy.warning')}</SelectItem>
+                    <SelectItem value="CRITICAL" className="text-red-300">{t('legacy.critical')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-slate-300 text-sm">Audience</Label>
+                <Label className="text-slate-300 text-sm">{t('legacy.audience')}</Label>
                 <Select value={newAnn.audience} onValueChange={v => setNewAnn(a => ({ ...a, audience: v }))}>
                   <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 border-slate-600">
-                    <SelectItem value="ALL" className="text-white">All Users</SelectItem>
-                    <SelectItem value="LANDLORDS_ONLY" className="text-white">Landlords Only</SelectItem>
-                    <SelectItem value="TENANTS_ONLY" className="text-white">Tenants Only</SelectItem>
+                    <SelectItem value="ALL" className="text-white">{t('legacy.allUsers')}</SelectItem>
+                    <SelectItem value="LANDLORDS_ONLY" className="text-white">{t('legacy.landlordsOnly')}</SelectItem>
+                    <SelectItem value="TENANTS_ONLY" className="text-white">{t('legacy.tenantsOnly')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -299,7 +301,7 @@ export default function SystemVitals() {
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setAnnDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setAnnDialogOpen(false)}>{t('legacy.cancel')}</Button>
             <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={!newAnn.message.trim() || createAnnouncement.isPending}
               onClick={() => createAnnouncement.mutate()}>
               {createAnnouncement.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}

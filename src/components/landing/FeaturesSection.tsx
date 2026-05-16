@@ -59,7 +59,7 @@ function PendingQueueVisual() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ delay: i * 0.1 + 0.2 }}
-          className="flex items-center justify-between bg-white rounded-[6px] border border-[#E2E8F0] px-3 py-2"
+          className="flex items-center justify-between bg-card rounded-[6px] border border-[#E2E8F0] px-3 py-2"
         >
           <div>
             <p className="text-xs font-semibold text-[#1E3A8A]">{p.name}</p>
@@ -83,13 +83,13 @@ function PendingQueueVisual() {
 function FraudVisual() {
   return (
     <div className="flex gap-3 p-4 bg-[#F8FAFC] rounded-[8px] border border-[#E2E8F0]">
-      <div className="flex-1 relative bg-white rounded-[6px] border-2 border-[#DC2626] p-3 flex items-center justify-center" style={{ minHeight: '80px' }}>
+      <div className="flex-1 relative bg-card rounded-[6px] border-2 border-[#DC2626] p-3 flex items-center justify-center" style={{ minHeight: '80px' }}>
         <div className="blur-sm text-xs text-center text-[#94A3B8]">📷<br/>blurry.jpg</div>
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-2xl">❌</span>
         </div>
       </div>
-      <div className="flex-1 relative bg-white rounded-[6px] border-2 border-[#10B981] p-3">
+      <div className="flex-1 relative bg-card rounded-[6px] border-2 border-[#10B981] p-3">
         <div className="text-xs font-mono text-[#1E3A8A] font-bold">MP26040100001234</div>
         <div className="text-xs text-[#64748B] mt-1">Verified ✓</div>
         <div className="mt-2 text-xs font-bold text-[#10B981]">RWF 120,000</div>
@@ -134,7 +134,7 @@ function ReceiptVisual() {
       whileInView={{ rotateY: 0, opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="bg-white rounded-[6px] border border-[#E2E8F0] p-4 shadow-elevated"
+      className="bg-card rounded-[6px] border border-[#E2E8F0] p-4 shadow-elevated"
     >
       <div className="flex justify-between items-start mb-3">
         <div>

@@ -70,7 +70,7 @@ export default function SolutionSection() {
               viewport={{ once: true, margin: '-60px' }}
               transition={{ delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6, boxShadow: '0 16px 40px rgba(0,0,0,0.1)' }}
-              className="bg-white rounded-[8px] border border-[#E2E8F0] p-8 shadow-card cursor-default"
+              className="bg-card rounded-[8px] border border-[#E2E8F0] p-8 shadow-card cursor-default"
               style={{ transition: 'box-shadow 0.2s' }}
             >
               <motion.div

@@ -36,7 +36,7 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   let label = status.replace(/_/g, ' ');
   let icon = null;
-  let colorClasses = 'bg-slate-100 text-slate-700';
+  let colorClasses = 'bg-muted text-foreground/80';
 
   switch (status.toUpperCase()) {
     // ─── PAYMENTS & INVOICES ───
@@ -84,7 +84,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     case 'DRAFT':
       label = 'Draft';
       icon = <MinusCircle className="w-3 h-3 mr-1.5" />;
-      colorClasses = 'bg-slate-100 text-slate-700';
+      colorClasses = 'bg-muted text-foreground/80';
       break;
 
     // ─── UNIT STATUSES ───
@@ -156,7 +156,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     default:
       label = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase().replace(/_/g, ' ');
       icon = null;
-      colorClasses = 'bg-slate-100 text-slate-700';
+      colorClasses = 'bg-muted text-foreground/80';
       break;
   }
 

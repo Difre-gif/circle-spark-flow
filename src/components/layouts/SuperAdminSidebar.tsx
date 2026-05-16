@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -59,6 +60,7 @@ const navGroups: NavGroup[] = [
 ];
 
 export function SuperAdminSidebar() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -74,7 +76,7 @@ export function SuperAdminSidebar() {
       {/* Mobile Toggle */}
       <Button
         variant="ghost"
-        className="fixed top-4 left-4 z-50 lg:hidden text-slate-600"
+        className="fixed top-4 left-4 z-50 lg:hidden text-muted-foreground"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -93,8 +95,8 @@ export function SuperAdminSidebar() {
             <Link to="/super-admin" className="flex items-center gap-3">
               <BizRentLogo className="text-emerald-400 h-8 w-8" />
               <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-white">BizRent</span>
-                <span className="text-xxs uppercase tracking-widest text-emerald-400 font-bold">Super Admin</span>
+                <span className="text-xl font-bold tracking-tight text-white">{t('legacy.bizrent')}</span>
+                <span className="text-xxs uppercase tracking-widest text-emerald-400 font-bold">{t('legacy.superAdmin')}</span>
               </div>
             </Link>
           </div>
@@ -103,7 +105,7 @@ export function SuperAdminSidebar() {
           <nav className="flex-1 overflow-y-auto px-3 py-2 mt-1 space-y-4">
             {navGroups.map((group) => (
               <div key={group.label}>
-                <p className="px-3 mb-1 text-xxs font-bold uppercase tracking-widest text-slate-500">{group.label}</p>
+                <p className="px-3 mb-1 text-xxs font-bold uppercase tracking-widest text-muted-foreground">{group.label}</p>
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const isActive = location.pathname === item.href;
@@ -116,10 +118,10 @@ export function SuperAdminSidebar() {
                           "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                           isActive
                             ? "bg-slate-800 text-white shadow-sm ring-1 ring-slate-700"
-                            : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+                            : "text-muted-foreground hover:bg-slate-800/50 hover:text-white"
                         )}
                       >
-                        <item.icon size={18} className={cn("transition-colors", isActive ? "text-emerald-400" : "text-slate-500 group-hover:text-slate-300")} />
+                        <item.icon size={18} className={cn("transition-colors", isActive ? "text-emerald-400" : "text-muted-foreground group-hover:text-slate-300")} />
                         {item.label}
                       </Link>
                     );
@@ -138,17 +140,17 @@ export function SuperAdminSidebar() {
               </Avatar>
               <div className="flex flex-col overflow-hidden">
                 <span className="truncate text-sm font-semibold text-white">{user?.name}</span>
-                <span className="truncate text-xs text-slate-500">{user?.email}</span>
+                <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
               </div>
             </div>
             
             <Button
               variant="outline"
-              className="mt-4 w-full justify-start gap-3 border-slate-800 bg-transparent text-slate-400 hover:bg-slate-800 hover:text-white"
+              className="mt-4 w-full justify-start gap-3 border-slate-800 bg-transparent text-muted-foreground hover:bg-slate-800 hover:text-white"
               onClick={handleLogout}
             >
               <LogOut size={16} />
-              Sign Out
+              {t('legacy.signOut')}
             </Button>
           </div>
         </div>

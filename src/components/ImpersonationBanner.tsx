@@ -40,7 +40,7 @@ export default function ImpersonationBanner() {
           variant="secondary" 
           size="sm" 
           onClick={stopImpersonating}
-          className="bg-white text-amber-700 hover:bg-amber-50 border-none h-8 font-bold text-xs"
+          className="bg-card text-amber-700 hover:bg-amber-50 border-none h-8 font-bold text-xs"
         >
           <LogOut size={14} className="mr-2" />
           Stop & Return to Admin

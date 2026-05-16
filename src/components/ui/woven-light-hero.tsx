@@ -41,11 +41,11 @@ export const WovenLightHero = () => {
   const headline = "Woven by Light";
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-white">
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-card">
       <WovenCanvas />
       <HeroNav />
       <div className="relative z-10 text-center px-4">
-        <h1 className="text-6xl md:text-8xl text-slate-900" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 0 50px rgba(0, 0, 0, 0.1)' }}>
+        <h1 className="text-6xl md:text-8xl text-foreground" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 0 50px rgba(0, 0, 0, 0.1)' }}>
             {headline.split(" ").map((word, i) => (
                 <span key={i} className="inline-block">
                     {word.split("").map((char, j) => (
@@ -61,13 +61,13 @@ export const WovenLightHero = () => {
           custom={headline.length}
           initial={{ opacity: 0, y: 30 }}
           animate={textControls}
-          className="mx-auto mt-6 max-w-xl text-lg text-slate-600"
+          className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
           An interactive tapestry of light and motion, crafted with code and creativity.
         </motion.p>
         <motion.div initial={{ opacity: 0 }} animate={buttonControls} className="mt-10">
-          <button className="rounded-full border-2 border-gray-300 bg-gray-100 px-8 py-3 font-semibold text-bizrent-navy backdrop-blur-sm transition-all hover:bg-gray-200" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <button className="rounded-full border-2 border-gray-300 bg-gray-100 px-8 py-3 font-semibold text-bizrent-navy dark:text-white backdrop-blur-sm transition-all hover:bg-gray-200" style={{ fontFamily: "'Inter', sans-serif" }}>
             Explore the Weave
           </button>
         </motion.div>

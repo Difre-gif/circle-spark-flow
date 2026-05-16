@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from "react";
 import {
   useSubscriptionTiers,
@@ -33,6 +34,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 export default function SuperAdminSettings() {
+  const { t } = useTranslation();
   const { data: tiers, isLoading } = useSubscriptionTiers();
   const updateTier = useUpdateSubscriptionTier();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -80,14 +82,14 @@ export default function SuperAdminSettings() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Platform Configuration</h1>
-        <p className="text-slate-500 font-medium italic">Manage subscription tiers, system limits, and platform-wide feature flags.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('legacy.platformConfiguration')}</h1>
+        <p className="text-muted-foreground font-medium italic">{t('legacy.manageSubscriptionTiersSystemLimitsAndPlatformWideFeatureFlags')}</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
         {tiers?.map((tier) => (
           <Card key={tier.id} className={`border-none shadow-md overflow-hidden flex flex-col ${editingId === tier.id ? 'ring-2 ring-indigo-500' : ''}`}>
-            <CardHeader className="bg-bizrent-light border-b border-slate-100 flex flex-row justify-between items-start">
+            <CardHeader className="bg-bizrent-light border-b border-border flex flex-row justify-between items-start">
               <div>
                 <Badge variant="outline" className="mb-2 bg-indigo-50 text-indigo-700 border-indigo-200 uppercase tracking-widest text-xxs font-bold">
                   {tier.tier}
@@ -99,17 +101,17 @@ export default function SuperAdminSettings() {
                   <Settings size={16} />
                 </Button>
               ) : (
-                <Badge className="bg-emerald-500">Editing</Badge>
+                <Badge className="bg-emerald-500">{t('legacy.editing')}</Badge>
               )}
             </CardHeader>
 
             <CardContent className="pt-6 space-y-6 flex-1">
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 flex items-center gap-2"><CreditCard size={14} /> Monthly Price</span>
+                  <span className="text-muted-foreground flex items-center gap-2"><CreditCard size={14} /> {t('legacy.monthlyPrice')}</span>
                   {editingId === tier.id ? (
                     <div className="flex items-center gap-2 w-32 font-mono">
-                      <span className="text-xxs">RWF</span>
+                      <span className="text-xxs">{t('legacy.rwf')}</span>
                       <Input 
                         value={editForm?.monthly_price_rwf} 
                         onChange={(e) => setEditForm({...editForm, monthly_price_rwf: e.target.value})}
@@ -117,12 +119,12 @@ export default function SuperAdminSettings() {
                       />
                     </div>
                   ) : (
-                    <span className="font-bold text-slate-900">{formatRWF(tier.monthly_price_rwf)}</span>
+                    <span className="font-bold text-foreground">{formatRWF(tier.monthly_price_rwf)}</span>
                   )}
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 flex items-center gap-2"><Package size={14} /> Max Units</span>
+                  <span className="text-muted-foreground flex items-center gap-2"><Package size={14} /> {t('legacy.maxUnits')}</span>
                   {editingId === tier.id ? (
                     <Input 
                       value={editForm?.max_units} 
@@ -130,12 +132,12 @@ export default function SuperAdminSettings() {
                       className="h-8 w-20 text-right font-mono"
                     />
                   ) : (
-                    <span className="font-semibold text-slate-700">{tier.max_units === 99999 ? 'Unlimited' : tier.max_units}</span>
+                    <span className="font-semibold text-foreground/80">{tier.max_units === 99999 ? 'Unlimited' : tier.max_units}</span>
                   )}
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 flex items-center gap-2"><Globe size={14} /> Max Properties</span>
+                  <span className="text-muted-foreground flex items-center gap-2"><Globe size={14} /> {t('legacy.maxProperties')}</span>
                   {editingId === tier.id ? (
                     <Input 
                       value={editForm?.max_properties} 
@@ -143,15 +145,15 @@ export default function SuperAdminSettings() {
                       className="h-8 w-20 text-right font-mono"
                     />
                   ) : (
-                    <span className="font-semibold text-slate-700">{tier.max_properties === 99999 ? 'Unlimited' : tier.max_properties}</span>
+                    <span className="font-semibold text-foreground/80">{tier.max_properties === 99999 ? 'Unlimited' : tier.max_properties}</span>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-4 border-t border-slate-100 pt-4">
+              <div className="space-y-4 border-t border-border pt-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <MessageSquare size={14} /> WhatsApp Notifications
+                  <span className="text-sm font-medium text-foreground/80 flex items-center gap-2">
+                    <MessageSquare size={14} /> {t('legacy.whatsappNotifications')}
                   </span>
                   <Switch 
                     disabled={editingId !== tier.id}
@@ -160,8 +162,8 @@ export default function SuperAdminSettings() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <CheckCircle2 size={14} /> Kinyarwanda Support
+                  <span className="text-sm font-medium text-foreground/80 flex items-center gap-2">
+                    <CheckCircle2 size={14} /> {t('legacy.kinyarwandaSupport')}
                   </span>
                   <Switch 
                     disabled={editingId !== tier.id}
@@ -170,8 +172,8 @@ export default function SuperAdminSettings() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Zap size={14} /> Developer API
+                  <span className="text-sm font-medium text-foreground/80 flex items-center gap-2">
+                    <Zap size={14} /> {t('legacy.developerApi')}
                   </span>
                   <Switch 
                     disabled={editingId !== tier.id}
@@ -182,17 +184,17 @@ export default function SuperAdminSettings() {
               </div>
             </CardContent>
 
-            <CardFooter className="bg-slate-50/30 border-t border-slate-100 pt-4 space-x-2">
+            <CardFooter className="bg-muted/30 border-t border-border pt-4 space-x-2">
               {editingId === tier.id ? (
                 <>
                   <Button variant="default" className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleSave} disabled={updateTier.isPending}>
-                    {updateTier.isPending ? <Loader2 className="animate-spin" size={16} /> : <><Save size={16} className="mr-2"/> Save Changes</>}
+                    {updateTier.isPending ? <Loader2 className="animate-spin" size={16} /> : <><Save size={16} className="mr-2"/> {t('legacy.saveChanges')}</>}
                   </Button>
-                  <Button variant="outline" className="w-fit px-3" onClick={() => setEditingId(null)}>Cancel</Button>
+                  <Button variant="outline" className="w-fit px-3" onClick={() => setEditingId(null)}>{t('legacy.cancel')}</Button>
                 </>
               ) : (
-                <div className="text-xxs text-slate-400 flex items-center italic gap-1">
-                  <AlertCircle size={10} /> Limits automatically synced to organization RLS functions
+                <div className="text-xxs text-muted-foreground flex items-center italic gap-1">
+                  <AlertCircle size={10} /> {t('legacy.limitsAutomaticallySyncedToOrganizationRlsFunctions')}
                 </div>
               )}
             </CardFooter>
@@ -203,31 +205,31 @@ export default function SuperAdminSettings() {
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-red-400" />
-          <h2 className="text-xl font-bold text-slate-900">Super Admin Access</h2>
+          <h2 className="text-xl font-bold text-foreground">{t('legacy.superAdminAccess')}</h2>
         </div>
 
         {/* Current Super Admins */}
         <Card className="border-none shadow-md">
-          <CardHeader className="border-b border-slate-100">
-            <CardTitle className="text-base text-slate-900">Current Super Admins</CardTitle>
-            <CardDescription>Accounts with full platform access. Changes require database intervention.</CardDescription>
+          <CardHeader className="border-b border-border">
+            <CardTitle className="text-base text-foreground">{t('legacy.currentSuperAdmins')}</CardTitle>
+            <CardDescription>{t('legacy.accountsWithFullPlatformAccessChangesRequireDatabaseIntervention')}</CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
             {allowlistLoading ? (
-              <div className="flex items-center gap-2 text-slate-400 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading…
               </div>
             ) : (allowlist ?? []).length === 0 ? (
-              <p className="text-slate-500 text-sm">No entries in the allowlist.</p>
+              <p className="text-muted-foreground text-sm">{t('legacy.noEntriesInTheAllowlist')}</p>
             ) : (
               <ul className="space-y-2">
                 {(allowlist ?? []).map((entry: any) => (
-                  <li key={entry.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                  <li key={entry.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                     <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-slate-400" />
+                      <Mail className="h-4 w-4 text-muted-foreground" />
                       <span className="text-slate-800 text-sm font-medium">{entry.email}</span>
                     </div>
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-xs">Super Admin</Badge>
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-xs">{t('legacy.superAdmin')}</Badge>
                   </li>
                 ))}
               </ul>
@@ -237,43 +239,43 @@ export default function SuperAdminSettings() {
 
         {/* Pending Invitations */}
         <Card className="border-none shadow-md">
-          <CardHeader className="border-b border-slate-100">
+          <CardHeader className="border-b border-border">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base text-slate-900">Pending Invitations</CardTitle>
-                <CardDescription>Invited emails that have not yet accepted super admin access.</CardDescription>
+                <CardTitle className="text-base text-foreground">{t('legacy.pendingInvitations')}</CardTitle>
+                <CardDescription>{t('legacy.invitedEmailsThatHaveNotYetAcceptedSuperAdminAccess')}</CardDescription>
               </div>
               <Button
                 size="sm"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
                 onClick={() => { setInviteEmail(''); setInviteDialogOpen(true); }}
               >
-                <UserPlus className="h-3.5 w-3.5 mr-1.5" /> Invite Super Admin
+                <UserPlus className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.inviteSuperAdmin')}
               </Button>
             </div>
           </CardHeader>
           <CardContent className="pt-4">
             {invitationsLoading ? (
-              <div className="flex items-center gap-2 text-slate-400 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading…
               </div>
             ) : (invitations ?? []).filter((inv: any) => inv.status === 'PENDING').length === 0 ? (
-              <p className="text-slate-500 text-sm">No pending invitations.</p>
+              <p className="text-muted-foreground text-sm">{t('legacy.noPendingInvitations')}</p>
             ) : (
               <ul className="space-y-2">
                 {(invitations ?? [])
                   .filter((inv: any) => inv.status === 'PENDING')
                   .map((inv: any) => (
-                    <li key={inv.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                    <li key={inv.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                       <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-slate-400" />
+                        <Mail className="h-4 w-4 text-muted-foreground" />
                         <div>
                           <p className="text-slate-800 text-sm font-medium">{inv.invited_email}</p>
-                          <p className="text-slate-400 text-xs">Invited by {inv.invited_by}</p>
+                          <p className="text-muted-foreground text-xs">Invited by {inv.invited_by}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">Pending</Badge>
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">{t('legacy.pending')}</Badge>
                         <Button
                           size="sm"
                           variant="outline"
@@ -281,7 +283,7 @@ export default function SuperAdminSettings() {
                           disabled={revokeMutation.isPending}
                           onClick={() => revokeMutation.mutate(inv.id)}
                         >
-                          <Trash2 className="h-3 w-3 mr-1" /> Revoke
+                          <Trash2 className="h-3 w-3 mr-1" /> {t('legacy.revoke')}
                         </Button>
                       </div>
                     </li>
@@ -294,26 +296,26 @@ export default function SuperAdminSettings() {
 
       {/* Invite Super Admin Dialog */}
       <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-        <DialogContent className="bg-white border border-slate-200 text-slate-900">
+        <DialogContent className="bg-card border border-border text-foreground">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-slate-900">
-              <UserPlus className="h-4 w-4 text-indigo-600" /> Invite Super Admin
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <UserPlus className="h-4 w-4 text-indigo-600" /> {t('legacy.inviteSuperAdmin')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <Label className="text-slate-700 text-sm">Email address <span className="text-red-500">*</span></Label>
+            <Label className="text-foreground/80 text-sm">{t('legacy.emailAddress')} <span className="text-red-500">*</span></Label>
             <Input
               type="email"
               placeholder="admin@bizrent.rw"
               value={inviteEmail}
               onChange={e => setInviteEmail(e.target.value)}
-              className="border-slate-300 text-slate-900 placeholder:text-slate-400"
+              className="border-slate-300 text-foreground placeholder:text-muted-foreground"
               onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
             />
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" className="border-slate-300 text-slate-600" onClick={() => setInviteDialogOpen(false)}>
-              Cancel
+            <Button variant="outline" className="border-slate-300 text-muted-foreground" onClick={() => setInviteDialogOpen(false)}>
+              {t('legacy.cancel')}
             </Button>
             <Button
               className="bg-indigo-600 hover:bg-indigo-700 text-white"

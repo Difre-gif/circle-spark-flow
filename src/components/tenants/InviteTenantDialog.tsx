@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { 
   Dialog, 
@@ -27,6 +28,7 @@ interface InviteTenantDialogProps {
 }
 
 export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [unitId, setUnitId] = useState<string>('none');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -69,35 +71,35 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-0 shadow-2xl p-8 bg-white/95 backdrop-blur-sm">
+      <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-0 shadow-2xl p-8 bg-card/95 backdrop-blur-sm">
         <DialogHeader className="space-y-3">
           <div className="w-12 h-12 rounded-2xl bg-bizrent-blue/10 flex items-center justify-center mb-2">
             <Mail className="h-6 w-6 text-bizrent-blue" />
           </div>
-          <DialogTitle className="text-2xl font-extrabold text-bizrent-navy tracking-tight">
-            Invite Tenant
+          <DialogTitle className="text-2xl font-extrabold text-bizrent-navy dark:text-white tracking-tight">
+            {t('legacy.inviteTenant')}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground font-medium leading-relaxed">
-            Record an email invitation. The system will automatically link them to your organisation and assigned unit when they sign up.
+            {t('legacy.recordAnEmailInvitationTheSystemWillAutomaticallyLinkThemToYourOrganis')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-bold text-bizrent-navy ml-1">Email Address <span className="text-red-500">*</span></Label>
+            <Label htmlFor="email" className="text-sm font-bold text-bizrent-navy dark:text-white ml-1">{t('legacy.emailAddress')} <span className="text-red-500">*</span></Label>
             <Input
               id="email"
               type="email"
               placeholder="tenant@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 rounded-xl border-border/60 bg-white/50 focus-visible:ring-bizrent-navy/20 font-medium transition-all"
+              className="h-12 rounded-xl border-border/60 bg-card/50 focus-visible:ring-bizrent-navy/20 font-medium transition-all"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="unit" className="text-sm font-bold text-bizrent-navy ml-1 flex items-center gap-1.5">
+            <Label htmlFor="unit" className="text-sm font-bold text-bizrent-navy dark:text-white ml-1 flex items-center gap-1.5">
               <Home className="h-3.5 w-3.5" /> Assign to Unit (Optional)
             </Label>
             <Select value={unitId} onValueChange={value => {
@@ -105,18 +107,18 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
               const unit = vacantUnits.find(u => u.id === value);
               if (unit) setRent(unit.monthly_rent);
             }}>
-              <SelectTrigger className="h-12 rounded-xl border-border/60 bg-white/50 focus:ring-bizrent-navy/20 font-medium transition-all">
+              <SelectTrigger className="h-12 rounded-xl border-border/60 bg-card/50 focus:ring-bizrent-navy/20 font-medium transition-all">
                 <SelectValue placeholder="Select a vacant unit" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-border/40 shadow-2xl bg-white/95 backdrop-blur-sm">
-                <SelectItem value="none" className="font-semibold text-bizrent-navy">Stay unassigned</SelectItem>
+              <SelectContent className="rounded-xl border-border/40 shadow-2xl bg-card/95 backdrop-blur-sm">
+                <SelectItem value="none" className="font-semibold text-bizrent-navy dark:text-white">{t('legacy.stayUnassigned')}</SelectItem>
                 {vacantUnits.map((u) => (
                   <SelectItem key={u.id} value={u.id} className="font-medium py-2.5">
                     Unit {u.unit_number} — { (u as any).properties?.name || 'Property'}
                   </SelectItem>
                 ))}
                 {vacantUnits.length === 0 && !unitsLoading && (
-                  <div className="p-3 text-xs text-center text-muted-foreground italic font-medium">No vacant units available</div>
+                  <div className="p-3 text-xs text-center text-muted-foreground italic font-medium">{t('legacy.noVacantUnitsAvailable')}</div>
                 )}
               </SelectContent>
             </Select>
@@ -126,29 +128,29 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
             <div className="space-y-4 rounded-2xl border border-bizrent-blue/10 bg-bizrent-blue/5 p-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-bizrent-navy">Move-in date</Label>
+                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.moveInDate')}</Label>
                   <Input type="date" value={startDate} onChange={e => {
                     setStartDate(e.target.value);
                     if (e.target.value) setAnchorDay(new Date(`${e.target.value}T12:00:00`).getDate());
                   }} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-bizrent-navy">Cycle starts day</Label>
+                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.cycleStartsDay')}</Label>
                   <Input type="number" min="1" max="31" value={anchorDay} onChange={e => setAnchorDay(Number(e.target.value))} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-bizrent-navy">Monthly rent</Label>
+                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.monthlyRent')}</Label>
                   <Input type="number" value={rent} onChange={e => setRent(e.target.value === '' ? '' : Number(e.target.value))} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-bizrent-navy">Deposit</Label>
+                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.deposit')}</Label>
                   <Input type="number" value={deposit} onChange={e => setDeposit(e.target.value === '' ? '' : Number(e.target.value))} />
                 </div>
               </div>
               {cyclePreview && (
-                <p className="text-xs font-semibold text-bizrent-navy">
+                <p className="text-xs font-semibold text-bizrent-navy dark:text-white">
                   First monthly cycle: <span className="text-bizrent-blue">{cyclePreview.label}</span>
                 </p>
               )}
@@ -162,7 +164,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
               onClick={() => onOpenChange(false)}
               className="flex-1 rounded-xl font-bold text-muted-foreground hover:bg-muted"
             >
-              Cancel
+              {t('legacy.cancel')}
             </Button>
             <Button 
               type="submit" 

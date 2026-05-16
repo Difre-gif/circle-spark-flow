@@ -14,7 +14,7 @@ interface FeatureCardProps {
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, iconColor, title, description, hasCoreBadge, staggerDelay }) => {
   return (
     <motion.div
-      className="bg-white border border-gray-100/50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 relative"
+      className="bg-card border border-gray-100/50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 relative"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}

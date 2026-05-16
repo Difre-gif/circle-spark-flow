@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Loader2, Download, Search, FileCheck, Filter, CalendarIcon, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { downloadReceiptPdf } from '@/lib/receiptPdf';
 
 export default function Receipts() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [dateRange, setDateRange] = useState<Date | undefined>(undefined);
   const { data: receipts, isLoading } = useReceipts();
@@ -36,7 +38,7 @@ export default function Receipts() {
 
   if (isLoading) return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <Loader2 className="h-10 w-10 animate-spin text-bizrent-navy" />
+      <Loader2 className="h-10 w-10 animate-spin text-bizrent-navy dark:text-white" />
     </div>
   );
 
@@ -45,17 +47,17 @@ export default function Receipts() {
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
-            <span className="cursor-pointer hover:text-bizrent-navy transition-colors">Collections</span>
+            <span className="cursor-pointer hover:text-bizrent-navy dark:text-white transition-colors">{t('legacy.collections')}</span>
             <ChevronRight className="h-3.5 w-3.5" />
-            <span className="text-bizrent-blue">Receipts</span>
+            <span className="text-bizrent-blue">{t('legacy.receipts')}</span>
           </p>
-          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy tracking-tight">Receipts</h1>
+          <h1 className="page-title text-3xl font-extrabold text-bizrent-navy dark:text-white tracking-tight">{t('legacy.receipts')}</h1>
           <p className="page-description font-medium text-muted-foreground">View and download {receipts?.length ?? 0} generated payment receipts</p>
         </div>
         <div className="flex items-center gap-3">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("rounded-xl border-border/60 font-semibold h-11", dateRange && "bg-muted text-bizrent-navy")}>
+              <Button variant="outline" className={cn("rounded-xl border-border/60 font-semibold h-11", dateRange && "bg-muted text-bizrent-navy dark:text-white")}>
                 <CalendarIcon className="mr-2 h-4 w-4" /> 
                 {dateRange ? format(dateRange, "MMM d, yyyy") : "Pick a date"}
               </Button>
@@ -69,7 +71,7 @@ export default function Receipts() {
               />
               {dateRange && (
                 <div className="p-3 border-t border-border/50">
-                  <Button variant="ghost" className="w-full text-xs h-8" onClick={() => setDateRange(undefined)}>Clear Filter</Button>
+                  <Button variant="ghost" className="w-full text-xs h-8" onClick={() => setDateRange(undefined)}>{t('legacy.clearFilter')}</Button>
                 </div>
               )}
             </PopoverContent>
@@ -78,18 +80,18 @@ export default function Receipts() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-semibold h-11 px-6 shadow-sm transition-all hover:scale-[1.02]">
-                <Download className="mr-2 h-4 w-4" /> Export All
+                <Download className="mr-2 h-4 w-4" /> {t('legacy.exportAll')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[180px] rounded-xl shadow-lg border-border/40">
-              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 transition-colors">
-                Export as CSV
+              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-muted/40 transition-colors">
+                {t('legacy.exportAsCsv')}
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 transition-colors">
-                Export as PDF
+              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-muted/40 transition-colors">
+                {t('legacy.exportAsPdf')}
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-slate-50 transition-colors">
-                Export as Excel
+              <DropdownMenuItem className="cursor-pointer py-2 px-3 font-medium rounded-lg hover:bg-muted/40 transition-colors">
+                {t('legacy.exportAsExcel')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -102,43 +104,43 @@ export default function Receipts() {
           placeholder="Search by receipt, tenant or invoice..." 
           value={search} 
           onChange={e => setSearch(e.target.value)} 
-          className="pl-11 h-11 rounded-xl bg-white border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20 text-sm font-medium" 
+          className="pl-11 h-11 rounded-xl bg-card border-border/50 shadow-sm focus-visible:ring-bizrent-blue/20 text-sm font-medium" 
         />
       </div>
 
-      <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-white">
+      <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px] text-sm">
               <thead>
                 <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
-                  <th className="text-left px-8 py-4 whitespace-nowrap">Receipt #</th>
-                  <th className="text-left px-4 py-4">Linked Invoice</th>
-                  <th className="text-left px-4 py-4">Tenant</th>
-                  <th className="text-left px-4 py-4 text-right">Amount</th>
-                  <th className="text-left px-4 py-4 text-center">Status</th>
-                  <th className="text-left px-8 py-4 text-right">Generated At</th>
+                  <th className="text-left px-8 py-4 whitespace-nowrap">{t('legacy.receiptNumber')}</th>
+                  <th className="text-left px-4 py-4">{t('legacy.linkedInvoice')}</th>
+                  <th className="text-left px-4 py-4">{t('legacy.tenant')}</th>
+                  <th className="text-left px-4 py-4 text-right">{t('legacy.amount')}</th>
+                  <th className="text-left px-4 py-4 text-center">{t('legacy.status')}</th>
+                  <th className="text-left px-8 py-4 text-right">{t('legacy.generatedAt')}</th>
                   <th className="px-8 py-4"></th>
                 </tr>
               </thead>
-              <tbody className="[&_tr:nth-child(even)]:bg-slate-50">
+              <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
                 {filtered.map(r => (
-                  <tr key={r.id} className="transition-all hover:bg-white border-b border-border/10 group">
+                  <tr key={r.id} className="transition-all hover:bg-card border-b border-border/10 group">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-bizrent-emerald/10 rounded-lg group-hover:scale-110 transition-transform">
                           <FileCheck className="h-4 w-4 text-bizrent-emerald" />
                         </div>
-                        <span className="font-extrabold text-bizrent-navy">BR-2026-{r.receipt_number.split("-").pop()}</span>
+                        <span className="font-extrabold text-bizrent-navy dark:text-white">BR-2026-{r.receipt_number.split("-").pop()}</span>
                       </div>
                     </td>
                     <td className="px-4 py-5 font-bold text-bizrent-blue">
                       {(r.invoice as any)?.invoice_number ?? '—'}
                     </td>
-                    <td className="px-4 py-5 font-semibold text-bizrent-navy">
+                    <td className="px-4 py-5 font-semibold text-bizrent-navy dark:text-white">
                       {(r.tenant as any)?.full_name ?? '—'}
                     </td>
-                    <td className="px-4 py-5 text-right font-extrabold text-bizrent-navy font-mono">
+                    <td className="px-4 py-5 text-right font-extrabold text-bizrent-navy dark:text-white font-mono">
                       {formatRWF((r.payment as any)?.amount ?? 0)}
                     </td>
                     <td className="px-4 py-5 text-center">
@@ -164,8 +166,8 @@ export default function Receipts() {
                     <td colSpan={7} className="py-20 text-center text-muted-foreground">
                       <div className="flex flex-col items-center justify-center">
                         <FileCheck className="h-10 w-10 mb-2 opacity-10" />
-                        <p className="font-bold text-bizrent-navy">No receipts found</p>
-                        <p className="text-xs font-medium mt-1">Try adjusting your filters or search terms.</p>
+                        <p className="font-bold text-bizrent-navy dark:text-white">{t('legacy.noReceiptsFound')}</p>
+                        <p className="text-xs font-medium mt-1">{t('legacy.tryAdjustingYourFiltersOrSearchTerms')}</p>
                       </div>
                     </td>
                   </tr>

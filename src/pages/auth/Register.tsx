@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
@@ -8,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { useTranslation } from 'react-i18next';
 
 function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
   if (!pw) return { score: 0, label: '', color: '' };
@@ -100,7 +100,7 @@ export default function Register() {
           <div className="flex justify-center"><BizRentLogo size="lg" className="text-primary" /></div>
           <div>
             <CardTitle className="text-2xl">{t('auth.createAccount')}</CardTitle>
-            <CardDescription>Start managing your properties with BizRent</CardDescription>
+            <CardDescription>{t('legacy.startManagingYourPropertiesWithBizrent')}</CardDescription>
           </div>
         </CardHeader>
         <form onSubmit={handleSubmit} noValidate>

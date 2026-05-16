@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { ShieldAlert, Search, AlertTriangle, CheckCircle2, RefreshCw, Database, TrendingUp, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,6 +47,7 @@ const SEVERITY_STYLES: Record<string, string> = {
 };
 
 export default function FraudDetection() {
+  const { t } = useTranslation();
   const { data: signals, isLoading, refetch, isFetching } = useAdminFraudSignals();
   const integrityCheck = useDataIntegrityCheck();
   const [integrityResults, setIntegrityResults] = useState<IntegrityIssue[] | null>(null);
@@ -71,9 +73,9 @@ export default function FraudDetection() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <ShieldAlert className="h-5 w-5 text-red-400" />
-            <h1 className="text-2xl font-bold text-white">Fraud &amp; Forensics</h1>
+            <h1 className="text-2xl font-bold text-white">{t('legacy.fraudAmpForensics')}</h1>
           </div>
-          <p className="text-slate-400 text-sm">Anomaly detection, integrity checks, and forensic audit tools.</p>
+          <p className="text-muted-foreground text-sm">{t('legacy.anomalyDetectionIntegrityChecksAndForensicAuditTools')}</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -84,7 +86,7 @@ export default function FraudDetection() {
             disabled={isFetching}
           >
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('legacy.refresh')}
           </Button>
           <Button
             variant="outline"
@@ -109,7 +111,7 @@ export default function FraudDetection() {
         ].map(({ label, value, color, bg }) => (
           <Card key={label} className={`border-slate-700 ${bg}`}>
             <CardContent className="p-4">
-              <p className="text-slate-400 text-xs mb-1">{label}</p>
+              <p className="text-muted-foreground text-xs mb-1">{label}</p>
               {isLoading ? (
                 <Skeleton className="h-8 w-12 bg-slate-700" />
               ) : (
@@ -131,14 +133,14 @@ export default function FraudDetection() {
 
       <Tabs defaultValue="signals">
         <TabsList className="bg-slate-800 border border-slate-700">
-          <TabsTrigger value="signals" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-slate-400">
-            <ShieldAlert className="h-3.5 w-3.5 mr-1.5" /> Fraud Signals
+          <TabsTrigger value="signals" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-muted-foreground">
+            <ShieldAlert className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.fraudSignals')}
           </TabsTrigger>
-          <TabsTrigger value="patterns" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-slate-400">
-            <TrendingUp className="h-3.5 w-3.5 mr-1.5" /> Pattern Analysis
+          <TabsTrigger value="patterns" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-muted-foreground">
+            <TrendingUp className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.patternAnalysis')}
           </TabsTrigger>
-          <TabsTrigger value="timeline" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-slate-400">
-            <Clock className="h-3.5 w-3.5 mr-1.5" /> Event Timeline
+          <TabsTrigger value="timeline" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-muted-foreground">
+            <Clock className="h-3.5 w-3.5 mr-1.5" /> {t('legacy.eventTimeline')}
           </TabsTrigger>
         </TabsList>
 
@@ -149,12 +151,12 @@ export default function FraudDetection() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">Severity</th>
-                      <th className="text-left px-4 py-3">Type</th>
-                      <th className="text-left px-4 py-3">Organisation</th>
-                      <th className="text-left px-4 py-3">Detail</th>
-                      <th className="text-left px-4 py-3">Detected</th>
+                    <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">{t('legacy.severity')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.type')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.organisation')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.detail')}</th>
+                      <th className="text-left px-4 py-3">{t('legacy.detected')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -170,8 +172,8 @@ export default function FraudDetection() {
                       <tr>
                         <td colSpan={5} className="py-16 text-center">
                           <CheckCircle2 className="h-10 w-10 mx-auto text-emerald-500 mb-3" />
-                          <p className="text-slate-400 text-sm">No fraud signals detected</p>
-                          <p className="text-slate-600 text-xs mt-1">All clear — system looks healthy</p>
+                          <p className="text-muted-foreground text-sm">{t('legacy.noFraudSignalsDetected')}</p>
+                          <p className="text-muted-foreground text-xs mt-1">{t('legacy.allClearSystemLooksHealthy')}</p>
                         </td>
                       </tr>
                     ) : (
@@ -189,8 +191,8 @@ export default function FraudDetection() {
                             <code className="text-xxs bg-slate-900/50 text-red-300 px-2 py-0.5 rounded">{s.type}</code>
                           </td>
                           <td className="px-4 py-3 text-white text-xs font-medium">{s.org_name}</td>
-                          <td className="px-4 py-3 text-slate-400 text-xs max-w-xs truncate">{s.detail}</td>
-                          <td className="px-4 py-3 text-slate-500 text-xs font-mono whitespace-nowrap">{formatDate(s.detected_at)}</td>
+                          <td className="px-4 py-3 text-muted-foreground text-xs max-w-xs truncate">{s.detail}</td>
+                          <td className="px-4 py-3 text-muted-foreground text-xs font-mono whitespace-nowrap">{formatDate(s.detected_at)}</td>
                         </tr>
                       ))
                     )}
@@ -233,13 +235,13 @@ export default function FraudDetection() {
                 title: 'Dormant Org Reactivation',
                 desc: 'Orgs with zero activity for 60+ days that suddenly have high transaction volume.',
                 status: 'v2 — ML model required',
-                statusColor: 'bg-slate-600/50 text-slate-400 border-slate-600',
+                statusColor: 'bg-slate-600/50 text-muted-foreground border-slate-600',
               },
               {
                 title: 'Cross-Org Tenant Overlap',
                 desc: 'Tenants enrolled in multiple orgs simultaneously — identify shared identity fraud.',
                 status: 'v2 — graph analysis',
-                statusColor: 'bg-slate-600/50 text-slate-400 border-slate-600',
+                statusColor: 'bg-slate-600/50 text-muted-foreground border-slate-600',
               },
             ].map(({ title, desc, status, statusColor }) => (
               <Card key={title} className="bg-slate-800 border-slate-700">
@@ -247,7 +249,7 @@ export default function FraudDetection() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-white text-sm">{title}</p>
-                      <p className="text-slate-400 text-xs mt-1 leading-relaxed">{desc}</p>
+                      <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{desc}</p>
                     </div>
                     <Badge className={`text-xxxs whitespace-nowrap shrink-0 ${statusColor}`}>{status}</Badge>
                   </div>
@@ -261,7 +263,7 @@ export default function FraudDetection() {
         <TabsContent value="timeline" className="mt-4">
           <Card className="bg-slate-800 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white text-base">Recent High-Risk Events</CardTitle>
+              <CardTitle className="text-white text-base">{t('legacy.recentHighRiskEvents')}</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -279,7 +281,7 @@ export default function FraudDetection() {
               ) : (signals ?? []).filter(s => s.severity !== 'LOW').length === 0 ? (
                 <div className="py-10 text-center">
                   <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" />
-                  <p className="text-slate-400 text-sm">No high-risk events in the timeline</p>
+                  <p className="text-muted-foreground text-sm">{t('legacy.noHighRiskEventsInTheTimeline')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -292,8 +294,8 @@ export default function FraudDetection() {
                       }`} />
                       <div>
                         <p className="text-white text-sm font-medium">{s.org_name} — <code className="text-xs text-slate-300">{s.type}</code></p>
-                        <p className="text-slate-400 text-xs">{s.detail}</p>
-                        <p className="text-slate-600 text-xs font-mono mt-0.5">{formatDate(s.detected_at)}</p>
+                        <p className="text-muted-foreground text-xs">{s.detail}</p>
+                        <p className="text-muted-foreground text-xs font-mono mt-0.5">{formatDate(s.detected_at)}</p>
                       </div>
                     </div>
                   ))}
@@ -309,18 +311,18 @@ export default function FraudDetection() {
         <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Database className="h-4 w-4 text-blue-400" /> Data Integrity Check Results
+              <Database className="h-4 w-4 text-blue-400" /> {t('legacy.dataIntegrityCheckResults')}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              Full scan of referential integrity, orphaned records, and data consistency across all tables.
+            <DialogDescription className="text-muted-foreground">
+              {t('legacy.fullScanOfReferentialIntegrityOrphanedRecordsAndDataConsistencyAcrossA')}
             </DialogDescription>
           </DialogHeader>
           <div className="max-h-[60vh] overflow-y-auto space-y-3 pr-1">
             {(integrityResults ?? []).length === 0 ? (
               <div className="py-10 text-center">
                 <CheckCircle2 className="h-10 w-10 mx-auto text-emerald-500 mb-3" />
-                <p className="text-emerald-400 font-medium">All checks passed</p>
-                <p className="text-slate-400 text-sm mt-1">No integrity issues found in the database</p>
+                <p className="text-emerald-400 font-medium">{t('legacy.allChecksPassed')}</p>
+                <p className="text-muted-foreground text-sm mt-1">{t('legacy.noIntegrityIssuesFoundInTheDatabase')}</p>
               </div>
             ) : (
               (integrityResults ?? []).map((issue, i) => (
@@ -330,7 +332,7 @@ export default function FraudDetection() {
                       <code className="text-xs text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded">{issue.table_name}</code>
                       <Badge className="text-xxxs bg-red-500/20 text-red-400 border-red-500/30">{issue.issue_type}</Badge>
                     </div>
-                    <span className="text-xs text-slate-400">{issue.affected_rows} row{issue.affected_rows !== 1 ? 's' : ''}</span>
+                    <span className="text-xs text-muted-foreground">{issue.affected_rows} row{issue.affected_rows !== 1 ? 's' : ''}</span>
                   </div>
                   <p className="text-slate-300 text-xs">{issue.detail}</p>
                 </div>
@@ -339,7 +341,7 @@ export default function FraudDetection() {
           </div>
           <DialogFooter>
             <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => setShowIntegrityModal(false)}>
-              Close
+              {t('legacy.close')}
             </Button>
           </DialogFooter>
         </DialogContent>

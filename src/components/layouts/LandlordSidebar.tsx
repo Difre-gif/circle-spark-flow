@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Building2, Users, FileText, CreditCard,
@@ -28,7 +29,6 @@ import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { can } from '@/lib/permissions';
 import { WorkspaceSwitcher } from '@/components/shared/WorkspaceSwitcher';
-import { useTranslation } from 'react-i18next';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function LandlordSidebar() {
@@ -107,7 +107,7 @@ export function LandlordSidebar() {
         {!isCollapsed && (
           <button
             onClick={() => setCreateOrgOpen(true)}
-            className="mt-2 w-full flex items-center gap-2.5 px-2 py-2 text-xs text-white/50 hover:text-white/80 transition-colors rounded-xl hover:bg-white/5"
+            className="mt-2 w-full flex items-center gap-2.5 px-2 py-2 text-xs text-white/50 hover:text-white/80 transition-colors rounded-xl hover:bg-muted/5"
           >
             <div className="h-6 w-6 rounded flex items-center justify-center border border-dashed border-white/20 shrink-0">
               <Plus className="h-3.5 w-3.5" />
@@ -119,14 +119,14 @@ export function LandlordSidebar() {
         <Dialog open={createOrgOpen} onOpenChange={setCreateOrgOpen}>
           <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-8">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-extrabold text-bizrent-navy">{t('workspace.newWorkspace')}</DialogTitle>
+              <DialogTitle className="text-2xl font-extrabold text-bizrent-navy dark:text-white">{t('workspace.newWorkspace')}</DialogTitle>
               <DialogDescription className="font-medium">
                 {t('workspace.newWorkspaceDesc')}
               </DialogDescription>
             </DialogHeader>
             <div className="py-6 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-bizrent-navy font-bold px-1">{t('workspace.orgName')}</Label>
+                <Label htmlFor="name" className="text-bizrent-navy dark:text-white font-bold px-1">{t('workspace.orgName')}</Label>
                 <Input 
                   id="name" 
                   placeholder="e.g. Blue Sky Properties" 
@@ -136,7 +136,7 @@ export function LandlordSidebar() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-bizrent-navy font-bold px-1">{t('workspace.country')}</Label>
+                <Label className="text-bizrent-navy dark:text-white font-bold px-1">{t('workspace.country')}</Label>
                 <Select value={newOrgCountry} onValueChange={value => setNewOrgCountry(value as 'RW' | 'KE')}>
                   <SelectTrigger className="rounded-2xl h-12 border-border/60 focus:ring-bizrent-blue/20">
                     <SelectValue />
@@ -182,7 +182,7 @@ export function LandlordSidebar() {
                       ? isCollapsed
                         ? "bg-white/12 text-white ring-1 ring-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
                         : "bg-bizrent-blue/20 text-white"
-                      : "text-white/70 hover:bg-white/10 hover:text-white"
+                      : "text-white/70 hover:bg-muted/10 hover:text-white"
                   )}
                 >
                   <NavLink
@@ -210,12 +210,12 @@ export function LandlordSidebar() {
                       <div className="ml-auto flex items-center">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="bg-bizrent-amber text-bizrent-navy text-xxxs px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-bizrent-amber/50 cursor-help">
-                              MoMo
+                            <span className="bg-bizrent-amber text-bizrent-navy dark:text-white text-xxxs px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-widest shadow-sm border border-bizrent-amber/50 cursor-help">
+                              {t('legacy.momo')}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent side="right">
-                            <p>Payments via MTN Mobile Money</p>
+                            <p>{t('legacy.paymentsViaMtnMobileMoney')}</p>
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -241,9 +241,9 @@ export function LandlordSidebar() {
       <SidebarFooter className={cn("border-t border-white/10 bg-black/10 transition-all duration-300", isCollapsed ? "p-3" : "p-4")}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className={cn("flex items-center gap-3 w-full cursor-pointer hover:bg-white/10 p-2 rounded-xl transition-colors", isCollapsed && "justify-center p-0 hover:bg-transparent")}>
+            <div className={cn("flex items-center gap-3 w-full cursor-pointer hover:bg-muted/10 p-2 rounded-xl transition-colors", isCollapsed && "justify-center p-0 hover:bg-transparent")}>
               <div className={cn(
-                "rounded-2xl bg-white text-bizrent-navy flex items-center justify-center font-bold shrink-0 shadow-lg shadow-black/20 relative group transition-transform hover:scale-105 active:scale-95",
+                "rounded-2xl bg-card text-bizrent-navy dark:text-white flex items-center justify-center font-bold shrink-0 shadow-lg shadow-black/20 relative group transition-transform hover:scale-105 active:scale-95",
                 isCollapsed ? "h-12 w-12" : "h-10 w-10"
               )}>
                 {getInitials(user?.name)}
@@ -270,8 +270,8 @@ export function LandlordSidebar() {
               </>
             )}
 
-            <DropdownMenuItem className="font-bold text-bizrent-navy py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5" onClick={() => navigate('/landlord/profile')}>
-              <div className="h-6 w-6 rounded flex items-center justify-center bg-bizrent-navy/10 text-bizrent-navy"><Settings className="h-3.5 w-3.5" /></div>
+            <DropdownMenuItem className="font-bold text-bizrent-navy dark:text-white py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-muted/40 flex items-center gap-2.5" onClick={() => navigate('/landlord/profile')}>
+              <div className="h-6 w-6 rounded flex items-center justify-center bg-bizrent-navy/10 text-bizrent-navy dark:text-white"><Settings className="h-3.5 w-3.5" /></div>
               <span>{t('nav.profile')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="my-1.5 opacity-50" />
@@ -280,7 +280,7 @@ export function LandlordSidebar() {
               onClick={handleLogout}
             >
               <div className="h-6 w-6 rounded flex items-center justify-center bg-red-100 text-bizrent-red"><LogOut className="h-3.5 w-3.5" /></div>
-              <span>Log Out</span>
+              <span>{t('legacy.logOut')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
