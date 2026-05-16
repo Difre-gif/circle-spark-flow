@@ -161,7 +161,11 @@ export function LandlordSidebar() {
                   className={cn(
                     "relative w-full py-6 transition-all rounded-2xl group",
                     isCollapsed && "group-data-[collapsible=icon]:!size-12 group-data-[collapsible=icon]:!p-0",
-                    isActive ? "bg-bizrent-blue/20 text-white" : "text-white/70 hover:bg-white/10 hover:text-white"
+                    isActive
+                      ? isCollapsed
+                        ? "bg-white/12 text-white ring-1 ring-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
+                        : "bg-bizrent-blue/20 text-white"
+                      : "text-white/70 hover:bg-white/10 hover:text-white"
                   )}
                 >
                   <NavLink
@@ -172,7 +176,17 @@ export function LandlordSidebar() {
                       isCollapsed ? "justify-center px-0" : "gap-3 px-4"
                     )}
                   >
-                    <item.icon className={cn("h-5 w-5 shrink-0 transition-transform group-hover:scale-110", isActive ? "text-bizrent-blue" : "text-white/60 group-hover:text-white")} strokeWidth={isActive ? 2.5 : 1.5} />
+                    <item.icon
+                      className={cn(
+                        "h-5 w-5 shrink-0 transition-transform group-hover:scale-110",
+                        isActive
+                          ? isCollapsed
+                            ? "text-white"
+                            : "text-bizrent-blue"
+                          : "text-white/60 group-hover:text-white"
+                      )}
+                      strokeWidth={isActive ? 2.5 : 1.5}
+                    />
                     {!isCollapsed && <span className="text-sm font-bold tracking-tight">{item.title}</span>}
                     
                     {!isCollapsed && item.highlight && (
