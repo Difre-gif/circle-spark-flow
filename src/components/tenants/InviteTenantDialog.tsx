@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { useUnits, useInviteTenant } from '@/hooks/useSupabaseData';
 import { Loader2, Mail, Home, Send } from 'lucide-react';
+import { getCyclePreview } from '@/lib/billingCycles';
 
 interface InviteTenantDialogProps {
   open: boolean;
@@ -28,10 +29,16 @@ interface InviteTenantDialogProps {
 export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogProps) {
   const [email, setEmail] = useState('');
   const [unitId, setUnitId] = useState<string>('none');
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [anchorDay, setAnchorDay] = useState(new Date().getDate());
+  const [rent, setRent] = useState<number | ''>('');
+  const [deposit, setDeposit] = useState<number | ''>('');
   const { data: units, isLoading: unitsLoading } = useUnits();
   const inviteTenant = useInviteTenant();
 
   const vacantUnits = (units ?? []).filter(u => u.status === 'VACANT');
+  const selectedUnit = vacantUnits.find(u => u.id === unitId);
+  const cyclePreview = getCyclePreview(startDate, anchorDay);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +47,20 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
     try {
       await inviteTenant.mutateAsync({
         email,
-        unit_id: unitId === 'none' ? undefined : unitId
+        unit_id: unitId === 'none' ? undefined : unitId,
+        tenancy_start_date: unitId === 'none' ? undefined : startDate,
+        agreed_rent: unitId === 'none' ? undefined : Number(rent || selectedUnit?.monthly_rent || 0),
+        deposit_amount: unitId === 'none' ? undefined : Number(deposit || 0),
+        billing_frequency: 'MONTHLY',
+        period_anchor_day: unitId === 'none' ? undefined : anchorDay,
       });
 
       setEmail('');
       setUnitId('none');
+      setStartDate(new Date().toISOString().split('T')[0]);
+      setAnchorDay(new Date().getDate());
+      setRent('');
+      setDeposit('');
       onOpenChange(false);
     } catch (err) {
       // toast is handled in mutation onSuccess/onError
@@ -84,7 +100,11 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
             <Label htmlFor="unit" className="text-sm font-bold text-bizrent-navy ml-1 flex items-center gap-1.5">
               <Home className="h-3.5 w-3.5" /> Assign to Unit (Optional)
             </Label>
-            <Select value={unitId} onValueChange={setUnitId}>
+            <Select value={unitId} onValueChange={value => {
+              setUnitId(value);
+              const unit = vacantUnits.find(u => u.id === value);
+              if (unit) setRent(unit.monthly_rent);
+            }}>
               <SelectTrigger className="h-12 rounded-xl border-border/60 bg-white/50 focus:ring-bizrent-navy/20 font-medium transition-all">
                 <SelectValue placeholder="Select a vacant unit" />
               </SelectTrigger>
@@ -101,6 +121,39 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
               </SelectContent>
             </Select>
           </div>
+
+          {unitId !== 'none' && (
+            <div className="space-y-4 rounded-2xl border border-bizrent-blue/10 bg-bizrent-blue/5 p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-bizrent-navy">Move-in date</Label>
+                  <Input type="date" value={startDate} onChange={e => {
+                    setStartDate(e.target.value);
+                    if (e.target.value) setAnchorDay(new Date(`${e.target.value}T12:00:00`).getDate());
+                  }} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-bizrent-navy">Cycle starts day</Label>
+                  <Input type="number" min="1" max="31" value={anchorDay} onChange={e => setAnchorDay(Number(e.target.value))} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-bizrent-navy">Monthly rent</Label>
+                  <Input type="number" value={rent} onChange={e => setRent(e.target.value === '' ? '' : Number(e.target.value))} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-bizrent-navy">Deposit</Label>
+                  <Input type="number" value={deposit} onChange={e => setDeposit(e.target.value === '' ? '' : Number(e.target.value))} />
+                </div>
+              </div>
+              {cyclePreview && (
+                <p className="text-xs font-semibold text-bizrent-navy">
+                  First monthly cycle: <span className="text-bizrent-blue">{cyclePreview.label}</span>
+                </p>
+              )}
+            </div>
+          )}
 
           <DialogFooter className="pt-4 flex flex-row gap-3">
             <Button 

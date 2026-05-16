@@ -12,6 +12,7 @@ import { useTenants, useInvitations, formatDate, useResendInvitation, useCancelI
 import { InviteTenantDialog } from '@/components/tenants/InviteTenantDialog';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getCyclePreview } from '@/lib/billingCycles';
 
 export default function Tenants() {
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -32,6 +33,7 @@ export default function Tenants() {
     phone: string; 
     unit_id?: string; 
     rent?: number;
+    start_date?: string;
     billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
     period_anchor_day?: number;
     security_deposit_total?: number;
@@ -374,8 +376,22 @@ export default function Tenants() {
                     </div>
                     
                     <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-slate-500 ml-1">Move-in / tenancy start date</Label>
+                      <Input
+                        type="date"
+                        className="rounded-xl h-11 border-border/60 bg-white focus-visible:ring-bizrent-blue/20 font-bold"
+                        value={editTenantTarget?.start_date || new Date().toISOString().split('T')[0]}
+                        onChange={e => setEditTenantTarget(prev => prev ? {
+                          ...prev,
+                          start_date: e.target.value,
+                          period_anchor_day: prev.period_anchor_day || (e.target.value ? new Date(`${e.target.value}T12:00:00`).getDate() : undefined),
+                        } : null)}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-slate-500 ml-1 flex items-center justify-between">
-                        <span>Period Anchor Day</span>
+                        <span>Rent cycle starts on day</span>
                         <span className="text-xxxs uppercase tracking-widest text-bizrent-blue bg-bizrent-blue/10 px-2 py-0.5 rounded-full">Override</span>
                       </Label>
                       <div className="flex items-center gap-3">
@@ -391,7 +407,12 @@ export default function Tenants() {
                         />
                         <span className="text-xs font-medium text-slate-400">of the month</span>
                       </div>
-                      <p className="text-xxs text-slate-400 leading-tight ml-1 mt-1">Leave blank to use the organisation's default billing day.</p>
+                      <p className="text-xxs text-slate-400 leading-tight ml-1 mt-1">The cycle end is derived as the day before the next cycle starts.</p>
+                      {editTenantTarget?.start_date && editTenantTarget?.period_anchor_day && getCyclePreview(editTenantTarget.start_date, editTenantTarget.period_anchor_day) && (
+                        <p className="text-xs font-bold text-bizrent-blue ml-1 mt-2">
+                          First cycle: {getCyclePreview(editTenantTarget.start_date, editTenantTarget.period_anchor_day)?.label}
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -417,7 +438,7 @@ export default function Tenants() {
                       tenant_user_id: editTenantTarget.id,
                       unit_id: editTenantTarget.unit_id,
                       agreed_rent: editTenantTarget.rent,
-                      start_date: new Date().toISOString().split('T')[0],
+                      start_date: editTenantTarget.start_date || new Date().toISOString().split('T')[0],
                       deposit_amount: editTenantTarget.security_deposit_total || 0,
                       security_deposit_total: editTenantTarget.security_deposit_total,
                       billing_frequency: editTenantTarget.billing_frequency || 'MONTHLY',

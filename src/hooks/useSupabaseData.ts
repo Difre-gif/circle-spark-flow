@@ -935,7 +935,15 @@ export function useInviteTenant() {
   const { orgId, user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { email: string; unit_id?: string }) => {
+    mutationFn: async (input: {
+      email: string;
+      unit_id?: string;
+      tenancy_start_date?: string;
+      agreed_rent?: number;
+      deposit_amount?: number;
+      billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
+      period_anchor_day?: number;
+    }) => {
       const { data: inserted, error } = await supabase
         .from('invitations')
         .insert({
@@ -945,6 +953,11 @@ export function useInviteTenant() {
           invited_by: user!.id,
           role: 'TENANT' as any,
           status: 'PENDING' as any,
+          tenancy_start_date: input.tenancy_start_date || null,
+          agreed_rent: input.agreed_rent ?? null,
+          deposit_amount: input.deposit_amount ?? 0,
+          billing_frequency: input.billing_frequency ?? 'MONTHLY',
+          period_anchor_day: input.period_anchor_day ?? null,
         })
         .select('id')
         .single();
