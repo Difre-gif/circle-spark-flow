@@ -417,6 +417,7 @@ const en = {
     rentCycleStartsOnDay: 'Rent Due Day',
     selectCountry: 'Select Country',
     countryHelpsSetTimezone: 'We use this to set your workspace timezone for invoice scheduling.',
+    changingCountryUpdatesTimezoneSuggestion: 'Changing country updates the suggested timezone. You can still choose a different timezone if needed.',
     override: 'Override',
     theCycleEndIsDerivedAsTheDayBeforeTheNextCycleStarts: 'The cycle end is derived as the day before the next cycle starts.',
     firstCycle: 'First cycle: {{label}}',

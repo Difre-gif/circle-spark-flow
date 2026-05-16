@@ -900,7 +900,8 @@ const sw = {
     "useWorkspaceDefault": "Chaguomsingi",
     "leaveBlankToUseWorkspaceDefaultInvoiceTiming": "Acha wazi ili kutumia muda wa ankara chaguomsingi wa nafasi ya kazi.",
     "selectCountry": "Chagua Nchi",
-    "countryHelpsSetTimezone": "Tunatumia hii kuweka saa za eneo lako la kazi kwa kuratibu ankara."
+    "countryHelpsSetTimezone": "Tunatumia hii kuweka saa za eneo lako la kazi kwa kuratibu ankara.",
+    "changingCountryUpdatesTimezoneSuggestion": "Nchi inayobadilisha husasisha saa za eneo zilizopendekezwa. Bado unaweza kuchagua saa za eneo tofauti ikihitajika."
   },
   "countries": {
     "kenya": "Kenya",

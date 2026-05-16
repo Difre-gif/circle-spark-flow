@@ -25,7 +25,7 @@ export default function Settings() {
   const updateNotifPrefs = useUpdateNotificationPrefs();
   const { data: teamMembers } = useTeamMembers();
 
-  const [form, setForm] = useState<{ name: string; email: string; phone: string; timezone: string } | null>(null);
+  const [form, setForm] = useState<{ name: string; email: string; phone: string; timezone: string; country_code: string } | null>(null);
   const [settingsForm, setSettingsForm] = useState<PolicyForm | null>(null);
   const [savedPolicy, setSavedPolicy] = useState<PolicyForm | null>(null);
   const [customBeforeDay, setCustomBeforeDay] = useState('');
@@ -50,7 +50,8 @@ export default function Settings() {
       name: org.name ?? '',
       email: org.email ?? '',
       phone: org.phone ?? '',
-      timezone: (org as any).timezone ?? 'Africa/Kigali'
+      timezone: (org as any).timezone ?? 'Africa/Kigali',
+      country_code: (org as any).country_code ?? 'RW',
     });
   }, [org]);
 
@@ -64,7 +65,14 @@ export default function Settings() {
       toast.error('Enter a valid support email address.');
       return;
     }
-    updateOrg.mutate({ name: form.name, email: form.email, phone: form.phone, timezone: form.timezone });
+    updateOrg.mutate({
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      timezone: form.timezone,
+      country_code: form.country_code,
+      currency_code: form.country_code === 'KE' ? 'KES' : 'RWF',
+    });
   };
 
   const policyErrors = useMemo(() => getPolicyErrors(settingsForm), [settingsForm]);
@@ -200,15 +208,25 @@ export default function Settings() {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[12px] font-medium uppercase tracking-wider text-foreground/80">{t('legacy.country')}</Label>
-                  <Select value={(org as any)?.country_code ?? 'RW'} disabled>
-                    <SelectTrigger className="h-10 rounded-xl bg-muted/30 focus:ring-0 cursor-not-allowed text-muted-foreground font-medium">
-                      <SelectValue placeholder="Select Country" />
+                  <Select
+                    value={form?.country_code}
+                    onValueChange={country_code => setForm(prev => prev ? {
+                      ...prev,
+                      country_code,
+                      timezone: country_code === 'KE' ? 'Africa/Nairobi' : 'Africa/Kigali',
+                    } : null)}
+                  >
+                    <SelectTrigger className="h-10 rounded-xl border-border/60 focus:ring-bizrent-blue/20">
+                      <SelectValue placeholder={t('legacy.selectCountry')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="RW">Rwanda (RW)</SelectItem>
                       <SelectItem value="KE">Kenya (KE)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-[12px] text-muted-foreground font-medium mt-1 leading-relaxed">
+                    {t('legacy.changingCountryUpdatesTimezoneSuggestion')}
+                  </p>
                 </div>
               </div>
               <Button className="rounded-xl font-semibold bg-bizrent-navy hover:bg-bizrent-navy/90" onClick={handleSaveProfile} disabled={updateOrg.isPending}>

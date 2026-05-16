@@ -718,7 +718,7 @@ export function useUpdateOrganisation() {
   const { orgId } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { name?: string; email?: string; phone?: string; timezone?: string; settings?: Record<string, unknown> }) => {
+    mutationFn: async (input: { name?: string; email?: string; phone?: string; timezone?: string; country_code?: string; currency_code?: string; settings?: Record<string, unknown> }) => {
       const { error } = await supabase
         .from('organisations')
         .update(input)

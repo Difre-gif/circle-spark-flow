@@ -900,7 +900,8 @@ const rw = {
     "useWorkspaceDefault": "Mburabuzi",
     "leaveBlankToUseWorkspaceDefaultInvoiceTiming": "Kureka ubusa kugirango ukoreshe umwanya wibanze wa fagitire igihe.",
     "selectCountry": "Hitamo Igihugu",
-    "countryHelpsSetTimezone": "Twifashishije ibi kugirango dushyireho umwanya wakazi kumwanya wigihe cyo gutanga inyemezabuguzi."
+    "countryHelpsSetTimezone": "Twifashishije ibi kugirango dushyireho umwanya wakazi kumwanya wigihe cyo gutanga inyemezabuguzi.",
+    "changingCountryUpdatesTimezoneSuggestion": "Guhindura igihugu kuvugurura igihe cyagenwe. Urashobora guhitamo igihe cyigihe gitandukanye nibikenewe."
   },
   "countries": {
     "kenya": "Kenya",
