@@ -82,7 +82,7 @@ const ProblemSection: React.FC = () => {
             </span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-6">
-            Rwandan landlords are savvy businesspeople. The problem is not skill — it's tooling. No platform was ever built for how East Africa actually pays rent.
+            Landlords in Rwanda and Kenya are savvy businesspeople. The problem is not skill — it's tooling. No platform was ever built for how East Africa actually pays rent.
           </p>
         </motion.div>
 

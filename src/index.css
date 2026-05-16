@@ -81,9 +81,9 @@
   }
 
   .dark {
-    --background: 222 47% 6%;
+    --background: 222 47% 7%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
+    --card: 222 40% 10%;
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 8%;
     --popover-foreground: 210 40% 98%;
@@ -91,15 +91,23 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 163 90% 20%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --muted: 217.2 28% 18%;
+    --muted-foreground: 214 24% 74%;
+    --accent: 217.2 32.6% 20%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 217.2 26% 22%;
+    --input: 217.2 26% 22%;
     --ring: 222 72% 48%;
+    --sidebar-background: 222 58% 17%;
+    --sidebar-accent: 222 45% 24%;
+    --sidebar-border: 222 35% 28%;
+    --color-surface: #0f172a;
+    --color-surface-raised: #111827;
+    --color-border: #334155;
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
   }
 }
 
@@ -111,6 +119,7 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
+    transition: background-color 180ms ease, color 180ms ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -126,7 +135,7 @@
     @apply flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8;
   }
   .page-title {
-    @apply text-3xl md:text-4xl font-extrabold tracking-tight text-bizrent-navy mt-1;
+    @apply text-3xl md:text-4xl font-extrabold tracking-tight text-bizrent-navy dark:text-white mt-1;
   }
   .page-description {
     @apply text-base font-medium text-muted-foreground mt-2;
@@ -282,4 +291,4 @@
   syntax: '<percentage>';
   inherits: false;
   initial-value: 0%;
-}
+}

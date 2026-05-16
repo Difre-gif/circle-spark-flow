@@ -196,7 +196,7 @@ export default function Settings() {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[12px] font-medium uppercase tracking-wider text-slate-700">Country</Label>
-                  <Select defaultValue="RW" disabled>
+                  <Select value={(org as any)?.country_code ?? 'RW'} disabled>
                     <SelectTrigger className="h-10 rounded-xl bg-muted/30 focus:ring-0 cursor-not-allowed text-muted-foreground font-medium">
                       <SelectValue placeholder="Select Country" />
                     </SelectTrigger>

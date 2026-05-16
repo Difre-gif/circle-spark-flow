@@ -74,7 +74,7 @@ const TestimonialsSection: React.FC = () => {
           className="mb-16"
         >
           <h2 className="text-5xl font-extrabold text-[#0D1B3E] mt-4 leading-tight">
-            What Kigali property owners are saying.
+            What property owners in Kigali and Nairobi are saying.
           </h2>
         </motion.div>
 

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 
 function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
   if (!pw) return { score: 0, label: '', color: '' };
@@ -31,6 +32,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const pwStrength = getPasswordStrength(form.password);
 
@@ -97,7 +99,7 @@ export default function Register() {
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center"><BizRentLogo size="lg" className="text-primary" /></div>
           <div>
-            <CardTitle className="text-2xl">Create your account</CardTitle>
+            <CardTitle className="text-2xl">{t('auth.createAccount')}</CardTitle>
             <CardDescription>Start managing your properties with BizRent</CardDescription>
           </div>
         </CardHeader>
@@ -109,26 +111,26 @@ export default function Register() {
               </Alert>
             )}
             <div className="space-y-1">
-              <Label>Full Name <span className="text-red-500">*</span></Label>
+              <Label>{t('auth.fullName')} <span className="text-red-500">*</span></Label>
               <Input placeholder="Jean-Pierre Habimana" value={form.name} onChange={update('name')} aria-invalid={!!fieldErrors.name} />
               {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
             </div>
             <div className="space-y-1">
-              <Label>Email Address <span className="text-red-500">*</span></Label>
+              <Label>{t('fields.email')} <span className="text-red-500">*</span></Label>
               <Input type="email" placeholder="you@example.com" value={form.email} onChange={update('email')} aria-invalid={!!fieldErrors.email} />
               {fieldErrors.email && <p className="text-xs text-red-500 mt-1">{fieldErrors.email}</p>}
             </div>
             <div className="space-y-1">
-              <Label>Phone <span className="text-muted-foreground text-xs font-normal">(optional)</span></Label>
-              <Input placeholder="+250 788 000 000" value={form.phone} onChange={update('phone')} />
+              <Label>{t('fields.phone')} <span className="text-muted-foreground text-xs font-normal">(optional)</span></Label>
+              <Input placeholder="+250 / +254 ..." value={form.phone} onChange={update('phone')} />
             </div>
             <div className="space-y-1">
-              <Label>Organisation Name <span className="text-red-500">*</span></Label>
-              <Input placeholder="Kigali Homes Ltd" value={form.organisation} onChange={update('organisation')} aria-invalid={!!fieldErrors.organisation} />
+              <Label>{t('auth.orgName')} <span className="text-red-500">*</span></Label>
+              <Input placeholder="East Africa Homes Ltd" value={form.organisation} onChange={update('organisation')} aria-invalid={!!fieldErrors.organisation} />
               {fieldErrors.organisation && <p className="text-xs text-red-500 mt-1">{fieldErrors.organisation}</p>}
             </div>
             <div className="space-y-1">
-              <Label>Password <span className="text-red-500">*</span></Label>
+              <Label>{t('auth.password')} <span className="text-red-500">*</span></Label>
               <div className="relative">
                 <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={update('password')} aria-invalid={!!fieldErrors.password} className="pr-10" />
                 <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
@@ -150,7 +152,7 @@ export default function Register() {
               {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
             </div>
             <div className="space-y-1">
-              <Label>Confirm Password <span className="text-red-500">*</span></Label>
+              <Label>{t('auth.confirmPassword')} <span className="text-red-500">*</span></Label>
               <div className="relative">
                 <Input type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={form.confirm} onChange={update('confirm')} aria-invalid={!!fieldErrors.confirm} className="pr-10" />
                 <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1} aria-label={showConfirm ? 'Hide password' : 'Show password'}>
@@ -162,9 +164,9 @@ export default function Register() {
           </CardContent>
           <CardFooter className="flex flex-col gap-3">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading ? t('auth.registering') : t('auth.createAccount')}
             </Button>
-            <p className="text-sm text-muted-foreground">Already have an account? <Link to="/login" className="text-primary hover:underline">Sign in</Link></p>
+            <p className="text-sm text-muted-foreground">{t('auth.alreadyHaveAccount')} <Link to="/login" className="text-primary hover:underline">{t('auth.signIn')}</Link></p>
           </CardFooter>
         </form>
       </Card>

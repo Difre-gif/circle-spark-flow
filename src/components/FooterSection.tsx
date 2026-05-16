@@ -27,7 +27,7 @@ const FooterSection: React.FC = () => {
               </div>
             </Link>
             <p className="text-sm mb-2">Stop chasing. Start collecting.</p>
-            <p className="text-xs mb-1">Rwanda Phase 1</p>
+            <p className="text-xs mb-1">Rwanda & Kenya</p>
             <p className="text-xs">Founded by Fredrick Kariuki (Kenya) & Axel Karambizi (Rwanda)</p>
           </div>
 

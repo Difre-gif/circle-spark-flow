@@ -83,7 +83,7 @@ const HeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.6 }}
         >
-          BizRent gives every landlord in Rwanda a single dashboard to track properties, verify MoMo
+          BizRent gives landlords in Rwanda and Kenya a single dashboard to track properties, verify MoMo
           payments, and know exactly who has paid — and who has not.
         </motion.p>
 

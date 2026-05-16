@@ -78,8 +78,8 @@ const ComparisonTableSection: React.FC = () => {
   ];
 
   const marketStats = [
-    { value: '5.8M', label: 'Active MTN MoMo users in Rwanda' },
-    { value: '95B', label: 'Rwanda\'s real estate market (2025)' },
+    { value: '5.8M', label: 'Active mobile-money users across Rwanda and Kenya' },
+    { value: '95B', label: 'Rwanda and Kenya real estate markets' },
     { value: '30', label: 'Year-on-year MoMo revenue growth' },
     { value: '0', label: 'Dedicated MoMo-first property platforms before BizRent' },
   ];

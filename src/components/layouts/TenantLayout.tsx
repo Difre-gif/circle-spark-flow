@@ -4,19 +4,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Home, FileText, CreditCard, Receipt, User, LogOut, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  { title: 'Home', url: '/tenant', icon: Home },
-  { title: 'Invoices', url: '/tenant/invoices', icon: FileText },
-  { title: 'Payments', url: '/tenant/payments', icon: CreditCard },
-  { title: 'Receipts', url: '/tenant/receipts', icon: Receipt },
-  { title: 'Profile', url: '/tenant/profile', icon: User },
-];
+import { useTranslation } from 'react-i18next';
 
 export function TenantLayout() {
   const { user, logout, isSuperAdmin } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const navItems = [
+    { title: t('nav.home'), url: '/tenant', icon: Home },
+    { title: t('nav.myInvoices'), url: '/tenant/invoices', icon: FileText },
+    { title: t('nav.myPayments'), url: '/tenant/payments', icon: CreditCard },
+    { title: t('nav.myReceipts'), url: '/tenant/receipts', icon: Receipt },
+    { title: t('nav.myProfile'), url: '/tenant/profile', icon: User },
+  ];
 
   const isActive = (url: string) => {
     if (url === '/tenant') return location.pathname === '/tenant';
@@ -27,12 +28,12 @@ export function TenantLayout() {
     <div className="min-h-screen flex flex-col">
       {/* Top header */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-card px-4">
-        <BizRentLogo variant="full" size="sm" className="text-bizrent-navy" />
+        <BizRentLogo variant="full" size="sm" className="text-bizrent-navy dark:text-white" />
         <div className="flex items-center gap-2">
           {isSuperAdmin && (
             <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 hidden sm:flex" onClick={() => navigate('/super-admin')}>
               <Shield className="h-4 w-4 mr-1" />
-              Admin
+              {t('workspace.superAdminPortal')}
             </Button>
           )}
           <span className="text-sm text-muted-foreground hidden sm:block">{user?.name}</span>

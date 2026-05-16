@@ -15,7 +15,7 @@ const HeroContentSection: React.FC = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          🇷🇼 Rwanda's First MoMo-First Platform
+          🇷🇼 🇰🇪 Built for Rwanda and Kenya
         </motion.div>
 
         {/* Subheadline */}

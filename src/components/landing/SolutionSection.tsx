@@ -57,7 +57,7 @@ export default function SolutionSection() {
             transition={{ delay: 0.2 }}
             className="text-lg text-[#64748B] max-w-xl mx-auto"
           >
-            BizRent replaces the WhatsApp chaos with a professional system built for how landlords in Rwanda actually work.
+            BizRent replaces the WhatsApp chaos with a professional system built for how landlords in Rwanda and Kenya actually work.
           </motion.p>
         </div>
 

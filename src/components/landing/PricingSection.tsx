@@ -108,7 +108,7 @@ export default function PricingSection() {
             className="text-4xl lg:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: 'Inter, Arial, sans-serif' }}
           >
-            Priced for Kigali.
+            Priced for Kigali and Nairobi.
           </motion.h2>
 
           {/* ROI framing */}

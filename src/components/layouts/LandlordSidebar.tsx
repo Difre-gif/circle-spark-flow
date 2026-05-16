@@ -28,18 +28,8 @@ import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { can } from '@/lib/permissions';
 import { WorkspaceSwitcher } from '@/components/shared/WorkspaceSwitcher';
-
-const ALL_NAV_ITEMS = [
-  { title: 'Dashboard', url: '/landlord', icon: LayoutDashboard, action: null },
-  { title: 'Properties', url: '/landlord/properties', icon: Building2, action: 'property:view' as const },
-  { title: 'Units', url: '/landlord/units', icon: Home, action: 'unit:view' as const },
-  { title: 'Tenants', url: '/landlord/tenants', icon: Users, action: 'tenant:view' as const },
-  { title: 'Invoices', url: '/landlord/invoices', icon: FileText, action: 'invoice:view' as const },
-  { title: 'Payments', url: '/landlord/payments', icon: CreditCard, action: 'payment:view' as const, highlight: true },
-  { title: 'Receipts', url: '/landlord/receipts', icon: Receipt, action: 'receipt:view' as const },
-  { title: 'Reports', url: '/landlord/reports', icon: BarChart, action: 'report:view' as const },
-  { title: 'Settings', url: '/landlord/settings', icon: Settings, action: 'settings:view' as const },
-];
+import { useTranslation } from 'react-i18next';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function LandlordSidebar() {
   const { user, logout, userOrgs, switchOrg, orgId, orgRole, isSuperAdmin } = useAuth();
@@ -50,20 +40,35 @@ export function LandlordSidebar() {
   const isCollapsed = state === "collapsed";
   const [createOrgOpen, setCreateOrgOpen] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
+  const [newOrgCountry, setNewOrgCountry] = useState<'RW' | 'KE'>('RW');
   const createOrg = useCreateOrganisation();
+  const { t } = useTranslation();
+
+  const allNavItems = useMemo(() => [
+    { title: t('nav.dashboard'), url: '/landlord', icon: LayoutDashboard, action: null },
+    { title: t('nav.properties'), url: '/landlord/properties', icon: Building2, action: 'property:view' as const },
+    { title: t('nav.units'), url: '/landlord/units', icon: Home, action: 'unit:view' as const },
+    { title: t('nav.tenants'), url: '/landlord/tenants', icon: Users, action: 'tenant:view' as const },
+    { title: t('nav.invoices'), url: '/landlord/invoices', icon: FileText, action: 'invoice:view' as const },
+    { title: t('nav.payments'), url: '/landlord/payments', icon: CreditCard, action: 'payment:view' as const, highlight: true },
+    { title: t('nav.receipts'), url: '/landlord/receipts', icon: Receipt, action: 'receipt:view' as const },
+    { title: t('nav.reports'), url: '/landlord/reports', icon: BarChart, action: 'report:view' as const },
+    { title: t('nav.settings'), url: '/landlord/settings', icon: Settings, action: 'settings:view' as const },
+  ], [t]);
 
   const navigationItems = useMemo(
-    () => ALL_NAV_ITEMS.filter(item => !item.action || can(orgRole ?? '', item.action)),
-    [orgRole]
+    () => allNavItems.filter(item => !item.action || can(orgRole ?? '', item.action)),
+    [orgRole, allNavItems]
   );
 
   const handleCreateOrg = async () => {
     if (!newOrgName.trim()) return;
     try {
-      await createOrg.mutateAsync({ name: newOrgName, country_code: 'RW' });
+      await createOrg.mutateAsync({ name: newOrgName, country_code: newOrgCountry });
       toast.success(`Organization "${newOrgName}" created!`);
       setCreateOrgOpen(false);
       setNewOrgName('');
+      setNewOrgCountry('RW');
     } catch (error) {
       toast.error('Failed to create organization');
     }
@@ -107,21 +112,21 @@ export function LandlordSidebar() {
             <div className="h-6 w-6 rounded flex items-center justify-center border border-dashed border-white/20 shrink-0">
               <Plus className="h-3.5 w-3.5" />
             </div>
-            <span className="font-semibold">Add Organization</span>
+            <span className="font-semibold">{t('workspace.addOrg')}</span>
           </button>
         )}
 
         <Dialog open={createOrgOpen} onOpenChange={setCreateOrgOpen}>
           <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-8">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-extrabold text-bizrent-navy">New Workspace</DialogTitle>
+              <DialogTitle className="text-2xl font-extrabold text-bizrent-navy">{t('workspace.newWorkspace')}</DialogTitle>
               <DialogDescription className="font-medium">
-                Create a new organization to manage separate portfolios.
+                {t('workspace.newWorkspaceDesc')}
               </DialogDescription>
             </DialogHeader>
             <div className="py-6 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-bizrent-navy font-bold px-1">Organization Name</Label>
+                <Label htmlFor="name" className="text-bizrent-navy font-bold px-1">{t('workspace.orgName')}</Label>
                 <Input 
                   id="name" 
                   placeholder="e.g. Blue Sky Properties" 
@@ -130,15 +135,27 @@ export function LandlordSidebar() {
                   onChange={(e) => setNewOrgName(e.target.value)}
                 />
               </div>
+              <div className="space-y-2">
+                <Label className="text-bizrent-navy font-bold px-1">{t('workspace.country')}</Label>
+                <Select value={newOrgCountry} onValueChange={value => setNewOrgCountry(value as 'RW' | 'KE')}>
+                  <SelectTrigger className="rounded-2xl h-12 border-border/60 focus:ring-bizrent-blue/20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="RW">{t('countries.rwanda')} (RW)</SelectItem>
+                    <SelectItem value="KE">{t('countries.kenya')} (KE)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <DialogFooter className="gap-3">
-              <Button variant="ghost" className="rounded-xl font-bold" onClick={() => setCreateOrgOpen(false)}>Cancel</Button>
+              <Button variant="ghost" className="rounded-xl font-bold" onClick={() => setCreateOrgOpen(false)}>{t('actions.cancel')}</Button>
               <Button 
                 className="bg-bizrent-navy hover:bg-bizrent-navy/90 text-white rounded-xl font-bold h-12 px-8 shadow-lg shadow-bizrent-navy/10"
                 onClick={handleCreateOrg}
                 disabled={createOrg.isPending || !newOrgName.trim()}
               >
-                {createOrg.isPending ? 'Creating...' : 'Create Workspace'}
+                {createOrg.isPending ? t('workspace.creating') : t('workspace.createWorkspace')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -241,13 +258,13 @@ export function LandlordSidebar() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[212px] rounded-2xl shadow-xl border-border/40 p-1.5" align="start" sideOffset={12}>
-            <DropdownMenuLabel className="text-xxs text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">My Account</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xxs text-muted-foreground uppercase tracking-widest font-extrabold px-2 py-2">{t('workspace.myAccount')}</DropdownMenuLabel>
             
             {isSuperAdmin && (
               <>
                 <DropdownMenuItem className="font-bold text-indigo-700 py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-indigo-50 flex items-center gap-2.5" onClick={() => navigate('/super-admin')}>
                   <div className="h-6 w-6 rounded flex items-center justify-center bg-indigo-100 text-indigo-700"><Shield className="h-3.5 w-3.5" /></div>
-                  <span>Super Admin Portal</span>
+                  <span>{t('workspace.superAdminPortal')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1.5 opacity-50" />
               </>
@@ -255,7 +272,7 @@ export function LandlordSidebar() {
 
             <DropdownMenuItem className="font-bold text-bizrent-navy py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-slate-50 flex items-center gap-2.5" onClick={() => navigate('/landlord/profile')}>
               <div className="h-6 w-6 rounded flex items-center justify-center bg-bizrent-navy/10 text-bizrent-navy"><Settings className="h-3.5 w-3.5" /></div>
-              <span>Profile Settings</span>
+              <span>{t('nav.profile')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="my-1.5 opacity-50" />
             <DropdownMenuItem 

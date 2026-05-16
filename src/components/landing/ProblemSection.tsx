@@ -16,7 +16,7 @@ const MESSAGES = [
 ];
 
 const STATS = [
-  { value: '3', unit: 'days', label: 'A Kigali landlord spends every month chasing rent' },
+  { value: '3', unit: 'days', label: 'Landlords spend every month chasing rent' },
   { value: '43', unit: '%', label: 'Of disputes caused by unverifiable screenshots' },
   { value: '0', unit: '', label: 'Official receipts most tenants have ever received' },
 ];
@@ -282,7 +282,7 @@ export default function ProblemSection() {
 
             <div className="pt-6 border-t border-white/8">
               <p className="text-base text-white/50 leading-relaxed mb-6">
-                Most landlords in Kigali manage rent the same way they did in 2005 — on the phone, on WhatsApp, on faith. BizRent ends that.
+                Many landlords in Kigali and Nairobi manage rent the same way they did in 2005 — on the phone, on WhatsApp, on faith. BizRent ends that.
               </p>
               <a
                 href="#solution"

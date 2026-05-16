@@ -464,14 +464,14 @@ export default function HeroSection() {
         className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 pt-24 pb-32 lg:pb-40"
       >
         <div className="max-w-3xl">
-          {/* Rwanda badge */}
+          {/* Regional launch badge */}
           <div ref={badgeRef} className="mb-8" style={{ opacity: 0 }}>
             <span
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#1E3A8A] bg-[#F8FAFC] border border-[#E2E8F0]"
               style={{ fontFamily: 'Inter, Arial, sans-serif' }}
             >
-              <span>🇷🇼</span>
-              <span>Now live in Rwanda</span>
+              <span>🇷🇼 🇰🇪</span>
+              <span>Now live in Rwanda and Kenya</span>
             </span>
           </div>
 
@@ -507,7 +507,7 @@ export default function HeroSection() {
             className="text-lg lg:text-xl text-white/60 leading-relaxed max-w-xl mb-10"
             style={{ fontFamily: 'Inter, Arial, sans-serif', fontWeight: 400, opacity: 0 }}
           >
-            BizRent gives every landlord in Rwanda a single dashboard to verify MoMo
+            BizRent gives landlords in Rwanda and Kenya a single dashboard to verify MoMo
             payments, track every property, and know — with certainty — who has paid
             and who has not.
           </p>
@@ -545,7 +545,7 @@ export default function HeroSection() {
             style={{ opacity: 0 }}
           >
             {[
-              'Trusted by 50+ Kigali landlords',
+              'Trusted by landlords in Kigali and Nairobi',
               'RWF 2.5B+ tracked',
               'Zero missed payments',
             ].map((text, i) => (

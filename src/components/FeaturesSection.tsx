@@ -89,7 +89,7 @@ const FeaturesSection: React.FC = () => {
         >
           <span className="section-label text-[#0D1B3E] font-semibold uppercase text-sm">Features</span>
           <h2 className="text-5xl font-extrabold text-[#0D1B3E] mt-4 leading-tight">
-            Everything a Rwandan landlord<br/>actually needs.
+            Everything landlords in Rwanda and Kenya<br/>actually need.
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-6">
             Built from scratch for the East African market — not ported<br/>from South Africa or Silicon Valley and adapted as an afterthought.

@@ -214,7 +214,7 @@ export default function FeaturesSection() {
             viewport={{ once: true }}
             className="text-xs font-bold uppercase tracking-[0.2em] text-[#10B981] mb-4 block"
           >
-            Built for Rwanda
+            Built for Rwanda and Kenya
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -233,7 +233,7 @@ export default function FeaturesSection() {
             transition={{ delay: 0.2 }}
             className="text-lg text-white/50 max-w-xl mx-auto"
           >
-            No bloat. No complexity. Just the exact tools a Kigali landlord needs, done right.
+            No bloat. No complexity. Just the exact tools landlords in Kigali and Nairobi need, done right.
           </motion.p>
         </div>
 

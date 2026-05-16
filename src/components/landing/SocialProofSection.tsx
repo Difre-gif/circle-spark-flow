@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const STATS = [
-  { value: 200, suffix: '+', label: 'Landlords', sub: 'Active in Rwanda' },
+  { value: 200, suffix: '+', label: 'Landlords', sub: 'Active in Rwanda and Kenya' },
   { value: 2.5, suffix: 'B+', label: 'RWF Tracked', sub: 'This year' },
   { value: 99.9, suffix: '%', label: 'Uptime', sub: 'Last 12 months' },
   { value: 2, suffix: 's', label: 'Approval time', sub: 'Average' },
@@ -23,7 +23,7 @@ const TESTIMONIALS = [
   {
     initials: 'JH',
     name: 'Jean-Pierre Habimana',
-    role: 'Property Manager · Kigali',
+    role: 'Property Manager · Nairobi',
     color: '#10B981',
     quote: 'My clients used to call me every third of the month asking how much was collected. Now I send them the BizRent report link. They see it themselves. I look professional.',
   },

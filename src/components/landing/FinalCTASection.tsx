@@ -145,7 +145,7 @@ export default function FinalCTASection() {
             viewport={{ once: true }}
             className="text-xs font-bold uppercase tracking-[0.2em] text-[#10B981] mb-6 block"
           >
-            Join 200+ Kigali landlords
+            Join landlords across Kigali and Nairobi
           </motion.span>
 
           <motion.h2
@@ -166,7 +166,7 @@ export default function FinalCTASection() {
             transition={{ delay: 0.2 }}
             className="text-xl text-white/60 mb-12 max-w-xl mx-auto leading-relaxed"
           >
-            50+ Kigali landlords already know who has paid and who has not. In real time. Every day.
+            Landlords across Kigali and Nairobi already know who has paid and who has not. In real time. Every day.
           </motion.p>
 
           {/* Button */}

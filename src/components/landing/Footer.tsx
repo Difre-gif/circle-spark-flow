@@ -25,10 +25,10 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-white/40 leading-relaxed max-w-xs mb-4">
-              Stop chasing. Start collecting. Built for every landlord in Rwanda who is tired of managing rent on WhatsApp.
+              Stop chasing. Start collecting. Built for landlords in Rwanda and Kenya who are tired of managing rent on WhatsApp.
             </p>
             <p className="text-xs text-white/25">
-              📍 Kigali, Rwanda · support@bizrent.rw
+              📍 Kigali, Rwanda · Nairobi, Kenya · support@bizrent.rw
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export default function Footer() {
           <p className="text-xs text-white/25">© 2026 BizRent. All rights reserved.</p>
           <p className="text-xs text-white/20 flex items-center gap-1.5">
             <span className="text-[#10B981]">🇷🇼</span>
-            Made in Rwanda for Rwanda
+            Made in East Africa for Rwanda and Kenya
           </p>
         </div>
       </div>

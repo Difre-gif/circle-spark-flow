@@ -117,7 +117,7 @@ const PricingSection: React.FC = () => {
             Simple pricing for every landlord.
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-6">
-            No setup fees. No contracts. Cancel anytime. Priced for the Rwandan market — not Silicon Valley.
+            No setup fees. No contracts. Cancel anytime. Priced for landlords in Rwanda and Kenya — not Silicon Valley.
           </p>
         </motion.div>
 
