@@ -734,7 +734,7 @@ export function useUpdateOrganisation() {
 
 export function useUpdateUserProfile() {
   const { user } = useAuth();
-  const qc = useQueryClient();
+  const fetchUserProfile = useAuthStore(s => s.fetchUserProfile);
   return useMutation({
     mutationFn: async (input: { full_name?: string; phone?: string }) => {
       if (!user?.id) throw new Error('Not authenticated');
@@ -744,8 +744,8 @@ export function useUpdateUserProfile() {
         .eq('id', user.id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['user-profile'] });
+    onSuccess: async () => {
+      if (user?.id) await fetchUserProfile(user.id);
       toast.success('Profile updated successfully');
     },
     onError: (e: Error) => toast.error(e.message),
