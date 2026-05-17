@@ -1,11 +1,51 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(
+  Deno.env.get("SUPABASE_PUBLISHABLE_KEYS")!,
+) as Record<string, string>;
+const SUPABASE_PUBLISHABLE_KEY = SUPABASE_PUBLISHABLE_KEYS.default;
+const INTERNAL_EMAIL_SECRET = Deno.env.get("INTERNAL_EMAIL_SECRET")!;
 
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = new Set([
+  "https://bizrent.rw",
+  "https://www.bizrent.rw",
+  "http://localhost:5173",
+]);
+
+function corsHeaders(origin: string | null) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin)
+    ? origin
+    : "https://bizrent.rw";
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Vary": "Origin",
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+  };
+}
+
+async function authenticateRequest(
+  req: Request,
+): Promise<"internal" | "user" | null> {
+  const internalSecret = req.headers.get("x-bizrent-internal-secret");
+  if (internalSecret && internalSecret === INTERNAL_EMAIL_SECRET) {
+    return "internal";
+  }
+
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    global: {
+      headers: { Authorization: authHeader },
+    },
+  });
+  const { data, error } = await supabase.auth.getUser();
+  return !error && data.user ? "user" : null;
+}
 
 // ─── Senders ─────────────────────────────────────────────────────────────────
 const SENDERS = {
@@ -505,11 +545,20 @@ function buildEmailByType(type: string, data: Record<string, unknown>): { subjec
 
 // ─── Request handler ──────────────────────────────────────────────────────────
 serve(async (req) => {
+  const CORS = corsHeaders(req.headers.get("Origin"));
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS });
   }
 
   try {
+    const caller = await authenticateRequest(req);
+    if (!caller) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...CORS, "Content-Type": "application/json" },
+      });
+    }
+
     const { to, type, data } = await req.json() as {
       to: string;
       type: string;
