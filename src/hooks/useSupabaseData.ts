@@ -315,6 +315,26 @@ export function useInvoice(id: string | undefined) {
   });
 }
 
+export function useCancelInvoice() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ invoiceId, reason }: { invoiceId: string; reason: string }) => {
+      const { error } = await supabase.rpc('cancel_invoice', {
+        p_invoice_id: invoiceId,
+        p_reason: reason,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ['invoices'] });
+      qc.invalidateQueries({ queryKey: ['invoice', variables.invoiceId] });
+      qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      toast.success('Invoice cancelled');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
 // ─── Payments ───
 export function usePayments(filters?: { status?: string; tenantUserId?: string }) {
   const { orgId } = useAuth();

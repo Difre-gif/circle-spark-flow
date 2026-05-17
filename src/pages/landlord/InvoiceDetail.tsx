@@ -6,7 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Separator } from '@/components/ui/separator';
-import { useInvoice, usePayments, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { useInvoice, usePayments, useCancelInvoice, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
 
 export default function InvoiceDetail() {
   const { t } = useTranslation();
@@ -14,6 +17,9 @@ export default function InvoiceDetail() {
   const navigate = useNavigate();
   const { data: invoice, isLoading } = useInvoice(id);
   const { data: allPayments } = usePayments();
+  const cancelInvoice = useCancelInvoice();
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
   const payments = (allPayments ?? []).filter(p => p.invoice_id === id);
 
   if (isLoading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -24,6 +30,7 @@ export default function InvoiceDetail() {
   const propertyName = (invoice.unit as any)?.property?.name ?? '';
   const unitNumber = (invoice.unit as any)?.unit_number ?? '';
   const tenantName = (invoice.tenant as any)?.full_name ?? '—';
+  const canCancel = invoice.status === 'DUE' || invoice.status === 'OVERDUE';
 
   return (
     <>
@@ -50,6 +57,11 @@ export default function InvoiceDetail() {
         <Button variant="outline" className="gap-2 rounded-xl font-semibold" onClick={() => window.print()}>
           <Printer className="h-4 w-4" /> {t('legacy.exportPdf')}
         </Button>
+        {canCancel && (
+          <Button variant="destructive" className="rounded-xl font-semibold" onClick={() => setCancelOpen(true)}>
+            {t('status.cancelInvoice')}
+          </Button>
+        )}
       </div>
 
       {/* Print header (visible only when printing) */}
@@ -106,6 +118,32 @@ export default function InvoiceDetail() {
         </Card>
       </div>
     </div>
+    <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+      <DialogContent className="sm:max-w-[440px] rounded-2xl">
+        <DialogHeader>
+          <DialogTitle>{t('status.cancelInvoice')}</DialogTitle>
+          <DialogDescription>{t('status.cancelInvoiceExplanation')}</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2 py-2">
+          <label className="text-sm font-bold">{t('status.cancellationReason')}</label>
+          <Textarea value={cancelReason} onChange={e => setCancelReason(e.target.value)} placeholder={t('status.enterCancellationReason')} />
+        </div>
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => setCancelOpen(false)}>{t('status.keepInvoice')}</Button>
+          <Button
+            variant="destructive"
+            disabled={cancelInvoice.isPending || cancelReason.trim().length < 5}
+            onClick={async () => {
+              await cancelInvoice.mutateAsync({ invoiceId: invoice.id, reason: cancelReason.trim() });
+              setCancelOpen(false);
+              setCancelReason('');
+            }}
+          >
+            {cancelInvoice.isPending ? t('status.cancelling') : t('status.confirmCancelInvoice')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
     </>
   );
 }

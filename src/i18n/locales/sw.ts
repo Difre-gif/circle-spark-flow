@@ -63,7 +63,14 @@ const sw = {
     "sent": "Imetumwa",
     "cancelled": "Imefutwa",
     "expired": "Imeisha",
-    "outstanding": "Inabaki"
+    "outstanding": "Inabaki",
+    "cancelInvoice": "Ghairi ankara",
+    "cancelInvoiceExplanation": "Ankara zilizoghairiwa husalia katika historia lakini hazihesabiki kama pesa zinazodaiwa.",
+    "cancellationReason": "Sababu ya Kughairi",
+    "enterCancellationReason": "Eleza kwa nini ankara hii inaghairiwa...",
+    "keepInvoice": "Weka ankara",
+    "confirmCancelInvoice": "Ghairi ankara",
+    "cancelling": "Inaghairi..."
   },
   "auth": {
     "welcomeBack": "Karibu tena",

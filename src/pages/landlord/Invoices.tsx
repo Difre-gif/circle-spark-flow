@@ -90,6 +90,9 @@ export default function Invoices() {
             <TabsTrigger value="PAID" className="rounded-full px-4 text-xs font-bold data-[state=active]:bg-green-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-colors">
               {t('legacy.paid')}
             </TabsTrigger>
+            <TabsTrigger value="CANCELLED" className="rounded-full px-4 text-xs font-bold data-[state=active]:bg-muted data-[state=active]:text-bizrent-navy dark:text-white data-[state=active]:shadow-sm transition-colors">
+              {t('legacy.cancelled')}
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

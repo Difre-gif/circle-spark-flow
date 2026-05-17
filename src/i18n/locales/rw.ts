@@ -63,7 +63,14 @@ const rw = {
     "sent": "Yoherejwe",
     "cancelled": "Ivanywemo",
     "expired": "Irangiye",
-    "outstanding": "Isigaye"
+    "outstanding": "Isigaye",
+    "cancelInvoice": "Kuraho inyemezabuguzi",
+    "cancelInvoiceExplanation": "Inyemezabuguzi zahagaritswe ziguma mu mateka ariko ntizongera kubarwa nkamafaranga yagurijwe.",
+    "cancellationReason": "Impamvu yo guhagarika",
+    "enterCancellationReason": "Sobanura impamvu iyi fagitire ihagarikwa ...",
+    "keepInvoice": "Komeza inyemezabuguzi",
+    "confirmCancelInvoice": "Kuraho inyemezabuguzi",
+    "cancelling": "Guhagarika ..."
   },
   "auth": {
     "welcomeBack": "Murakaza neza",
