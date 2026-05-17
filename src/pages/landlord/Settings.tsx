@@ -40,6 +40,7 @@ export default function Settings() {
     const nextPolicy = {
       default_due_day: dbSettings?.billing?.default_due_day ?? DEFAULT_POLICY_FORM.default_due_day,
       default_invoice_lead_days: dbSettings?.billing?.default_invoice_lead_days ?? DEFAULT_POLICY_FORM.default_invoice_lead_days,
+      default_invoice_send_time: dbSettings?.billing?.default_invoice_send_time ?? DEFAULT_POLICY_FORM.default_invoice_send_time,
       grace_period_days: dbSettings?.billing?.grace_period_days ?? DEFAULT_POLICY_FORM.grace_period_days,
       days_before_due: normalizeDays(dbSettings?.reminders?.days_before_due ?? DEFAULT_POLICY_FORM.days_before_due),
       days_after_due: normalizeDays(dbSettings?.reminders?.days_after_due ?? DEFAULT_POLICY_FORM.days_after_due),
@@ -93,6 +94,7 @@ export default function Settings() {
         ...currentSettings.billing,
         default_due_day: settingsForm.default_due_day,
         default_invoice_lead_days: settingsForm.default_invoice_lead_days,
+        default_invoice_send_time: settingsForm.default_invoice_send_time,
         grace_period_days: settingsForm.grace_period_days
       },
       reminders: {
@@ -353,7 +355,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label className="text-[12px] font-medium uppercase tracking-wider text-foreground/80">{t('legacy.defaultBillingDay')}</Label>
@@ -371,6 +373,21 @@ export default function Settings() {
                       </div>
                       <p className="text-[12px] text-muted-foreground font-medium mt-1 leading-relaxed">
                         {t('legacy.defaultBillingDayHelp')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-[12px] font-medium uppercase tracking-wider text-foreground/80">{t('legacy.sendAt')}</Label>
+                      <Input
+                        type="time"
+                        className="h-10 rounded-xl font-bold border-border/60 focus-visible:ring-bizrent-blue/20"
+                        value={settingsForm.default_invoice_send_time}
+                        onChange={e => setSettingsForm({ ...settingsForm, default_invoice_send_time: e.target.value })}
+                      />
+                      <p className="text-[12px] text-muted-foreground font-medium mt-1 leading-relaxed">
+                        {t('legacy.sendAtHelp')}
                       </p>
                     </div>
                   </div>

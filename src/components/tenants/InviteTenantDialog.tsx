@@ -36,6 +36,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
   const [rent, setRent] = useState<number | ''>('');
   const [deposit, setDeposit] = useState<number | ''>('');
   const [invoiceLeadDays, setInvoiceLeadDays] = useState<number | ''>('');
+  const [invoiceSendTime, setInvoiceSendTime] = useState('');
   const { data: units, isLoading: unitsLoading } = useUnits();
   const inviteTenant = useInviteTenant();
 
@@ -57,6 +58,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
         billing_frequency: 'MONTHLY',
         period_anchor_day: unitId === 'none' ? undefined : anchorDay,
         invoice_lead_days: unitId === 'none' || invoiceLeadDays === '' ? undefined : Number(invoiceLeadDays),
+        invoice_send_time: unitId === 'none' || !invoiceSendTime ? undefined : invoiceSendTime,
       });
 
       setEmail('');
@@ -66,6 +68,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
       setRent('');
       setDeposit('');
       setInvoiceLeadDays('');
+      setInvoiceSendTime('');
       onOpenChange(false);
     } catch (err) {
       // toast is handled in mutation onSuccess/onError
@@ -149,6 +152,11 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
                   <span className="text-xs font-medium text-muted-foreground">{t('legacy.daysBeforeDueDate')}</span>
                 </div>
                 <p className="text-xxs text-muted-foreground">{t('legacy.leaveBlankToUseWorkspaceDefaultInvoiceTiming')}</p>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.sendAt')}</Label>
+                <Input type="time" value={invoiceSendTime} onChange={e => setInvoiceSendTime(e.target.value)} />
+                <p className="text-xxs text-muted-foreground">{t('legacy.leaveBlankToUseWorkspaceDefaultSendTime')}</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">

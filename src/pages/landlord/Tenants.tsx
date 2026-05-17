@@ -39,6 +39,7 @@ export default function Tenants() {
     billing_frequency?: 'WEEKLY' | 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
     period_anchor_day?: number;
     invoice_lead_days?: number;
+    invoice_send_time?: string;
     security_deposit_total?: number;
   } | null>(null);
 
@@ -436,6 +437,19 @@ export default function Tenants() {
                       </div>
                       <p className="text-xxs text-muted-foreground leading-tight ml-1 mt-1">{t('legacy.leaveBlankToUseWorkspaceDefaultInvoiceTiming')}</p>
                     </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-muted-foreground ml-1">{t('legacy.sendAt')}</Label>
+                      <Input
+                        type="time"
+                        className="rounded-xl h-11 border-border/60 bg-card focus-visible:ring-bizrent-blue/20 font-bold"
+                        value={editTenantTarget?.invoice_send_time ?? ''}
+                        onChange={e => setEditTenantTarget(prev => prev ? {
+                          ...prev,
+                          invoice_send_time: e.target.value || undefined,
+                        } : null)}
+                      />
+                      <p className="text-xxs text-muted-foreground leading-tight ml-1 mt-1">{t('legacy.leaveBlankToUseWorkspaceDefaultSendTime')}</p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -466,6 +480,7 @@ export default function Tenants() {
                       billing_frequency: editTenantTarget.billing_frequency || 'MONTHLY',
                       period_anchor_day: editTenantTarget.period_anchor_day,
                       invoice_lead_days: editTenantTarget.invoice_lead_days,
+                      invoice_send_time: editTenantTarget.invoice_send_time,
                     });
                   }
                   
