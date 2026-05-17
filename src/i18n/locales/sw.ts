@@ -904,7 +904,12 @@ const sw = {
     "changingCountryUpdatesTimezoneSuggestion": "Nchi inayobadilisha husasisha saa za eneo zilizopendekezwa. Bado unaweza kuchagua saa za eneo tofauti ikihitajika.",
     "sendAt": "Tuma Kwa",
     "sendAtHelp": "Ankara chaguomsingi za saa za ndani zinatolewa katika nafasi hii ya kazi.",
-    "leaveBlankToUseWorkspaceDefaultSendTime": "Acha wazi ili kutumia muda chaguomsingi wa kutuma nafasi ya kazi."
+    "leaveBlankToUseWorkspaceDefaultSendTime": "Acha wazi ili kutumia muda chaguomsingi wa kutuma nafasi ya kazi.",
+    "checkingOutstandingBalance": "Inaangalia salio ambalo hujalipa...",
+    "tenantHasOutstandingInvoices": "Mpangaji huyu ana ankara {{count}} ambazo hazijalipwa za jumla ya {{kiasi}}.",
+    "chooseWhetherToKeepOrWriteOffOutstandingBalance": "Chagua iwapo utaweka salio hili kwenye vitabu au uiandishe unapomwondoa mpangaji.",
+    "keepBalanceAndRemove": "Weka Mizani & Ondoa",
+    "writeOffBalanceAndRemove": "Andika Salio na Uondoe"
   },
   "countries": {
     "kenya": "Kenya",

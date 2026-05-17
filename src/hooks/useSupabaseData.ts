@@ -278,6 +278,27 @@ export function useInvoices(filters?: { tenantUserId?: string; status?: string }
   });
 }
 
+export function useTenantOutstandingInvoices(tenantUserId?: string) {
+  const { orgId } = useAuth();
+  return useQuery({
+    queryKey: ['tenant-outstanding-invoices', orgId, tenantUserId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('invoices')
+        .select('id, balance, status')
+        .eq('org_id', orgId!)
+        .eq('tenant_user_id', tenantUserId!)
+        .in('status', ['DUE', 'OVERDUE', 'PARTIAL'] as any);
+      if (error) throw error;
+      return {
+        count: data.length,
+        total: data.reduce((sum, invoice) => sum + Number(invoice.balance ?? 0), 0),
+      };
+    },
+    enabled: !!orgId && !!tenantUserId,
+  });
+}
+
 export function useInvoice(id: string | undefined) {
   return useQuery({
     queryKey: ['invoice', id],
@@ -1675,10 +1696,11 @@ export function useUpdateTenantDetails() {
     const { orgId } = useAuth();
     const qc = useQueryClient();
     return useMutation({
-      mutationFn: async (tenantUserId: string) => {
+      mutationFn: async ({ tenantUserId, writeOffOutstanding }: { tenantUserId: string; writeOffOutstanding: boolean }) => {
         const { error } = await supabase.rpc('remove_tenant_from_org', {
           p_tenant_user_id: tenantUserId,
           p_org_id: orgId!,
+          p_write_off_outstanding: writeOffOutstanding,
         });
         if (error) throw error;
       },

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useTenants, useInvitations, formatDate, useResendInvitation, useCancelInvitation, useUpdateTenantProfile, useRemoveTenant, useUnits, useCreateTenancy } from '@/hooks/useSupabaseData';
+import { useTenants, useInvitations, formatDate, useResendInvitation, useCancelInvitation, useUpdateTenantProfile, useRemoveTenant, useUnits, useCreateTenancy, useTenantOutstandingInvoices, formatRWF } from '@/hooks/useSupabaseData';
 import { InviteTenantDialog } from '@/components/tenants/InviteTenantDialog';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -29,6 +29,7 @@ export default function Tenants() {
   const createTenancy = useCreateTenancy();
   
   const [deleteTenantTarget, setDeleteTenantTarget] = useState<{ id: string; name: string } | null>(null);
+  const { data: outstandingInvoices, isLoading: outstandingLoading } = useTenantOutstandingInvoices(deleteTenantTarget?.id);
   const [editTenantTarget, setEditTenantTarget] = useState<{ 
     id: string; 
     name: string; 
@@ -250,25 +251,72 @@ export default function Tenants() {
             <DialogDescription className="text-sm text-muted-foreground font-medium">
               {t('legacy.areYouSureYouWantToRemove')} <strong>{deleteTenantTarget?.name}</strong> {t('legacy.fromYourWorkspaceTheyWillNoLongerBeAbleToSubmitPaymentsOrViewInvoicesF')}
             </DialogDescription>
+            {outstandingLoading ? (
+              <p className="text-xs text-muted-foreground">{t('legacy.checkingOutstandingBalance')}</p>
+            ) : (outstandingInvoices?.count ?? 0) > 0 ? (
+              <div className="w-full rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
+                <p className="text-sm font-bold text-amber-900">
+                  {t('legacy.tenantHasOutstandingInvoices', {
+                    count: outstandingInvoices?.count ?? 0,
+                    amount: formatRWF(outstandingInvoices?.total ?? 0),
+                  })}
+                </p>
+                <p className="mt-1 text-xs font-medium text-amber-800">
+                  {t('legacy.chooseWhetherToKeepOrWriteOffOutstandingBalance')}
+                </p>
+              </div>
+            ) : null}
           </div>
-          <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col sm:flex-row">
+          <DialogFooter className="gap-2 mt-8 sm:justify-center w-full flex-col">
             <Button variant="outline" className="rounded-xl font-bold h-11 sm:flex-1" onClick={() => setDeleteTenantTarget(null)}>
               {t('legacy.cancel')}
             </Button>
-            <Button 
-              variant="destructive" 
-              className="rounded-xl font-bold h-11 sm:flex-1 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
-              onClick={async () => {
-                if (deleteTenantTarget) {
-                  await removeTenant.mutateAsync(deleteTenantTarget.id);
-                  setDeleteTenantTarget(null);
-                }
-              }}
-              disabled={removeTenant.isPending}
-            >
-              {removeTenant.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {removeTenant.isPending ? t('legacy.removing') : t('legacy.removeTenant')}
-            </Button>
+            {(outstandingInvoices?.count ?? 0) > 0 ? (
+              <div className="flex w-full flex-col gap-2 sm:flex-row">
+                <Button
+                  variant="outline"
+                  className="rounded-xl font-bold h-11 sm:flex-1"
+                  onClick={async () => {
+                    if (deleteTenantTarget) {
+                      await removeTenant.mutateAsync({ tenantUserId: deleteTenantTarget.id, writeOffOutstanding: false });
+                      setDeleteTenantTarget(null);
+                    }
+                  }}
+                  disabled={removeTenant.isPending}
+                >
+                  {t('legacy.keepBalanceAndRemove')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="rounded-xl font-bold h-11 sm:flex-1 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
+                  onClick={async () => {
+                    if (deleteTenantTarget) {
+                      await removeTenant.mutateAsync({ tenantUserId: deleteTenantTarget.id, writeOffOutstanding: true });
+                      setDeleteTenantTarget(null);
+                    }
+                  }}
+                  disabled={removeTenant.isPending}
+                >
+                  {removeTenant.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {t('legacy.writeOffBalanceAndRemove')}
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                variant="destructive" 
+                className="rounded-xl font-bold h-11 sm:flex-1 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
+                onClick={async () => {
+                  if (deleteTenantTarget) {
+                    await removeTenant.mutateAsync({ tenantUserId: deleteTenantTarget.id, writeOffOutstanding: false });
+                    setDeleteTenantTarget(null);
+                  }
+                }}
+                disabled={removeTenant.isPending}
+              >
+                {removeTenant.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {removeTenant.isPending ? t('legacy.removing') : t('legacy.removeTenant')}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -904,7 +904,12 @@ const rw = {
     "changingCountryUpdatesTimezoneSuggestion": "Guhindura igihugu kuvugurura igihe cyagenwe. Urashobora guhitamo igihe cyigihe gitandukanye nibikenewe.",
     "sendAt": "Ohereza kuri",
     "sendAtHelp": "Inyemezabuguzi zisanzwe zaho zitangwa muri uyu mwanya.",
-    "leaveBlankToUseWorkspaceDefaultSendTime": "Kureka ubusa kugirango ukoreshe umwanya wibanze wohereze igihe."
+    "leaveBlankToUseWorkspaceDefaultSendTime": "Kureka ubusa kugirango ukoreshe umwanya wibanze wohereze igihe.",
+    "checkingOutstandingBalance": "Kugenzura impirimbanyi zidasanzwe ...",
+    "tenantHasOutstandingInvoices": "Uyu mukode afite {{kubara}} inyemezabuguzi zitishyuwe zose hamwe {{umubare}}.",
+    "chooseWhetherToKeepOrWriteOffOutstandingBalance": "Hitamo niba ukomeza kuringaniza ibitabo cyangwa kubyandika mugihe ukuraho umukode.",
+    "keepBalanceAndRemove": "Komeza Kuringaniza & Kuraho",
+    "writeOffBalanceAndRemove": "Andika Impirimbanyi & Kuraho"
   },
   "countries": {
     "kenya": "Kenya",
