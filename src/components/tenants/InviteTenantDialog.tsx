@@ -77,8 +77,8 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-0 shadow-2xl p-8 bg-card/95 backdrop-blur-sm">
-        <DialogHeader className="space-y-3">
+      <DialogContent className="flex max-h-[calc(100vh-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-[425px] rounded-[2rem] border-0 shadow-2xl bg-card/95 backdrop-blur-sm">
+        <DialogHeader className="shrink-0 space-y-3 px-6 pb-4 pt-6 sm:px-8 sm:pt-8">
           <div className="w-12 h-12 rounded-2xl bg-bizrent-blue/10 flex items-center justify-center mb-2">
             <Mail className="h-6 w-6 text-bizrent-blue" />
           </div>
@@ -90,7 +90,8 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 py-4">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-4 sm:px-8 custom-scrollbar">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-bold text-bizrent-navy dark:text-white ml-1">{t('legacy.emailAddress')} <span className="text-red-500">*</span></Label>
             <Input
@@ -176,7 +177,9 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
             </div>
           )}
 
-          <DialogFooter className="pt-4 flex flex-row gap-3">
+          </div>
+
+          <DialogFooter className="shrink-0 border-t border-border/60 bg-card/95 px-6 py-4 sm:px-8 flex flex-row gap-3">
             <Button 
               type="button" 
               variant="ghost" 
