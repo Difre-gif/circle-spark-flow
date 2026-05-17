@@ -223,14 +223,15 @@ export default function TenantInvoiceDetail() {
                   </div>
                 </div>
 
-                {/* Step 2 — Transaction ID */}
+                {/* Step 2 — Transaction ID (optional) */}
                 <FormField
                   control={form.control}
                   name="transaction_id"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-semibold text-[#0F172A]">
-                        {selectedMethod === 'MOMO' ? 'MoMo Transaction ID' : 'Bank Reference Number'}
+                        {selectedMethod === 'MOMO' ? 'MoMo Transaction ID' : 'Bank Reference Number'}{' '}
+                        <span className="font-normal text-[#64748B]">(optional)</span>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -240,27 +241,24 @@ export default function TenantInvoiceDetail() {
                           onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                         />
                       </FormControl>
-                      {selectedMethod === 'MOMO' && (
-                        <FormDescription className="text-xs text-[#64748B]">
-                          {t('legacy.thisIsTheCodeInYourMomoConfirmationSmsEGMp26040100001234TapYourMomoSms')}
-                        </FormDescription>
-                      )}
+                      <FormDescription className="text-xs text-[#64748B]">
+                        {selectedMethod === 'MOMO'
+                          ? 'Found in your MoMo confirmation SMS (e.g. MP26040100001234). Leave blank if unsure.'
+                          : 'Your bank transfer reference number. Leave blank if unsure.'}
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Screenshot upload — required for bank, optional for MoMo */}
+                {/* Screenshot upload — required */}
                 <FormField
                   control={form.control}
                   name="proof_file"
                   render={({ field: { value, onChange, ...fieldProps } }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-semibold text-[#0F172A]">
-                        Payment Screenshot{' '}
-                        <span className="font-normal text-[#64748B]">
-                          {selectedMethod === 'MOMO' ? '(optional)' : '(required)'}
-                        </span>
+                        Payment Screenshot <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <FileUpload

@@ -554,7 +554,7 @@ export function useSubmitPayment() {
       invoice_id: string;
       amount: number;
       payment_method: string;
-      transaction_id: string;
+      transaction_id?: string;
       proof_file?: File;
     }) => {
       let proof_file_id: string | null = null;
@@ -590,7 +590,7 @@ export function useSubmitPayment() {
         tenant_user_id: user!.id,
         amount: input.amount,
         payment_method: input.payment_method as any,
-        transaction_id: input.transaction_id.toUpperCase(),
+        transaction_id: input.transaction_id ? input.transaction_id.toUpperCase() : null,
         proof_file_id,
         status: 'PENDING' as any,
       });
@@ -630,7 +630,7 @@ export function useSubmitPayment() {
                   amount: input.amount,
                   propertyUnit: unit ? (unit.property?.name + ' — Unit ' + unit.unit_number) : '',
                   invoiceNumber: inv?.invoice_number || '',
-                  transactionId: input.transaction_id.toUpperCase() || undefined,
+                  transactionId: input.transaction_id ? input.transaction_id.toUpperCase() : undefined,
                   submittedAt: new Date().toISOString(),
                 },
               },
