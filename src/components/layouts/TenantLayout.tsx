@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export function TenantLayout() {
-  const { user, logout, isSuperAdmin, userOrgs, orgId, switchOrg } = useAuth();
+  const { user, logout, isSuperAdmin, userOrgs, orgId, orgRole, switchOrg } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,8 +25,20 @@ export function TenantLayout() {
     return location.pathname.startsWith(url);
   };
 
-  const tenantOrgs = userOrgs.filter(org => org.role === 'TENANT');
-  const activeOrg = tenantOrgs.find(org => org.id === orgId) ?? tenantOrgs[0];
+  const contextKey = (id: string, role?: string | null) => `${id}:${role ?? 'UNKNOWN'}`;
+  const roleLabel = (role?: string) => {
+    if (role === 'TENANT') return 'Tenant';
+    if (role === 'OWNER') return 'Landlord';
+    if (role === 'MANAGER') return 'Manager';
+    if (role === 'ACCOUNTANT') return 'Accountant';
+    return role ?? 'Workspace';
+  };
+  const activeContextKey = orgId ? contextKey(orgId, orgRole) : null;
+  const activeOrg = userOrgs.find(org => contextKey(org.id, org.role) === activeContextKey) ?? userOrgs[0];
+  const handleContextSwitch = (org: any) => {
+    switchOrg(org.id, org.role);
+    navigate(org.role === 'TENANT' ? '/tenant' : '/landlord');
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -34,37 +46,43 @@ export function TenantLayout() {
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-card px-4">
         <BizRentLogo variant="full" size="sm" className="text-bizrent-navy dark:text-white" />
         <div className="flex items-center gap-2">
-          {tenantOrgs.length > 0 && (
+          {userOrgs.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="hidden sm:flex h-9 max-w-[240px] items-center gap-2 rounded-xl px-3">
                   <Building2 className="h-4 w-4 text-bizrent-blue shrink-0" />
-                  <span className="truncate text-sm font-semibold">{activeOrg?.name}</span>
+                  <span className="min-w-0 truncate text-sm font-semibold">{activeOrg?.name}</span>
+                  <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-xxs font-extrabold uppercase tracking-widest text-muted-foreground">
+                    {roleLabel(activeOrg?.role)}
+                  </span>
                   <ChevronsUpDown className="h-4 w-4 text-muted-foreground shrink-0" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[240px] rounded-2xl p-1.5">
                 <DropdownMenuLabel className="text-xxs uppercase tracking-widest text-muted-foreground font-extrabold">
-                  {t('legacy.organizations')}
+                  Switch workspace
                 </DropdownMenuLabel>
-                {tenantOrgs.map(org => (
+                {userOrgs.map(org => {
+                  const isActiveContext = contextKey(org.id, org.role) === activeContextKey;
+                  return (
                   <DropdownMenuItem
-                    key={org.id}
+                    key={contextKey(org.id, org.role)}
                     onClick={() => {
-                      if (org.id !== orgId) {
-                        switchOrg(org.id);
-                        navigate('/tenant');
+                      if (!isActiveContext) {
+                        handleContextSwitch(org);
                       }
                     }}
                     className={cn(
                       'cursor-pointer rounded-xl px-2.5 py-2.5',
-                      org.id === orgId ? 'bg-muted/50 font-bold text-bizrent-navy dark:text-white' : 'text-muted-foreground'
+                      isActiveContext ? 'bg-muted/50 font-bold text-bizrent-navy dark:text-white' : 'text-muted-foreground'
                     )}
                   >
                     <Building2 className="mr-2 h-4 w-4" />
-                    <span className="truncate">{org.name}</span>
+                    <span className="min-w-0 flex-1 truncate">{org.name}</span>
+                    <span className="text-xxs font-extrabold uppercase tracking-widest opacity-60">{roleLabel(org.role)}</span>
                   </DropdownMenuItem>
-                ))}
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -81,7 +99,7 @@ export function TenantLayout() {
         </div>
       </header>
 
-      {tenantOrgs.length > 0 && (
+      {userOrgs.length > 0 && (
         <div className="border-b bg-card px-4 py-3 sm:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -89,32 +107,38 @@ export function TenantLayout() {
                 <span className="flex min-w-0 items-center gap-2">
                   <Building2 className="h-4 w-4 text-bizrent-blue shrink-0" />
                   <span className="truncate font-semibold">{activeOrg?.name}</span>
+                  <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-xxs font-extrabold uppercase tracking-widest text-muted-foreground">
+                    {roleLabel(activeOrg?.role)}
+                  </span>
                 </span>
                 <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[calc(100vw-2rem)] rounded-2xl p-1.5">
               <DropdownMenuLabel className="text-xxs uppercase tracking-widest text-muted-foreground font-extrabold">
-                {t('legacy.organizations')}
+                Switch workspace
               </DropdownMenuLabel>
-              {tenantOrgs.map(org => (
+              {userOrgs.map(org => {
+                const isActiveContext = contextKey(org.id, org.role) === activeContextKey;
+                return (
                 <DropdownMenuItem
-                  key={org.id}
+                  key={contextKey(org.id, org.role)}
                   onClick={() => {
-                    if (org.id !== orgId) {
-                      switchOrg(org.id);
-                      navigate('/tenant');
+                    if (!isActiveContext) {
+                      handleContextSwitch(org);
                     }
                   }}
                   className={cn(
                     'cursor-pointer rounded-xl px-2.5 py-2.5',
-                    org.id === orgId ? 'bg-muted/50 font-bold text-bizrent-navy dark:text-white' : 'text-muted-foreground'
+                    isActiveContext ? 'bg-muted/50 font-bold text-bizrent-navy dark:text-white' : 'text-muted-foreground'
                   )}
                 >
                   <Building2 className="mr-2 h-4 w-4" />
-                  <span className="truncate">{org.name}</span>
+                  <span className="min-w-0 flex-1 truncate">{org.name}</span>
+                  <span className="text-xxs font-extrabold uppercase tracking-widest opacity-60">{roleLabel(org.role)}</span>
                 </DropdownMenuItem>
-              ))}
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -13,6 +13,7 @@ export interface Workspace {
   id: string;
   name: string;
   role?: string;
+  key?: string;
 }
 
 interface WorkspaceSwitcherProps {
@@ -35,7 +36,15 @@ export function WorkspaceSwitcher({
   isCollapsed = false,
   dropdownLabel = 'Organizations',
 }: WorkspaceSwitcherProps) {
-  const active = workspaces.find(w => w.id === activeId) ?? workspaces[0];
+  const getKey = (workspace: Workspace) => workspace.key ?? workspace.id;
+  const active = workspaces.find(w => getKey(w) === activeId) ?? workspaces[0];
+  const roleLabel = (role?: string) => {
+    if (role === 'TENANT') return 'Tenant';
+    if (role === 'OWNER') return 'Landlord';
+    if (role === 'MANAGER') return 'Manager';
+    if (role === 'ACCOUNTANT') return 'Accountant';
+    return role;
+  };
 
   return (
     <DropdownMenu>
@@ -57,7 +66,9 @@ export function WorkspaceSwitcher({
               <span className="text-sm font-bold text-white truncate w-full text-left">
                 {active?.name ?? 'Select workspace'}
               </span>
-              <span className="text-xxs text-white/70 font-medium uppercase tracking-widest">Workspace</span>
+              <span className="text-xxs text-white/70 font-medium uppercase tracking-widest">
+                {roleLabel(active?.role) ?? 'Workspace'}
+              </span>
             </div>
           )}
           {!isCollapsed && <ChevronsUpDown className="ml-auto h-4 w-4 text-white/50 shrink-0" />}
@@ -71,25 +82,25 @@ export function WorkspaceSwitcher({
 
         {workspaces.map(ws => (
           <DropdownMenuItem
-            key={ws.id}
+            key={getKey(ws)}
             className={cn(
               'py-2.5 px-2.5 cursor-pointer rounded-xl focus:bg-muted/40 flex items-center gap-2.5 mb-1',
-              ws.id === activeId ? 'font-bold text-bizrent-navy dark:text-white bg-muted/50' : 'font-medium text-muted-foreground'
+              getKey(ws) === activeId ? 'font-bold text-bizrent-navy dark:text-white bg-muted/50' : 'font-medium text-muted-foreground'
             )}
-            onClick={() => ws.id !== activeId && onSwitch(ws.id)}
+            onClick={() => getKey(ws) !== activeId && onSwitch(getKey(ws))}
           >
             <div
               className={cn(
                 'h-6 w-6 rounded flex items-center justify-center',
-                ws.id === activeId ? 'bg-bizrent-blue/10 text-bizrent-blue' : 'bg-muted text-muted-foreground'
+                getKey(ws) === activeId ? 'bg-bizrent-blue/10 text-bizrent-blue' : 'bg-muted text-muted-foreground'
               )}
             >
               <Building2 className="h-3.5 w-3.5" />
             </div>
             <div className="flex flex-col overflow-hidden">
               <span className="truncate text-xs">{ws.name}</span>
-              {ws.role && ws.role !== 'OWNER' && (
-                <span className="text-xxxs uppercase tracking-widest opacity-60 font-extrabold">{ws.role}</span>
+              {ws.role && (
+                <span className="text-xxxs uppercase tracking-widest opacity-60 font-extrabold">{roleLabel(ws.role)}</span>
               )}
             </div>
           </DropdownMenuItem>

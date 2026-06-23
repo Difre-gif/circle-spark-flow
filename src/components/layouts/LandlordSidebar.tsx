@@ -88,6 +88,21 @@ export function LandlordSidebar() {
     return parts[0][0].toUpperCase();
   };
 
+  const contextKey = (id: string, role?: string | null) => `${id}:${role ?? 'UNKNOWN'}`;
+  const activeContextKey = orgId ? contextKey(orgId, orgRole) : null;
+  const workspaceContexts = userOrgs.map(o => ({
+    id: o.id,
+    key: contextKey(o.id, o.role),
+    name: o.name,
+    role: o.role,
+  }));
+  const handleWorkspaceSwitch = (key: string) => {
+    const target = workspaceContexts.find(o => o.key === key);
+    if (!target) return;
+    switchOrg(target.id, target.role);
+    navigate(target.role === 'TENANT' ? '/tenant' : '/landlord');
+  };
+
   return (
     <Sidebar collapsible="icon" className="border-r-0 bg-bizrent-navy text-white transition-all duration-300">
       {/* 1. Header: Branding & Org Switcher */}
@@ -97,9 +112,9 @@ export function LandlordSidebar() {
         </div>
 
         <WorkspaceSwitcher
-          workspaces={userOrgs.map(o => ({ id: o.id, name: o.name, role: o.role }))}
-          activeId={orgId}
-          onSwitch={id => { switchOrg(id); navigate('/landlord'); }}
+          workspaces={workspaceContexts}
+          activeId={activeContextKey}
+          onSwitch={handleWorkspaceSwitch}
           isCollapsed={isCollapsed}
         />
 
