@@ -111,6 +111,7 @@ export default function TenantInvoiceDetail() {
 
   const balance = Number(invoice.balance ?? (invoice.amount_due - invoice.amount_paid));
   const canPay = balance > 0 && !['PAID', 'CANCELLED'].includes(invoice.status);
+  const invoiceKind = invoice.invoice_type === 'DEPOSIT' ? 'Security Deposit' : 'Rent Invoice';
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-12">
@@ -134,9 +135,14 @@ export default function TenantInvoiceDetail() {
       {/* Invoice summary */}
       <Card className="border border-[#E2E8F0] rounded-[8px] shadow-card bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-[#1E3A8A]">{t('legacy.invoiceDetails')}</CardTitle>
+          <CardTitle className="text-base font-semibold text-[#1E3A8A]">{invoiceKind} Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-[#64748B]">Type</span>
+            <span className="font-medium text-[#0F172A]">{invoiceKind}</span>
+          </div>
+          <Separator />
           <div className="flex justify-between text-sm">
             <span className="text-[#64748B]">{t('legacy.property')}</span>
             <span className="font-medium text-[#0F172A]">{(invoice.unit as any)?.property?.name ?? '—'}</span>

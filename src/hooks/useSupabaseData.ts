@@ -988,6 +988,7 @@ export function useInviteTenant() {
       period_anchor_day?: number;
       invoice_lead_days?: number;
       invoice_send_time?: string;
+      initial_invoice_strategy?: 'DEPOSIT_ONLY' | 'RENT_IMMEDIATE' | 'DEPOSIT_AND_RENT' | 'NONE';
     }) => {
       const { data: inserted, error } = await supabase
         .from('invitations')
@@ -1005,6 +1006,7 @@ export function useInviteTenant() {
           period_anchor_day: input.period_anchor_day ?? null,
           invoice_lead_days: input.invoice_lead_days ?? null,
           invoice_send_time: input.invoice_send_time ?? null,
+          initial_invoice_strategy: input.initial_invoice_strategy ?? 'DEPOSIT_ONLY',
         })
         .select('id')
         .single();

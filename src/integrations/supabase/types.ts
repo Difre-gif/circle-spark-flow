@@ -217,6 +217,7 @@ export type Database = {
           generated_by: string
           id: string
           invoice_number: string
+          invoice_type: string
           last_3day_reminder_sent_at: string | null
           last_7day_reminder_sent_at: string | null
           notes: string | null
@@ -239,6 +240,7 @@ export type Database = {
           generated_by?: string
           id?: string
           invoice_number?: string
+          invoice_type?: string
           last_3day_reminder_sent_at?: string | null
           last_7day_reminder_sent_at?: string | null
           notes?: string | null
@@ -261,6 +263,7 @@ export type Database = {
           generated_by?: string
           id?: string
           invoice_number?: string
+          invoice_type?: string
           last_3day_reminder_sent_at?: string | null
           last_7day_reminder_sent_at?: string | null
           notes?: string | null
@@ -900,6 +903,7 @@ export type Database = {
           deposit_amount: number
           end_date: string | null
           id: string
+          initial_invoice_strategy: string
           org_id: string
           start_date: string
           status: Database["public"]["Enums"]["tenancy_status_enum"]
@@ -917,6 +921,7 @@ export type Database = {
           deposit_amount?: number
           end_date?: string | null
           id?: string
+          initial_invoice_strategy?: string
           org_id: string
           start_date: string
           status?: Database["public"]["Enums"]["tenancy_status_enum"]
@@ -934,6 +939,7 @@ export type Database = {
           deposit_amount?: number
           end_date?: string | null
           id?: string
+          initial_invoice_strategy?: string
           org_id?: string
           start_date?: string
           status?: Database["public"]["Enums"]["tenancy_status_enum"]

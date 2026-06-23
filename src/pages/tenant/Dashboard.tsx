@@ -20,6 +20,7 @@ export default function TenantDashboard() {
 
   const currentInvoice = (invoices ?? []).find(i => i.status === 'DUE' || i.status === 'OVERDUE' || i.status === 'PARTIAL');
   const totalPaid = (payments ?? []).filter(p => p.status === 'APPROVED' || p.status === 'AUTO_APPROVED').reduce((a, p) => a + Number(p.amount), 0);
+  const currentInvoiceType = currentInvoice?.invoice_type === 'DEPOSIT' ? 'Security Deposit' : 'Rent Invoice';
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
@@ -38,7 +39,7 @@ export default function TenantDashboard() {
                 <AlertCircle className="h-6 w-6 text-bizrent-amber" />
               </div>
               <div>
-                <p className="text-lg font-bold text-bizrent-navy dark:text-white">{t('legacy.paymentDue')}</p>
+                <p className="text-lg font-bold text-bizrent-navy dark:text-white">{currentInvoiceType} Due</p>
                 <p className="text-sm text-muted-foreground font-medium">
                   Invoice {currentInvoice.invoice_number} · <span className="font-mono text-bizrent-slate">{formatRWF(Number(currentInvoice.balance ?? (currentInvoice.amount_due - currentInvoice.amount_paid)))} balance</span>
                 </p>
@@ -53,7 +54,7 @@ export default function TenantDashboard() {
       )}
 
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
-        <StatCard title="Current Invoice" value={currentInvoice ? formatRWF(currentInvoice.amount_due) : 'All Paid'} subtitle={currentInvoice ? `Due ${formatDate(currentInvoice.due_date)}` : 'No pending dues'} icon={FileText} />
+        <StatCard title={currentInvoice ? currentInvoiceType : 'Current Invoice'} value={currentInvoice ? formatRWF(currentInvoice.amount_due) : 'All Paid'} subtitle={currentInvoice ? `Due ${formatDate(currentInvoice.due_date)}` : 'No pending dues'} icon={FileText} />
         <StatCard title="Total Paid" value={formatRWF(totalPaid)} subtitle="Lifetime rental payments" icon={CheckCircle} />
       </div>
       

@@ -27,6 +27,8 @@ interface InviteTenantDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type InitialInvoiceStrategy = 'DEPOSIT_ONLY' | 'RENT_IMMEDIATE' | 'DEPOSIT_AND_RENT' | 'NONE';
+
 export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogProps) {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
@@ -37,6 +39,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
   const [deposit, setDeposit] = useState<number | ''>('');
   const [invoiceLeadDays, setInvoiceLeadDays] = useState<number | ''>('');
   const [invoiceSendTime, setInvoiceSendTime] = useState('');
+  const [initialInvoiceStrategy, setInitialInvoiceStrategy] = useState<InitialInvoiceStrategy>('DEPOSIT_ONLY');
   const { data: units, isLoading: unitsLoading } = useUnits();
   const inviteTenant = useInviteTenant();
 
@@ -59,6 +62,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
         period_anchor_day: unitId === 'none' ? undefined : anchorDay,
         invoice_lead_days: unitId === 'none' || invoiceLeadDays === '' ? undefined : Number(invoiceLeadDays),
         invoice_send_time: unitId === 'none' || !invoiceSendTime ? undefined : invoiceSendTime,
+        initial_invoice_strategy: unitId === 'none' ? undefined : initialInvoiceStrategy,
       });
 
       setEmail('');
@@ -69,6 +73,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
       setDeposit('');
       setInvoiceLeadDays('');
       setInvoiceSendTime('');
+      setInitialInvoiceStrategy('DEPOSIT_ONLY');
       onOpenChange(false);
     } catch (err) {
       // toast is handled in mutation onSuccess/onError
@@ -178,9 +183,34 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
                   <Input type="number" value={deposit} onChange={e => setDeposit(e.target.value === '' ? '' : Number(e.target.value))} />
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-bizrent-navy dark:text-white">First payment request</Label>
+                <Select value={initialInvoiceStrategy} onValueChange={value => setInitialInvoiceStrategy(value as InitialInvoiceStrategy)}>
+                  <SelectTrigger className="h-12 rounded-xl border-border/60 bg-card/50 focus:ring-bizrent-navy/20 font-medium transition-all">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-border/40 shadow-2xl bg-card/95 backdrop-blur-sm">
+                    <SelectItem value="DEPOSIT_ONLY" className="font-medium py-2.5">
+                      Deposit now, first rent next cycle
+                    </SelectItem>
+                    <SelectItem value="RENT_IMMEDIATE" className="font-medium py-2.5">
+                      First month rent now
+                    </SelectItem>
+                    <SelectItem value="DEPOSIT_AND_RENT" className="font-medium py-2.5">
+                      Deposit and first month rent now
+                    </SelectItem>
+                    <SelectItem value="NONE" className="font-medium py-2.5">
+                      Do not create an invoice yet
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xxs text-muted-foreground">
+                  Choose what the tenant should see immediately after accepting the invite.
+                </p>
+              </div>
               {cyclePreview && (
                 <p className="text-xs font-semibold text-bizrent-navy dark:text-white">
-                  First bill covers: {cyclePreview.label}
+                  Rent cycle: {cyclePreview.label}
                 </p>
               )}
             </div>
