@@ -105,7 +105,7 @@ export default function Reports() {
       </div>
 
       <Tabs defaultValue="collections" className="space-y-6">
-        <TabsList className="bg-transparent border-b border-border/40 w-full justify-start h-auto p-0 rounded-none overflow-x-auto flex-nowrap">
+        <TabsList className="bg-transparent border-b border-border/40 w-full justify-start h-auto p-0 rounded-none flex flex-wrap">
           <TabsTrigger 
             value="collections" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-bizrent-blue data-[state=active]:text-bizrent-blue data-[state=active]:bg-transparent px-6 py-3 font-bold text-muted-foreground hover:text-bizrent-navy dark:text-white transition-all"
@@ -171,16 +171,16 @@ export default function Reports() {
                 <TableBody>
                   {agingBuckets.map(b => (
                     <TableRow key={b.bucket}>
-                      <TableCell className="font-medium">{b.bucket}</TableCell>
-                      <TableCell>{b.count}</TableCell>
-                      <TableCell className="font-semibold">{formatRWF(b.amount)}</TableCell>
+                      <TableCell data-label={t('legacy.bucket')} className="font-medium">{b.bucket}</TableCell>
+                      <TableCell data-label={t('legacy.invoices')}>{b.count}</TableCell>
+                      <TableCell data-label={t('legacy.totalAmount')} className="font-semibold">{formatRWF(b.amount)}</TableCell>
                     </TableRow>
                   ))}
                   {agingBuckets.length > 0 && (
                     <TableRow className="bg-muted/50 font-bold">
-                      <TableCell>{t('legacy.totalOutstanding')}</TableCell>
-                      <TableCell>{agingBuckets.reduce((a, b) => a + b.count, 0)}</TableCell>
-                      <TableCell className="font-mono">{formatRWF(agingBuckets.reduce((a, b) => a + b.amount, 0))}</TableCell>
+                      <TableCell data-label={t('legacy.bucket')}>{t('legacy.totalOutstanding')}</TableCell>
+                      <TableCell data-label={t('legacy.invoices')}>{agingBuckets.reduce((a, b) => a + b.count, 0)}</TableCell>
+                      <TableCell data-label={t('legacy.totalAmount')} className="font-mono">{formatRWF(agingBuckets.reduce((a, b) => a + b.amount, 0))}</TableCell>
                     </TableRow>
                   )}
                   {agingBuckets.length === 0 && <TableRow><TableCell colSpan={3} className="text-center py-8 text-muted-foreground">{t('legacy.noOverdueInvoices')}</TableCell></TableRow>}
@@ -199,11 +199,11 @@ export default function Reports() {
                 <TableBody>
                   {(occupancy ?? []).map(p => (
                     <TableRow key={p.property_id}>
-                      <TableCell className="font-medium">{p.property_name}</TableCell>
-                      <TableCell>{p.total_units}</TableCell>
-                      <TableCell>{p.occupied_units}</TableCell>
-                      <TableCell>{p.vacant_units}</TableCell>
-                      <TableCell className="font-semibold">{p.occupancy_rate_pct ?? 0}%</TableCell>
+                      <TableCell data-label={t('legacy.property')} className="font-medium">{p.property_name}</TableCell>
+                      <TableCell data-label={t('legacy.totalUnits')}>{p.total_units}</TableCell>
+                      <TableCell data-label={t('legacy.occupied')}>{p.occupied_units}</TableCell>
+                      <TableCell data-label={t('legacy.vacant')}>{p.vacant_units}</TableCell>
+                      <TableCell data-label={t('legacy.rate')} className="font-semibold">{p.occupancy_rate_pct ?? 0}%</TableCell>
                     </TableRow>
                   ))}
                   {(!occupancy || occupancy.length === 0) && <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">{t('legacy.noPropertyData')}</TableCell></TableRow>}

@@ -120,6 +120,19 @@
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
     transition: background-color 180ms ease, color 180ms ease;
+    overflow-x: hidden;
+  }
+
+  html,
+  body,
+  #root {
+    max-width: 100%;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -142,6 +155,148 @@
   }
   .card-shadow {
     box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.04);
+  }
+
+  .responsive-table-shell {
+    @apply w-full max-w-full overflow-visible;
+  }
+
+  .responsive-data-table {
+    @apply w-full max-w-full;
+  }
+
+  .mobile-data-list {
+    @apply grid gap-3 p-4 md:hidden;
+  }
+
+  .mobile-data-card {
+    @apply rounded-xl border border-border/60 bg-card p-4 shadow-sm;
+  }
+
+  .mobile-data-row {
+    @apply flex items-start justify-between gap-4 border-b border-border/30 py-2.5 text-sm last:border-b-0;
+  }
+
+  .mobile-data-label {
+    @apply shrink-0 text-xs font-extrabold uppercase tracking-wide text-muted-foreground;
+  }
+
+  .mobile-data-value {
+    @apply min-w-0 text-right font-semibold text-bizrent-navy dark:text-white;
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-data-actions {
+    @apply mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-border/30 pt-3;
+  }
+}
+
+@media (max-width: 767px) {
+  .responsive-table-shell {
+    overflow-x: visible !important;
+  }
+
+  .responsive-data-table,
+  .overflow-x-auto > table {
+    display: block;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .responsive-data-table thead,
+  .overflow-x-auto > table thead {
+    display: none;
+  }
+
+  .responsive-data-table tbody,
+  .overflow-x-auto > table tbody {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    width: 100%;
+  }
+
+  .responsive-data-table tr,
+  .overflow-x-auto > table tr {
+    display: block;
+    width: 100%;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    background: hsl(var(--card));
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  }
+
+  .responsive-data-table td,
+  .overflow-x-auto > table td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    min-width: 0;
+    border-bottom: 1px solid hsl(var(--border) / 0.45);
+    padding: 0.75rem 1rem !important;
+    text-align: right !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .responsive-data-table td::before,
+  .overflow-x-auto > table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    max-width: 45%;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.25rem;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .responsive-data-table td:last-child,
+  .overflow-x-auto > table td:last-child {
+    border-bottom: 0;
+  }
+
+  .responsive-data-table td[colspan],
+  .overflow-x-auto > table td[colspan] {
+    display: block;
+    text-align: center !important;
+  }
+
+  .responsive-data-table td[colspan]::before,
+  .responsive-data-table td:not([data-label])::before,
+  .responsive-data-table td[data-label=""]::before,
+  .overflow-x-auto > table td[colspan]::before,
+  .overflow-x-auto > table td:not([data-label])::before,
+  .overflow-x-auto > table td[data-label=""]::before {
+    content: none;
+  }
+
+  .responsive-data-table td[data-actions="true"],
+  .overflow-x-auto > table td[data-actions="true"] {
+    justify-content: flex-end;
+    padding-top: 1rem !important;
+  }
+
+  .responsive-data-table td[data-actions="true"]::before,
+  .overflow-x-auto > table td[data-actions="true"]::before {
+    content: none;
+  }
+
+  .responsive-data-table td > *,
+  .overflow-x-auto > table td > * {
+    min-width: 0;
+  }
+
+  .responsive-data-table button,
+  .overflow-x-auto > table button,
+  .mobile-data-actions button {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

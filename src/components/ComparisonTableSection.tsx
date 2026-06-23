@@ -102,13 +102,13 @@ const ComparisonTableSection: React.FC = () => {
 
         {/* Comparison Table */}
         <motion.div
-          className="overflow-x-auto mb-20 shadow-lg rounded-xl border border-gray-100/50"
+          className="responsive-table-shell mb-20 shadow-lg rounded-xl border border-gray-100/50"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ delay: 0.2, duration: 0.8 }}
         >
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="responsive-data-table w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">

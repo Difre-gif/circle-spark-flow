@@ -241,8 +241,8 @@ export default function PendingPayments() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm">
+          <div className="responsive-table-shell">
+            <table className="responsive-data-table w-full text-sm">
               <thead>
                 <tr className="bg-[#1E3A8A] text-white font-semibold">
                   <th className="text-left px-6 py-4 font-semibold text-sm">{t('legacy.tenant')}</th>
@@ -255,13 +255,13 @@ export default function PendingPayments() {
               <tbody className="[&_tr:nth-child(even)]:bg-[#F8FAFC] [&_tr:nth-child(odd)]:bg-white">
                 {filteredHistory.map(p => (
                   <tr key={p.id} className="border-b border-[#E2E8F0] cursor-pointer hover:bg-[#EFF6FF] transition-colors" onClick={() => navigate(`/landlord/payments/${p.id}`)}>
-                    <td className="px-6 py-4 font-semibold text-[#0F172A]">{(p.tenant as any)?.full_name ?? '—'}</td>
-                    <td className="px-6 py-4 font-semibold text-[#0F172A] text-right font-mono">{formatRWF(p.amount)}</td>
-                    <td className="px-6 py-4">
+                    <td data-label={t('legacy.tenant')} className="px-6 py-4 font-semibold text-[#0F172A] dark:text-white">{(p.tenant as any)?.full_name ?? '—'}</td>
+                    <td data-label={t('legacy.amount')} className="px-6 py-4 font-semibold text-[#0F172A] dark:text-white text-right font-mono">{formatRWF(p.amount)}</td>
+                    <td data-label={t('legacy.transactionId')} className="px-6 py-4">
                       <code className="text-xs font-mono bg-[#F8FAFC] px-2 py-1 rounded border border-[#E2E8F0] text-[#1E3A8A]">{p.transaction_id ?? '—'}</code>
                     </td>
-                    <td className="px-6 py-4 text-center"><StatusBadge status={p.status} /></td>
-                    <td className="px-6 py-4 text-muted-foreground font-medium text-xs">{formatDate(p.submitted_at)}</td>
+                    <td data-label={t('legacy.status')} className="px-6 py-4 text-center"><StatusBadge status={p.status} /></td>
+                    <td data-label={t('legacy.date')} className="px-6 py-4 text-muted-foreground font-medium text-xs">{formatDate(p.submitted_at)}</td>
                   </tr>
                 ))}
                 {filteredHistory.length === 0 && (

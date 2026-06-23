@@ -73,8 +73,8 @@ export default function Invoices() {
           />
         </div>
         
-        <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full sm:w-auto overflow-x-auto">
-          <TabsList className="h-11 bg-muted/50 rounded-full p-1 border border-border/40 w-max sm:w-auto flex-nowrap">
+        <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full sm:w-auto">
+          <TabsList className="h-auto min-h-11 bg-muted/50 rounded-full p-1 border border-border/40 w-full sm:w-auto flex flex-wrap justify-start">
             <TabsTrigger value="ALL" className="rounded-full px-4 text-xs font-bold data-[state=active]:bg-card data-[state=active]:text-bizrent-navy dark:text-white data-[state=active]:shadow-sm">
               {t('legacy.all')}
             </TabsTrigger>
@@ -99,8 +99,8 @@ export default function Invoices() {
 
       <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm">
+          <div className="responsive-table-shell">
+            <table className="responsive-data-table w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
                   <th className="text-left px-6 py-4 whitespace-nowrap">{t('legacy.invoiceNumber')}</th>
@@ -134,18 +134,18 @@ export default function Invoices() {
               <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
                 {filtered.map(inv => (
                   <tr key={inv.id} className="cursor-pointer transition-colors hover:bg-card border-b border-border/20" onClick={() => navigate(`/landlord/invoices/${inv.id}`)}>
-                    <td className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">
+                    <td data-label={t('legacy.invoiceNumber')} className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-bizrent-blue/70" />
                         {inv.invoice_number}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">{(inv.tenant as any)?.full_name ?? '—'}</td>
-                    <td className="px-6 py-4 text-muted-foreground font-medium">{(inv.unit as any)?.unit_number ?? '—'}</td>
-                    <td className="px-6 py-4 text-right font-medium text-muted-foreground font-mono">{formatRWF(inv.amount_due)}</td>
-                    <td className="px-6 py-4 text-right font-extrabold text-bizrent-navy dark:text-white font-mono">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</td>
-                    <td className="px-6 py-4 text-center"><StatusBadge status={inv.status} /></td>
-                    <td className="px-6 py-4 text-xs font-semibold text-muted-foreground">{formatDate(inv.due_date)}</td>
+                    <td data-label={t('legacy.tenant')} className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">{(inv.tenant as any)?.full_name ?? '—'}</td>
+                    <td data-label={t('legacy.unit')} className="px-6 py-4 text-muted-foreground font-medium">{(inv.unit as any)?.unit_number ?? '—'}</td>
+                    <td data-label="Amount" className="px-6 py-4 text-right font-medium text-muted-foreground font-mono">{formatRWF(inv.amount_due)}</td>
+                    <td data-label={t('legacy.outstandingBalance')} className="px-6 py-4 text-right font-extrabold text-bizrent-navy dark:text-white font-mono">{formatRWF(Number(inv.balance ?? (inv.amount_due - inv.amount_paid)))}</td>
+                    <td data-label={t('legacy.status')} className="px-6 py-4 text-center"><StatusBadge status={inv.status} /></td>
+                    <td data-label="Due Date" className="px-6 py-4 text-xs font-semibold text-muted-foreground">{formatDate(inv.due_date)}</td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (

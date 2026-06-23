@@ -77,10 +77,10 @@ export default function TenantDashboard() {
             <TableBody>
               {(payments ?? []).slice(0, 5).map(p => (
                 <TableRow key={p.id} className="transition-colors hover:bg-muted/50">
-                  <TableCell className="font-mono text-sm text-bizrent-slate">{p.transaction_id ?? '—'}</TableCell>
-                  <TableCell className="font-mono font-bold text-bizrent-navy dark:text-white">{formatRWF(p.amount)}</TableCell>
-                  <TableCell><StatusBadge status={p.status} /></TableCell>
-                  <TableCell className="text-sm text-muted-foreground font-medium">{formatDate(p.submitted_at)}</TableCell>
+                  <TableCell data-label={t('legacy.transactionId')} className="font-mono text-sm text-bizrent-slate">{p.transaction_id ?? '—'}</TableCell>
+                  <TableCell data-label={t('legacy.amount')} className="font-mono font-bold text-bizrent-navy dark:text-white">{formatRWF(p.amount)}</TableCell>
+                  <TableCell data-label={t('legacy.status')}><StatusBadge status={p.status} /></TableCell>
+                  <TableCell data-label={t('legacy.date')} className="text-sm text-muted-foreground font-medium">{formatDate(p.submitted_at)}</TableCell>
                 </TableRow>
               ))}
               {(!payments || payments.length === 0) && (

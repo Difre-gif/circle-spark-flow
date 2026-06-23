@@ -49,8 +49,8 @@ export default function AuditLogs() {
 
       <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm">
+          <div className="responsive-table-shell">
+            <table className="responsive-data-table w-full text-sm">
               <thead>
                 <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
                   <th className="text-left px-8 py-4">{t('legacy.eventType')}</th>
@@ -63,7 +63,7 @@ export default function AuditLogs() {
               <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
                 {filtered.map(l => (
                   <tr key={l.id} className="transition-all hover:bg-card border-b border-border/10 group">
-                    <td className="px-8 py-5">
+                    <td data-label={t('legacy.eventType')} className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-bizrent-navy/5 rounded-lg text-bizrent-navy dark:text-white border border-bizrent-navy/10">
                           <History className="h-4 w-4" />
@@ -73,7 +73,7 @@ export default function AuditLogs() {
                         </Badge>
                       </div>
                     </td>
-                    <td className="px-4 py-5">
+                    <td data-label={t('legacy.actor')} className="px-4 py-5">
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
                           <User className="h-3 w-3 text-muted-foreground" />
@@ -81,15 +81,15 @@ export default function AuditLogs() {
                         <span className="font-extrabold text-bizrent-navy dark:text-white">{(l.actor as any)?.full_name ?? 'System'}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-5 text-muted-foreground font-semibold text-xs tracking-wide">
+                    <td data-label={t('legacy.targetType')} className="px-4 py-5 text-muted-foreground font-semibold text-xs tracking-wide">
                       {l.target_type}
                     </td>
-                    <td className="px-4 py-5">
+                    <td data-label={t('legacy.targetId')} className="px-4 py-5">
                       <code className="text-xxs bg-muted px-2 py-1 rounded font-mono text-bizrent-slate">
                         {(l.target_id as string)?.substring(0, 8)}...
                       </code>
                     </td>
-                    <td className="px-8 py-5 text-right font-bold text-muted-foreground text-xs font-mono">
+                    <td data-label={t('legacy.timestamp')} className="px-8 py-5 text-right font-bold text-muted-foreground text-xs font-mono">
                       {new Date(l.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                     </td>
                   </tr>

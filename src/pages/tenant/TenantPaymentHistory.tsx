@@ -23,12 +23,12 @@ export default function TenantPaymentHistory() {
             <TableBody>
               {(payments ?? []).map(p => (
                 <TableRow key={p.id}>
-                  <TableCell className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
-                  <TableCell>{(p.invoice as any)?.invoice_number ?? '—'}</TableCell>
-                  <TableCell className="font-mono font-bold text-bizrent-navy dark:text-white">{formatRWF(p.amount)}</TableCell>
-                  <TableCell>{p.payment_method?.replace('_', ' ')}</TableCell>
-                  <TableCell><StatusBadge status={p.status} /></TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDate(p.submitted_at)}</TableCell>
+                  <TableCell data-label={t('legacy.transactionId')} className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
+                  <TableCell data-label={t('legacy.invoice')}>{(p.invoice as any)?.invoice_number ?? '—'}</TableCell>
+                  <TableCell data-label={t('legacy.amount')} className="font-mono font-bold text-bizrent-navy dark:text-white">{formatRWF(p.amount)}</TableCell>
+                  <TableCell data-label={t('legacy.method')}>{p.payment_method?.replace('_', ' ')}</TableCell>
+                  <TableCell data-label={t('legacy.status')}><StatusBadge status={p.status} /></TableCell>
+                  <TableCell data-label={t('legacy.date')} className="text-sm text-muted-foreground">{formatDate(p.submitted_at)}</TableCell>
                 </TableRow>
               ))}
               {(!payments || payments.length === 0) && <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t('legacy.noPaymentsYet')}</TableCell></TableRow>}

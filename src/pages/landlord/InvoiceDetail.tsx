@@ -106,10 +106,10 @@ export default function InvoiceDetail() {
                   <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">{t('legacy.noPaymentsRecordedYet')}</TableCell></TableRow>
                 ) : payments.map(p => (
                   <TableRow key={p.id}>
-                    <TableCell className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
-                    <TableCell className="font-mono">{formatRWF(p.amount)}</TableCell>
-                    <TableCell><StatusBadge status={p.status} /></TableCell>
-                    <TableCell className="text-sm">{formatDate(p.submitted_at)}</TableCell>
+                    <TableCell data-label={t('legacy.transactionId')} className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
+                    <TableCell data-label={t('legacy.amount')} className="font-mono">{formatRWF(p.amount)}</TableCell>
+                    <TableCell data-label={t('legacy.status')}><StatusBadge status={p.status} /></TableCell>
+                    <TableCell data-label={t('legacy.date')} className="text-sm">{formatDate(p.submitted_at)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

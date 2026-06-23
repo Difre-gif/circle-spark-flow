@@ -72,7 +72,15 @@ export default function LandlordDashboard() {
     if (vacantUnits > 0) {
       // Assuming average rent is 150,000 for calculation if we don't have exact numbers
       const estLoss = vacantUnits * 150000;
-      return <span className="flex items-center gap-1.5"><Activity className="h-4 w-4 text-bizrent-red" /> {t('legacy.youHave')} <strong className="text-bizrent-navy dark:text-white">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong> losing approx {formatRWF(estLoss)}/month. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/units')}>List them now &rarr;</button></span>;
+      return (
+        <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
+          <Activity className="h-4 w-4 shrink-0 text-bizrent-red" />
+          <span>{t('legacy.youHave')}</span>
+          <strong className="text-bizrent-navy dark:text-white">{vacantUnits} vacant unit{vacantUnits > 1 ? 's' : ''}</strong>
+          <span>losing approx {formatRWF(estLoss)}/month.</span>
+          <button className="min-h-[32px] rounded text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/units')}>List them now &rarr;</button>
+        </span>
+      );
     }
     if (invCount > 0) {
       return <span className="flex items-center gap-1.5"><Send className="h-4 w-4 text-bizrent-amber" /> {invCount} tenant{invCount > 1 ? 's' : ''} invited, awaiting sign-up. <button className="text-bizrent-blue hover:underline font-medium" onClick={() => navigate('/landlord/tenants')}>Review invites &rarr;</button></span>;
@@ -174,10 +182,10 @@ export default function LandlordDashboard() {
           
           {/* Outstanding Balance Widget */}
           <Card className="rounded-3xl border-0 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card overflow-hidden">
-            <CardContent className="p-6 sm:p-8">
-              <div className="flex justify-between items-start mb-4">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('legacy.totalOutstandingRent')}</p>
-                <div className="bg-muted/50 px-3 py-1 rounded-full text-xs font-bold text-bizrent-navy dark:text-white flex items-center gap-1.5">
+            <CardContent className="min-w-0 p-6 sm:p-8">
+              <div className="mb-4 flex min-w-0 items-start justify-between gap-3">
+                <p className="min-w-0 text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('legacy.totalOutstandingRent')}</p>
+                <div className="shrink-0 bg-muted/50 px-3 py-1 rounded-full text-xs font-bold text-bizrent-navy dark:text-white flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-bizrent-red"></span> {t('legacy.rwf')}
                 </div>
               </div>
@@ -185,7 +193,7 @@ export default function LandlordDashboard() {
               {statsLoading ? (
                 <Skeleton className="h-12 w-48 mb-2" />
               ) : (
-                <h2 className="text-4xl font-extrabold text-bizrent-navy dark:text-white tracking-tight font-mono">
+                <h2 className="max-w-full break-words text-3xl sm:text-4xl font-extrabold text-bizrent-navy dark:text-white tracking-tight font-mono">
                   {formatRWF(stats?.outstanding ?? 0)}
                 </h2>
               )}
@@ -209,21 +217,27 @@ export default function LandlordDashboard() {
                 </p>
               ) : null}
               
-              <div className="flex flex-col gap-3 mt-8">
-                <Button 
-                  className="w-full rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold h-12 shadow-sm disabled:opacity-50"
-                  onClick={() => setReminderOpen(true)}
-                  disabled={!hasOverdueInvoices}
-                  title={!hasOverdueInvoices ? "No overdue invoices to remind" : undefined}
-                >
-                  <Send className="mr-2 h-4 w-4" /> {t('legacy.sendReminders')}
-                </Button>
+              <div className="mt-8 flex min-w-0 flex-col gap-3">
+                {hasOverdueInvoices ? (
+                  <Button
+                    className="w-full min-w-0 rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-semibold min-h-[44px] shadow-sm"
+                    onClick={() => setReminderOpen(true)}
+                  >
+                    <Send className="mr-2 h-4 w-4 shrink-0" />
+                    <span className="truncate">{t('legacy.sendReminders')}</span>
+                  </Button>
+                ) : (
+                  <div className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-border/60 bg-muted/30 px-4 text-center text-sm font-semibold text-muted-foreground">
+                    {t('legacy.zeroOverdueInvoices')}
+                  </div>
+                )}
                 <Button 
                   variant="outline" 
-                  className="w-full rounded-xl border-border/60 hover:bg-muted font-semibold h-12"
+                  className="w-full min-w-0 rounded-xl border-border/60 hover:bg-muted font-semibold min-h-[44px]"
                   onClick={() => navigate('/landlord/payments')}
                 >
-                  <ArrowRightLeft className="mr-2 h-4 w-4" /> {t('legacy.collectRent')}
+                  <ArrowRightLeft className="mr-2 h-4 w-4 shrink-0" />
+                  <span className="truncate">{t('legacy.collectRent')}</span>
                 </Button>
               </div>
             </CardContent>
@@ -451,8 +465,8 @@ export default function LandlordDashboard() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-sm">
+              <div className="responsive-table-shell">
+                <table className="responsive-data-table w-full text-sm">
                   <thead>
                     <tr className="bg-muted/20 text-muted-foreground font-semibold border-b border-border/40">
                       <th scope="col" className="text-left px-8 py-4 whitespace-nowrap min-w-[150px]">{t('legacy.transactionId')}</th>
@@ -477,21 +491,21 @@ export default function LandlordDashboard() {
                       <>
                         {(recentPayments ?? []).slice(0, 6).map((p, idx) => (
                           <tr key={p.id} className="border-b border-border/20 hover:bg-card transition-colors group">
-                            <td className="px-8 py-4">
+                            <td data-label={t('legacy.transactionId')} className="px-8 py-4">
                               <code className="font-mono text-xs font-bold bg-muted/50 px-2 py-1 rounded-md text-bizrent-navy dark:text-white group-hover:bg-card transition-colors">
                                 {p.transaction_id || `TXN_${idx}00${idx}`}
                               </code>
                             </td>
-                            <td className="px-4 py-4 font-bold text-bizrent-navy dark:text-white whitespace-nowrap">
+                            <td data-label={t('legacy.tenant')} className="px-4 py-4 font-bold text-bizrent-navy dark:text-white whitespace-nowrap">
                               {(p.tenant as any)?.full_name ?? '—'}
                             </td>
-                            <td className="px-4 py-4 font-semibold text-bizrent-slate whitespace-nowrap text-right font-mono">
+                            <td data-label={t('legacy.amount')} className="px-4 py-4 font-semibold text-bizrent-slate whitespace-nowrap text-right font-mono">
                               {formatRWF(p.amount)}
                             </td>
-                            <td className="px-4 py-4 text-center">
+                            <td data-label={t('legacy.status')} className="px-4 py-4 text-center">
                               <StatusBadge status={p.status} />
                             </td>
-                            <td className="px-8 py-4 text-muted-foreground font-medium whitespace-nowrap text-xs">
+                            <td data-label={t('legacy.date')} className="px-8 py-4 text-muted-foreground font-medium whitespace-nowrap text-xs">
                               {formatDate(p.submitted_at)}
                             </td>
                           </tr>

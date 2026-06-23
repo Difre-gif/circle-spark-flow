@@ -188,8 +188,8 @@ export default function PropertyControl() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-sm">
+              <div className="responsive-table-shell">
+                <table className="responsive-data-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">{t('legacy.property')}</th>
@@ -267,8 +267,8 @@ export default function PropertyControl() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-sm">
+              <div className="responsive-table-shell">
+                <table className="responsive-data-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-slate-700 text-muted-foreground text-xs uppercase tracking-wider">
                       <th className="text-left px-6 py-3">{t('legacy.unit')}</th>

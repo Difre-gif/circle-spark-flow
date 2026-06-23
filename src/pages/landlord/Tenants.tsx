@@ -95,8 +95,8 @@ export default function Tenants() {
 
           <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-sm">
+              <div className="responsive-table-shell">
+                <table className="responsive-data-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
                       <th className="text-left px-8 py-4 whitespace-nowrap">{t('legacy.name')}</th>
@@ -110,7 +110,7 @@ export default function Tenants() {
                       const user = tenant.user as any;
                       return (
                         <tr key={tenant.user_id} className="transition-all hover:bg-card border-b border-border/10 group">
-                          <td className="px-8 py-5">
+                          <td data-label={t('legacy.name')} className="px-8 py-5">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-xl bg-bizrent-blue/10 text-bizrent-blue flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-all">
                                 {user?.full_name?.charAt(0) || 'U'}
@@ -118,14 +118,14 @@ export default function Tenants() {
                               <span className="font-extrabold text-bizrent-navy dark:text-white">{user?.full_name ?? '—'}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-5">
+                          <td data-label={t('legacy.contactInfo')} className="px-4 py-5">
                             <div className="flex flex-col">
                               <span className="text-muted-foreground font-semibold text-xs">{user?.email ?? '—'}</span>
                               <span className="text-xs font-bold text-bizrent-slate">{user?.phone ?? '—'}</span>
                             </div>
                           </td>
-                          <td className="px-8 py-5 text-muted-foreground text-xs font-bold">{formatDate(tenant.created_at)}</td>
-                          <td className="px-8 py-5 text-right">
+                          <td data-label={t('legacy.joinedDate')} className="px-8 py-5 text-muted-foreground text-xs font-bold">{formatDate(tenant.created_at)}</td>
+                          <td data-actions="true" className="px-8 py-5 text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity">

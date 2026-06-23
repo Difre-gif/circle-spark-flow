@@ -158,7 +158,7 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="organisation" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-muted/80 p-1 rounded-xl h-auto mb-6 inline-flex overflow-x-auto max-w-full no-scrollbar">
+        <TabsList className="bg-muted/80 p-1 rounded-xl h-auto mb-6 flex max-w-full flex-wrap justify-start">
           <TabsTrigger value="organisation" className="rounded-lg text-sm font-bold px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:text-bizrent-navy dark:text-white data-[state=active]:shadow-sm">{t('legacy.organisation')}</TabsTrigger>
           <TabsTrigger value="team" className="rounded-lg text-sm font-bold px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:text-bizrent-navy dark:text-white data-[state=active]:shadow-sm">{t('legacy.team')}</TabsTrigger>
           <TabsTrigger value="policies" className="rounded-lg text-sm font-bold px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:text-bizrent-navy dark:text-white data-[state=active]:shadow-sm">{t('legacy.policies')}</TabsTrigger>
@@ -265,8 +265,8 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="p-0">
               <InviteStaffModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[600px] text-sm">
+              <div className="responsive-table-shell">
+                <table className="responsive-data-table w-full text-sm">
                   <thead>
                     <tr className="bg-muted/40 text-muted-foreground border-b border-border/40">
                       <th scope="col" className="text-left px-6 py-3 text-[11px] font-bold uppercase tracking-wider">{t('legacy.name')}</th>
@@ -278,10 +278,10 @@ export default function Settings() {
                   <tbody className="[&_tr:nth-child(even)]:bg-bizrent-light">
                     {(teamMembers ?? []).map(m => (
                       <tr key={m.id} className="transition-colors hover:bg-muted/40 border-b border-border/20">
-                        <td className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">{(m.user as any)?.full_name ?? '—'}</td>
-                        <td className="px-6 py-4 text-muted-foreground text-sm font-medium">{(m.user as any)?.email ?? '—'}</td>
-                        <td className="px-6 py-4"><StatusBadge status={m.role} /></td>
-                        <td className="px-6 py-4 text-muted-foreground text-[12px] font-semibold">{formatDate(m.created_at)}</td>
+                        <td data-label={t('legacy.name')} className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">{(m.user as any)?.full_name ?? '—'}</td>
+                        <td data-label={t('legacy.email')} className="px-6 py-4 text-muted-foreground text-sm font-medium">{(m.user as any)?.email ?? '—'}</td>
+                        <td data-label={t('legacy.role')} className="px-6 py-4"><StatusBadge status={m.role} /></td>
+                        <td data-label={t('legacy.joined')} className="px-6 py-4 text-muted-foreground text-[12px] font-semibold">{formatDate(m.created_at)}</td>
                       </tr>
                     ))}
                     {(!teamMembers || teamMembers.length === 0) && (

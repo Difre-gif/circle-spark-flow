@@ -25,10 +25,10 @@ export default function TenantReceipts() {
             <TableBody>
               {(receipts ?? []).map(r => (
                 <TableRow key={r.id}>
-                  <TableCell className="font-extrabold text-bizrent-navy dark:text-white font-mono">BR-2026-{r.receipt_number.split("-").pop()}</TableCell>
-                  <TableCell>{(r.invoice as any)?.invoice_number ?? '—'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDate(r.generated_at)}</TableCell>
-                  <TableCell>
+                  <TableCell data-label={t('legacy.receiptNumber')} className="font-extrabold text-bizrent-navy dark:text-white font-mono">BR-2026-{r.receipt_number.split("-").pop()}</TableCell>
+                  <TableCell data-label={t('legacy.invoice')}>{(r.invoice as any)?.invoice_number ?? '—'}</TableCell>
+                  <TableCell data-label={t('legacy.date')} className="text-sm text-muted-foreground">{formatDate(r.generated_at)}</TableCell>
+                  <TableCell data-actions="true">
                     <Button size="sm" variant="outline" onClick={() => downloadReceiptPdf(r as any, organisation?.name)}>
                       <Download className="mr-1 h-3 w-3" /> {t('legacy.pdf')}
                     </Button>

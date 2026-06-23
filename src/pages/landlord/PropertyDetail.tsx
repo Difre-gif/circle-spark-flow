@@ -120,7 +120,7 @@ export default function PropertyDetail() {
             <CardTitle className="text-lg font-bold text-bizrent-navy dark:text-white">{t('legacy.units')}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
+            <div className="responsive-table-shell">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/40 hover:bg-card border-b border-border/40">
@@ -133,15 +133,15 @@ export default function PropertyDetail() {
                 <TableBody>
                   {(units ?? []).map(u => (
                     <TableRow key={u.id} className="border-b border-border/20 transition-colors hover:bg-muted/20">
-                      <TableCell className="px-8 py-4">
+                      <TableCell data-label={t('legacy.unit')} className="px-8 py-4">
                         <div className="font-bold text-bizrent-navy dark:text-white">{u.unit_number}</div>
                         {u.floor && <div className="text-xxs font-semibold text-muted-foreground">Floor {u.floor}</div>}
                       </TableCell>
-                      <TableCell className="font-medium text-muted-foreground text-xs">{u.unit_type}</TableCell>
-                      <TableCell>
+                      <TableCell data-label={t('legacy.type')} className="font-medium text-muted-foreground text-xs">{u.unit_type}</TableCell>
+                      <TableCell data-label={t('legacy.monthlyRent')}>
                         <InlineRentEdit unit={u} updateUnit={updateUnit} />
                       </TableCell>
-                      <TableCell className="px-8 py-4 text-right"><StatusBadge status={u.status} /></TableCell>
+                      <TableCell data-label={t('legacy.status')} className="px-8 py-4 text-right"><StatusBadge status={u.status} /></TableCell>
                     </TableRow>
                   ))}
                   {(!units || units.length === 0) && (

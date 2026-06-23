@@ -98,8 +98,8 @@ export default function Units() {
 
       <Card className="overflow-hidden border-0 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm">
+          <div className="responsive-table-shell">
+            <table className="responsive-data-table w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40 bg-muted/20 text-muted-foreground font-semibold">
                   <th className="text-left px-6 py-4 whitespace-nowrap">Unit #</th>
@@ -113,7 +113,7 @@ export default function Units() {
               <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
                 {filtered.map(u => (
                   <tr key={u.id} className="transition-colors hover:bg-card border-b border-border/20">
-                    <td className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">
+                    <td data-label="Unit #" className="px-6 py-4 font-bold text-bizrent-navy dark:text-white">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-bizrent-blue/10 rounded-md">
                           <Home className="h-4 w-4 text-bizrent-blue" />
@@ -121,11 +121,11 @@ export default function Units() {
                         {u.unit_number}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-medium text-muted-foreground">{(u as any).properties?.name ?? '—'}</td>
-                    <td className="px-6 py-4 text-muted-foreground capitalize">{u.unit_type.toLowerCase()}</td>
-                    <td className="px-6 py-4 font-semibold text-bizrent-slate font-mono font-bold text-right">{formatRWF(u.monthly_rent)}</td>
-                    <td className="px-6 py-4 text-center"><StatusBadge status={u.status} /></td>
-                    <td className="px-6 py-4 text-right">
+                    <td data-label={t('legacy.property')} className="px-6 py-4 font-medium text-muted-foreground">{(u as any).properties?.name ?? '—'}</td>
+                    <td data-label={t('legacy.type')} className="px-6 py-4 text-muted-foreground capitalize">{u.unit_type.toLowerCase()}</td>
+                    <td data-label={t('legacy.monthlyRent')} className="px-6 py-4 font-semibold text-bizrent-slate font-mono font-bold text-right">{formatRWF(u.monthly_rent)}</td>
+                    <td data-label={t('legacy.status')} className="px-6 py-4 text-center"><StatusBadge status={u.status} /></td>
+                    <td data-actions="true" className="px-6 py-4 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">

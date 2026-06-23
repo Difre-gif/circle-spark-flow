@@ -83,17 +83,17 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
             <Mail className="h-6 w-6 text-bizrent-blue" />
           </div>
           <DialogTitle className="text-2xl font-extrabold text-bizrent-navy dark:text-white tracking-tight">
-            {t('legacy.inviteTenant')}
+            Invite a tenant
           </DialogTitle>
           <DialogDescription className="text-muted-foreground font-medium leading-relaxed">
-            {t('legacy.recordAnEmailInvitationTheSystemWillAutomaticallyLinkThemToYourOrganis')}
+            Send an invite and, if you already know their unit, set up their rent details now.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-4 sm:px-8 custom-scrollbar">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-bold text-bizrent-navy dark:text-white ml-1">{t('legacy.emailAddress')} <span className="text-red-500">*</span></Label>
+            <Label htmlFor="email" className="text-sm font-bold text-bizrent-navy dark:text-white ml-1">Tenant email <span className="text-red-500">*</span></Label>
             <Input
               id="email"
               type="email"
@@ -107,7 +107,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
 
           <div className="space-y-2">
             <Label htmlFor="unit" className="text-sm font-bold text-bizrent-navy dark:text-white ml-1 flex items-center gap-1.5">
-              <Home className="h-3.5 w-3.5" /> {t('legacy.assignToUnitOptional')}
+              <Home className="h-3.5 w-3.5" /> Choose their unit
             </Label>
             <Select value={unitId} onValueChange={value => {
               setUnitId(value);
@@ -118,7 +118,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
                 <SelectValue placeholder="Select a vacant unit" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-border/40 shadow-2xl bg-card/95 backdrop-blur-sm">
-                <SelectItem value="none" className="font-semibold text-bizrent-navy dark:text-white">{t('legacy.stayUnassigned')}</SelectItem>
+                <SelectItem value="none" className="font-semibold text-bizrent-navy dark:text-white">I will assign a unit later</SelectItem>
                 {vacantUnits.map((u) => (
                   <SelectItem key={u.id} value={u.id} className="font-medium py-2.5">
                     Unit {u.unit_number} — { (u as any).properties?.name || 'Property'}
@@ -132,46 +132,55 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
           </div>
 
           {unitId !== 'none' && (
-            <div className="space-y-4 rounded-2xl border border-bizrent-blue/10 bg-bizrent-blue/5 p-4">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-5 rounded-2xl border border-bizrent-blue/10 bg-bizrent-blue/5 p-4">
+              <div>
+                <p className="text-sm font-extrabold text-bizrent-navy dark:text-white">Rent setup for this unit</p>
+                <p className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground">
+                  These details help BizRent create invoices automatically. You can leave reminder timing blank to use your workspace defaults.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.moveInDate')}</Label>
+                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">Rent starts on</Label>
                   <Input type="date" value={startDate} onChange={e => {
                     setStartDate(e.target.value);
                     if (e.target.value) setAnchorDay(new Date(`${e.target.value}T12:00:00`).getDate());
                   }} />
+                  <p className="text-xxs text-muted-foreground">The first day this tenant should be billed.</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.cycleStartsDay')}</Label>
+                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">Monthly billing day</Label>
                   <Input type="number" min="1" max="31" value={anchorDay} onChange={e => setAnchorDay(Number(e.target.value))} />
+                  <p className="text-xxs text-muted-foreground">Example: 23 means rent is billed on the 23rd each month.</p>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.invoiceSendTiming')}</Label>
-                <div className="flex items-center gap-3">
-                  <Input type="number" min="0" max="30" placeholder={t('legacy.useWorkspaceDefault')} value={invoiceLeadDays} onChange={e => setInvoiceLeadDays(e.target.value === '' ? '' : Number(e.target.value))} />
-                  <span className="text-xs font-medium text-muted-foreground">{t('legacy.daysBeforeDueDate')}</span>
+                <Label className="text-xs font-bold text-bizrent-navy dark:text-white">Send invoice before rent is due</Label>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                  <Input type="number" min="0" max="30" placeholder="Use default" value={invoiceLeadDays} onChange={e => setInvoiceLeadDays(e.target.value === '' ? '' : Number(e.target.value))} />
+                  <span className="text-xs font-medium text-muted-foreground">days before</span>
                 </div>
-                <p className="text-xxs text-muted-foreground">{t('legacy.leaveBlankToUseWorkspaceDefaultInvoiceTiming')}</p>
+                <p className="text-xxs text-muted-foreground">Leave empty unless this tenant needs a different invoice schedule.</p>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.sendAt')}</Label>
+                <Label className="text-xs font-bold text-bizrent-navy dark:text-white">Invoice send time</Label>
                 <Input type="time" value={invoiceSendTime} onChange={e => setInvoiceSendTime(e.target.value)} />
-                <p className="text-xxs text-muted-foreground">{t('legacy.leaveBlankToUseWorkspaceDefaultSendTime')}</p>
+                <p className="text-xxs text-muted-foreground">Optional. Leave empty to use the normal workspace time.</p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.monthlyRent')}</Label>
                   <Input type="number" value={rent} onChange={e => setRent(e.target.value === '' ? '' : Number(e.target.value))} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">{t('legacy.deposit')}</Label>
+                  <Label className="text-xs font-bold text-bizrent-navy dark:text-white">Security deposit</Label>
                   <Input type="number" value={deposit} onChange={e => setDeposit(e.target.value === '' ? '' : Number(e.target.value))} />
                 </div>
               </div>
               {cyclePreview && (
                 <p className="text-xs font-semibold text-bizrent-navy dark:text-white">
-                  {t('legacy.firstMonthlyCycle', { label: cyclePreview.label })}
+                  First bill covers: {cyclePreview.label}
                 </p>
               )}
             </div>
@@ -194,7 +203,7 @@ export function InviteTenantDialog({ open, onOpenChange }: InviteTenantDialogPro
               className="flex-1 rounded-xl bg-bizrent-navy hover:bg-bizrent-navy/90 text-white font-bold h-12 shadow-md shadow-bizrent-navy/10"
             >
               {inviteTenant.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-              {inviteTenant.isPending ? 'Processing' : 'Invite User'}
+              {inviteTenant.isPending ? 'Sending...' : 'Send Invite'}
             </Button>
           </DialogFooter>
         </form>

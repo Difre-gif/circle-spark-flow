@@ -110,8 +110,8 @@ export default function Receipts() {
 
       <Card className="overflow-hidden border-0 rounded-3xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] bg-card">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm">
+          <div className="responsive-table-shell">
+            <table className="responsive-data-table w-full text-sm">
               <thead>
                 <tr className="border-b border-border/20 bg-muted/20 text-muted-foreground font-bold uppercase text-xxs tracking-widest">
                   <th className="text-left px-8 py-4 whitespace-nowrap">{t('legacy.receiptNumber')}</th>
@@ -126,7 +126,7 @@ export default function Receipts() {
               <tbody className="[&_tr:nth-child(even)]:bg-muted/40">
                 {filtered.map(r => (
                   <tr key={r.id} className="transition-all hover:bg-card border-b border-border/10 group">
-                    <td className="px-8 py-5">
+                    <td data-label={t('legacy.receiptNumber')} className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-bizrent-emerald/10 rounded-lg group-hover:scale-110 transition-transform">
                           <FileCheck className="h-4 w-4 text-bizrent-emerald" />
@@ -134,22 +134,22 @@ export default function Receipts() {
                         <span className="font-extrabold text-bizrent-navy dark:text-white">BR-2026-{r.receipt_number.split("-").pop()}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-5 font-bold text-bizrent-blue">
+                    <td data-label={t('legacy.linkedInvoice')} className="px-4 py-5 font-bold text-bizrent-blue">
                       {(r.invoice as any)?.invoice_number ?? '—'}
                     </td>
-                    <td className="px-4 py-5 font-semibold text-bizrent-navy dark:text-white">
+                    <td data-label={t('legacy.tenant')} className="px-4 py-5 font-semibold text-bizrent-navy dark:text-white">
                       {(r.tenant as any)?.full_name ?? '—'}
                     </td>
-                    <td className="px-4 py-5 text-right font-extrabold text-bizrent-navy dark:text-white font-mono">
+                    <td data-label={t('legacy.amount')} className="px-4 py-5 text-right font-extrabold text-bizrent-navy dark:text-white font-mono">
                       {formatRWF((r.payment as any)?.amount ?? 0)}
                     </td>
-                    <td className="px-4 py-5 text-center">
+                    <td data-label={t('legacy.status')} className="px-4 py-5 text-center">
                       <StatusBadge status="PAID" />
                     </td>
-                    <td className="px-8 py-5 text-right text-muted-foreground text-xs font-bold whitespace-nowrap">
+                    <td data-label={t('legacy.generatedAt')} className="px-8 py-5 text-right text-muted-foreground text-xs font-bold whitespace-nowrap">
                       {formatDate(r.generated_at)}
                     </td>
-                    <td className="px-8 py-5 text-right">
+                    <td data-actions="true" className="px-8 py-5 text-right">
                       <Button
                         variant="ghost"
                         size="icon"
