@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatusBadge } from '@/components/StatusBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePayments, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { formatPaymentMethod } from '@/lib/paymentMethods';
 
 export default function TenantPaymentHistory() {
   const { t } = useTranslation();
@@ -26,7 +27,7 @@ export default function TenantPaymentHistory() {
                   <TableCell data-label={t('legacy.transactionId')} className="font-mono text-sm">{p.transaction_id ?? '—'}</TableCell>
                   <TableCell data-label={t('legacy.invoice')}>{(p.invoice as any)?.invoice_number ?? '—'}</TableCell>
                   <TableCell data-label={t('legacy.amount')} className="font-mono font-bold text-bizrent-navy dark:text-white">{formatRWF(p.amount)}</TableCell>
-                  <TableCell data-label={t('legacy.method')}>{p.payment_method?.replace('_', ' ')}</TableCell>
+                  <TableCell data-label={t('legacy.method')}>{formatPaymentMethod(p.payment_method)}</TableCell>
                   <TableCell data-label={t('legacy.status')}><StatusBadge status={p.status} /></TableCell>
                   <TableCell data-label={t('legacy.date')} className="text-sm text-muted-foreground">{formatDate(p.submitted_at)}</TableCell>
                 </TableRow>

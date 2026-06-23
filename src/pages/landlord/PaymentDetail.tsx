@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { usePayment, useApprovePayment, useRejectPayment, formatRWF, formatDate } from '@/hooks/useSupabaseData';
 import { supabase } from '@/integrations/supabase/client';
+import { formatPaymentMethod } from '@/lib/paymentMethods';
 
 export default function PaymentDetail() {
   const { t } = useTranslation();
@@ -73,7 +74,7 @@ export default function PaymentDetail() {
             <Separator />
             <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.amount')}</span><span className="text-xl font-bold text-bizrent-navy dark:text-white font-mono">{formatRWF(payment.amount)}</span></div>
             <Separator />
-            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.method')}</span><span>{payment.payment_method?.replace('_', ' ')}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.method')}</span><span>{formatPaymentMethod(payment.payment_method)}</span></div>
             <Separator />
             <div className="flex justify-between"><span className="text-muted-foreground">{t('legacy.transactionId')}</span><span className="font-mono">{payment.transaction_id ?? '—'}</span></div>
             <Separator />

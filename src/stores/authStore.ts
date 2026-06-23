@@ -30,6 +30,7 @@ export interface AuthState {
   orgRole: string | null;
   userOrgs: any[];
   orgCurrency: string;
+  orgCountry: string;
   orgTimezone: string;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -61,6 +62,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   orgRole: null,
   userOrgs: [],
   orgCurrency: 'RWF',
+  orgCountry: 'RW',
   orgTimezone: 'Africa/Kigali',
   isAuthenticated: false,
   isLoading: true,
@@ -81,6 +83,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       orgRole: null,
       userOrgs: [],
       orgCurrency: 'RWF',
+      orgCountry: 'RW',
       orgTimezone: 'Africa/Kigali',
       isAuthenticated: false,
       isSuperAdmin: false,
@@ -136,15 +139,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       setSupabaseOrgId(currentOrgId || null);
 
       let orgCurrency = 'RWF';
+      let orgCountry = 'RW';
       let orgTimezone = 'Africa/Kigali';
 
       if (currentOrgId) {
         const { data: orgData } = await supabase
           .from('organisations')
-          .select('currency_code, timezone')
+          .select('country_code, currency_code, timezone')
           .eq('id', currentOrgId)
           .single();
         if (orgData?.currency_code) orgCurrency = orgData.currency_code;
+        if (orgData?.country_code) orgCountry = orgData.country_code;
         if (orgData?.timezone) orgTimezone = orgData.timezone;
       }
 
@@ -167,6 +172,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         orgRole: activeRole,
         userOrgs,
         orgCurrency,
+        orgCountry,
         orgTimezone,
         isSuperAdmin,
         isAuthenticated: !!get().session,

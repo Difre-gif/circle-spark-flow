@@ -10,39 +10,42 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { useInvoice, useSubmitPayment, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { useInvoice, useSubmitPayment, usePayments, formatRWF, formatDate } from '@/hooks/useSupabaseData';
+import { useAuth } from '@/contexts/AuthContext';
 import { FileUpload } from '@/components/ui/file-upload';
 import { paymentProofSchema, PaymentProofFormValues } from '@/lib/validations/payments.schema';
+import { getMobileMoneyContext } from '@/lib/paymentMethods';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-
-const PAYMENT_METHODS = [
-  {
-    value: 'MOMO',
-    label: 'MTN MoMo',
-    description: 'Pay via Mobile Money — most common',
-    icon: Smartphone,
-  },
-  {
-    value: 'BANK_TRANSFER',
-    label: 'Bank Transfer',
-    description: 'Pay via bank — attach a screenshot',
-    icon: Building2,
-  },
-];
 
 export default function TenantInvoiceDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, orgCountry, orgCurrency } = useAuth();
   const { data: invoice, isLoading } = useInvoice(id);
+  const { data: payments, isLoading: paymentsLoading } = usePayments({ tenantUserId: user?.id });
   const submitPayment = useSubmitPayment();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const mobileMoney = getMobileMoneyContext({ countryCode: orgCountry, currencyCode: orgCurrency });
+  const paymentMethods = [
+    {
+      value: mobileMoney.method,
+      label: mobileMoney.label,
+      description: mobileMoney.description,
+      icon: Smartphone,
+    },
+    {
+      value: 'BANK_TRANSFER',
+      label: 'Bank Transfer',
+      description: 'Pay via bank and attach proof',
+      icon: Building2,
+    },
+  ];
 
   const form = useForm<PaymentProofFormValues>({
     resolver: zodResolver(paymentProofSchema),
     defaultValues: {
-      payment_method: 'MOMO',
+      payment_method: mobileMoney.method,
       transaction_id: '',
       amount: 0,
       proof_file: undefined,
@@ -56,12 +59,12 @@ export default function TenantInvoiceDetail() {
     if (invoice) {
       const balance = Number(invoice.balance ?? (invoice.amount_due - invoice.amount_paid));
       form.reset({
-        payment_method: 'MOMO',
+        payment_method: mobileMoney.method,
         transaction_id: '',
         amount: balance > 0 ? balance : 0,
       });
     }
-  }, [invoice, form]);
+  }, [invoice, form, mobileMoney.method]);
 
   const onSubmit = async (data: PaymentProofFormValues) => {
     if (isSubmitting) return; // prevent double-submit
@@ -78,7 +81,7 @@ export default function TenantInvoiceDetail() {
         "Your payment has been submitted. It's waiting for your landlord to review — you'll receive a confirmation once it's approved.",
         { duration: 6000 }
       );
-      navigate(`/tenant/invoices/${id}`);
+      navigate('/tenant/payments', { replace: true });
     } catch (err: any) {
       const isIdempotency = err?.code === '23505' || err?.status === 409;
       if (isIdempotency) {
@@ -86,6 +89,7 @@ export default function TenantInvoiceDetail() {
           'This transaction ID has already been submitted. If you believe this is an error, contact your landlord.',
           { duration: 8000 }
         );
+        navigate('/tenant/payments', { replace: true });
       }
       // other errors handled by mutation
     } finally {
@@ -110,7 +114,11 @@ export default function TenantInvoiceDetail() {
   }
 
   const balance = Number(invoice.balance ?? (invoice.amount_due - invoice.amount_paid));
-  const canPay = balance > 0 && !['PAID', 'CANCELLED'].includes(invoice.status);
+  const submittedPayment = (payments ?? []).find(payment =>
+    payment.invoice_id === invoice.id &&
+    ['PENDING', 'APPROVED', 'AUTO_APPROVED'].includes(payment.status)
+  );
+  const canPay = balance > 0 && !['PAID', 'CANCELLED'].includes(invoice.status) && !paymentsLoading && !submittedPayment;
   const invoiceKind = invoice.invoice_type === 'DEPOSIT' ? 'Security Deposit' : 'Rent Invoice';
 
   return (
@@ -180,13 +188,36 @@ export default function TenantInvoiceDetail() {
         </CardContent>
       </Card>
 
+      {paymentsLoading && balance > 0 && !['PAID', 'CANCELLED'].includes(invoice.status) && (
+        <Card className="border border-[#E2E8F0] rounded-[8px] shadow-card bg-card">
+          <CardContent className="py-8 flex items-center justify-center gap-3 text-[#64748B]">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            Checking payment status...
+          </CardContent>
+        </Card>
+      )}
+
+      {submittedPayment && (
+        <Card className="border border-[#BBF7D0] bg-[#F0FDF4] rounded-[8px] shadow-card">
+          <CardContent className="p-6 space-y-3">
+            <p className="font-semibold text-[#166534]">Payment proof already submitted</p>
+            <p className="text-sm text-[#166534]/80">
+              Your {submittedPayment.payment_method === 'BANK_TRANSFER' ? 'bank transfer' : mobileMoney.label} payment is currently marked as {submittedPayment.status.toLowerCase().replace('_', ' ')}. You do not need to submit it again.
+            </p>
+            <Button className="bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white" onClick={() => navigate('/tenant/payments')}>
+              View Payment History
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Payment form */}
       {canPay && (
         <Card className="border-t-4 border-t-[#1D4ED8] border border-[#E2E8F0] rounded-[8px] shadow-card bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold text-[#1E3A8A]">{t('legacy.submitPayment')}</CardTitle>
             <p className="text-sm text-[#64748B]">
-              {t('legacy.payViaMobileMoneyThenEnterYourTransactionDetailsBelow')}
+              {mobileMoney.submitCopy}
             </p>
           </CardHeader>
           <CardContent>
@@ -197,7 +228,7 @@ export default function TenantInvoiceDetail() {
                 <div>
                   <p className="text-sm font-semibold text-[#0F172A] mb-3">{t('legacy.howDidYouPay')}</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {PAYMENT_METHODS.map(({ value, label, description, icon: Icon }) => {
+                    {paymentMethods.map(({ value, label, description, icon: Icon }) => {
                       const isSelected = selectedMethod === value;
                       return (
                         <button
@@ -236,20 +267,20 @@ export default function TenantInvoiceDetail() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-semibold text-[#0F172A]">
-                        {selectedMethod === 'MOMO' ? 'MoMo Transaction ID' : 'Bank Reference Number'}{' '}
+                        {selectedMethod === 'BANK_TRANSFER' ? 'Bank Reference Number' : mobileMoney.transactionLabel}{' '}
                         <span className="font-normal text-[#64748B]">(optional)</span>
                       </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={selectedMethod === 'MOMO' ? 'MP26...' : 'e.g. BT-123456789'}
+                          placeholder={selectedMethod === 'BANK_TRANSFER' ? 'e.g. BT-123456789' : mobileMoney.placeholder}
                           className="font-mono uppercase h-11 border-[#E2E8F0] focus-visible:ring-[#1D4ED8] text-[#0F172A]"
                           {...field}
                           onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                         />
                       </FormControl>
                       <FormDescription className="text-xs text-[#64748B]">
-                        {selectedMethod === 'MOMO'
-                          ? 'Found in your MoMo confirmation SMS (e.g. MP26040100001234). Leave blank if unsure.'
+                        {selectedMethod !== 'BANK_TRANSFER'
+                          ? mobileMoney.helpText
                           : 'Your bank transfer reference number. Leave blank if unsure.'}
                       </FormDescription>
                       <FormMessage />

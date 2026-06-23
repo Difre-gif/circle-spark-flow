@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { formatPaymentMethod } from '@/lib/paymentMethods';
 
 export default function PendingPayments() {
   const { t } = useTranslation();
@@ -146,7 +147,7 @@ export default function PendingPayments() {
                     <div>
                       <p className="font-bold text-lg text-bizrent-navy dark:text-white">{(p.tenant as any)?.full_name ?? '—'}</p>
                       <p className="text-sm font-medium text-muted-foreground mt-0.5">
-                        {(p.invoice as any)?.invoice_number ?? '—'} · {p.payment_method?.replace('_', ' ')}
+                        {(p.invoice as any)?.invoice_number ?? '—'} · {formatPaymentMethod(p.payment_method)}
                       </p>
                     </div>
                     <StatusBadge status={p.status} />
