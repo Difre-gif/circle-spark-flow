@@ -1,64 +1,73 @@
 import { Link } from 'react-router-dom';
+import { BizRentLogo } from '@/components/BizRentLogo';
 
-const LINKS = {
-  Product: ['Features', 'How it works', 'Pricing', 'Security'],
-  Company: ['About', 'Blog', 'Careers'],
-  Support: ['Help Centre', 'Contact', 'Privacy Policy', 'Terms of Service'],
-};
+const LINKS = [
+  {
+    title: 'Product',
+    items: [
+      { label: 'Features', href: '#features' },
+      { label: 'How it works', href: '#how-it-works' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+  },
+  {
+    title: 'Company',
+    items: [
+      { label: 'Results', href: '#testimonials' },
+      { label: 'Sign in', href: '/login' },
+      { label: 'Create account', href: '/register' },
+    ],
+  },
+  {
+    title: 'Markets',
+    items: [
+      { label: 'Kenya landlords', href: '#features' },
+      { label: 'Rwanda landlords', href: '#features' },
+      { label: 'Property managers', href: '#pricing' },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0F172A] border-t border-white/8 py-16">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid md:grid-cols-5 gap-12 mb-12">
-          {/* Brand */}
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-7 h-7 rounded-[5px] bg-[#10B981] flex items-center justify-center">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8.5L6.5 12L13 5" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <span className="text-base font-bold">
-                <span className="text-white">Biz</span>
-                <span className="text-[#10B981]">Rent</span>
-              </span>
-            </div>
-            <p className="text-sm text-white/40 leading-relaxed max-w-xs mb-4">
-              Stop chasing. Start collecting. Built for landlords in Rwanda and Kenya who are tired of managing rent on WhatsApp.
+    <footer className="border-t border-white/10 bg-[#08111F] py-12 text-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_2fr]">
+          <div>
+            <BizRentLogo theme="dark" size="sm" />
+            <p className="mt-5 max-w-sm text-sm leading-6 text-slate-400">
+              Rent collection software for landlords and property managers in Rwanda and Kenya.
             </p>
-            <p className="text-xs text-white/25">
-              📍 Kigali, Rwanda · Nairobi, Kenya · support@bizrent.rw
-            </p>
+            <p className="mt-4 text-xs font-semibold text-slate-500">Kigali, Rwanda - Nairobi, Kenya</p>
           </div>
 
-          {/* Link columns */}
-          {Object.entries(LINKS).map(([section, links]) => (
-            <div key={section}>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white/40 mb-4">{section}</h4>
-              <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-white/50 hover:text-white transition-colors"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="grid gap-8 sm:grid-cols-3">
+            {LINKS.map((group) => (
+              <div key={group.title}>
+                <h3 className="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-500">{group.title}</h3>
+                <ul className="mt-4 space-y-3">
+                  {group.items.map((item) => (
+                    <li key={item.label}>
+                      {item.href.startsWith('/') ? (
+                        <Link to={item.href} className="text-sm font-semibold text-slate-300 hover:text-white">
+                          {item.label}
+                        </Link>
+                      ) : (
+                        <a href={item.href} className="text-sm font-semibold text-slate-300 hover:text-white">
+                          {item.label}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 border-t border-white/8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/25">© 2026 BizRent. All rights reserved.</p>
-          <p className="text-xs text-white/20 flex items-center gap-1.5">
-            <span className="text-[#10B981]">🇷🇼</span>
-            Made in East Africa for Rwanda and Kenya
-          </p>
+        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs font-semibold text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <p>(c) 2026 BizRent. All rights reserved.</p>
+          <p>Built for East African rent collection.</p>
         </div>
       </div>
     </footer>
